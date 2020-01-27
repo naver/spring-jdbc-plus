@@ -1,0 +1,4 @@
+spring:
+  datasource:
+    schema: classpath:data/schema.sql
+    sql-script-encoding: UTF-8

@@ -1,0 +1,2 @@
+org.springframework.boot.env.EnvironmentPostProcessor=\
+  com.navercorp.spring.boot.starter.data.jdbc.plus.repository.JdbcPlusRepositoriesEnvironmentPostProcessor

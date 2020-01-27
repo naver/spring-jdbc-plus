@@ -1,0 +1,10 @@
+spring:
+  datasource:
+    hikari:
+      url: jdbc:h2:mem:test;MODE=MySQL;IGNORECASE=TRUE
+      driver-class-name: org.h2.Driver
+
+logging:
+  level:
+    org.springframework.jdbc.core: TRACE
+    org.springframework.jdbc.core.StatementCreatorUtils: TRACE

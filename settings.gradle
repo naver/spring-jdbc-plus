@@ -1,0 +1,15 @@
+rootProject.name = "spring-jdbc-plus"
+
+include "spring-jdbc-plus-support"
+include "spring-data-jdbc-plus-sql"
+include "spring-data-jdbc-plus-repository"
+include "spring-boot-autoconfigure-data-jdbc-plus"
+include "spring-boot-starter-data-jdbc-plus-sql"
+include "spring-boot-starter-data-jdbc-plus-repository"
+include "spring-data-plus-sql-gen"
+
+include "guide-projects:plus-repository-guide"
+include "guide-projects:plus-sql-java-groovy-guide"
+include "guide-projects:plus-sql-java-kotlin-guide"
+include "guide-projects:plus-sql-kotlin-guide"
+

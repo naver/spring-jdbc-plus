@@ -1,0 +1,23 @@
+{
+  "properties": [
+    {
+      "name": "spring.data.jdbc.plus.sql.enabled",
+      "type": "java.lang.Boolean",
+      "description": "Whether to enable JDBC Plus SQL.",
+      "defaultValue": true
+    },
+    {
+      "name": "spring.data.jdbc.plus.repositories.enabled",
+      "type": "java.lang.Boolean",
+      "description": "Whether to enable JDBC Plus repositories.",
+      "defaultValue": true
+    },
+    {
+      "name": "spring.data.jdbc.plus.repositories.reactive-support",
+      "type": "java.lang.Boolean",
+      "description": "Whether to enable JDBC Plus reactive support repositories.",
+      "defaultValue": false
+    }
+  ]
+}
+
