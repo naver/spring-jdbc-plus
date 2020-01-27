@@ -1,0 +1,2 @@
+org.springframework.data.repository.core.support.RepositoryFactorySupport=\
+  com.navercorp.spring.data.jdbc.plus.repository.support.JdbcPlusRepositoryFactory

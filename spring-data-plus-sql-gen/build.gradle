@@ -1,0 +1,16 @@
+dependencies {
+    compile("org.springframework.data:spring-data-relational:2.0.0.RC2")
+    compile("org.springframework.data:spring-data-commons:2.3.0.RC2")
+    compile project(":spring-data-jdbc-plus-sql")
+    compile("com.squareup:javapoet:1.12.1")
+
+    testImplementation("org.junit.jupiter:junit-jupiter")
+    testImplementation("org.junit.jupiter:junit-jupiter-api")
+    testImplementation("org.junit.jupiter:junit-jupiter-params")
+    testImplementation("org.junit.jupiter:junit-jupiter-engine")
+    testImplementation("org.assertj:assertj-core:3.6.2")
+    testImplementation("org.mockito:mockito-junit-jupiter")
+
+    testRuntime("org.junit.platform:junit-platform-launcher")
+    testRuntime("org.junit.platform:junit-platform-commons")
+}

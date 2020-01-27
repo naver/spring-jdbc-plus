@@ -1,0 +1,22 @@
+compileJava.dependsOn(processResources)
+
+dependencies {
+    compile("org.springframework.boot:spring-boot-autoconfigure")
+    implementation project(":spring-data-jdbc-plus-sql")
+    implementation project(":spring-data-jdbc-plus-repository")
+
+    implementation("org.springframework.data:spring-data-jdbc:2.0.0.RC2")
+    implementation("org.springframework.data:spring-data-relational:2.0.0.RC2")
+    implementation("org.springframework.data:spring-data-commons:2.3.0.RC2")
+    implementation("io.projectreactor:reactor-core")
+
+    testImplementation("org.junit.jupiter:junit-jupiter")
+    testImplementation("org.junit.jupiter:junit-jupiter-api")
+    testImplementation("org.junit.jupiter:junit-jupiter-params")
+    testImplementation("org.junit.jupiter:junit-jupiter-engine")
+    testImplementation("org.assertj:assertj-core")
+    testImplementation("org.mockito:mockito-junit-jupiter")
+
+    testRuntime("org.junit.platform:junit-platform-launcher")
+    testRuntime("org.junit.platform:junit-platform-commons")
+}

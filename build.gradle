@@ -1,0 +1,121 @@
+import org.springframework.boot.gradle.plugin.SpringBootPlugin
+
+buildscript {
+    repositories {
+        mavenCentral()
+        mavenLocal()
+        maven {
+            url "https://repo.spring.io/milestone/"
+        }
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:2.2.6.RELEASE")
+    }
+}
+
+allprojects {
+    group = "com.navercorp.spring"
+    version = "2.0.0.RC2"
+}
+
+subprojects {
+    apply plugin: "java"
+    apply plugin: "idea"
+    apply plugin: "checkstyle"
+    apply plugin: "io.spring.dependency-management"
+    apply plugin: "maven"
+    apply plugin: "signing"
+
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+
+    repositories {
+        mavenCentral()
+        maven {
+            url "https://repo.spring.io/milestone/"
+        }
+    }
+
+    dependencies {
+        compileOnly("com.google.code.findbugs:jsr305:3.0.2")
+        testCompileOnly("com.google.code.findbugs:jsr305:3.0.2")
+    }
+
+    dependencyManagement {
+        imports {
+            mavenBom SpringBootPlugin.BOM_COORDINATES
+        }
+    }
+
+    checkstyle {
+        configFile = file("${project.rootDir}/rule/naver-checkstyle-rules.xml")
+        configProperties = [config_loc: ".."]
+        toolVersion = "8.24"
+    }
+
+    test {
+        useJUnitPlatform()
+    }
+
+    task javadocJar(type: Jar) {
+        archiveClassifier = 'javadoc'
+        from javadoc
+    }
+
+    task sourcesJar(type: Jar) {
+        archiveClassifier = 'sources'
+        from sourceSets.main.allSource
+    }
+
+    artifacts {
+        archives javadocJar, sourcesJar
+    }
+
+    signing {
+        sign configurations.archives
+    }
+
+    uploadArchives {
+        repositories {
+            mavenDeployer {
+                beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
+                repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+                    authentication(userName: ossrhUsername, password: ossrhPassword)
+                }
+
+                snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
+                    authentication(userName: ossrhUsername, password: ossrhPassword)
+                }
+
+                pom.project {
+                    name project.name
+                    packaging "jar"
+                    description "Spring JDBC Plus"
+                    url "https://github.com/naver/spring-jdbc-plus"
+
+                    scm {
+                        connection "scm:git:git://github.com/naver/spring-jdbc-plus.git"
+                        developerConnection "scm:git:git://github.com/naver/spring-jdbc-plus.git"
+                        url "git://github.com/naver/spring-jdbc-plus.git"
+                    }
+
+                    licenses {
+                        license {
+                            name "The Apache License, Version 2.0"
+                            url "http://www.apache.org/licenses/LICENSE-2.0.txt"
+                        }
+                    }
+
+                    developers {
+                        developer {
+                            id "mhyeon.lee"
+                            name "Myeonghyeon Lee"
+                            email "mhyeon.lee@navercorp.com"
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

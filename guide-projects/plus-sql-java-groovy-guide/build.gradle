@@ -1,0 +1,66 @@
+plugins {
+    id "java"
+    id "groovy"
+}
+
+repositories {
+    mavenCentral()
+}
+
+compileGroovy {
+    options.encoding = "UTF-8"
+    groovyOptions.encoding = "UTF-8"
+}
+
+if (project.convention.findPlugin(JavaPluginConvention)) {
+    // Change the output directory for the main and test source sets back to the old path
+    sourceSets.main.java.outputDir = new File(buildDir, "classes/main")
+    sourceSets.main.groovy.outputDir = new File(buildDir, "classes/main")
+    sourceSets.test.java.outputDir = new File(buildDir, "classes/test")
+    sourceSets.test.groovy.outputDir = new File(buildDir, "classes/test")
+}
+
+tasks.withType(GroovyCompile) {
+    dependsOn = []
+    options.annotationProcessorGeneratedSourcesDirectory = project.file("src/main/generated")
+}
+
+tasks.withType(JavaCompile) { task ->
+    dependsOn task.name.replace("Java", "Groovy")
+}
+
+sourceSets {
+    main {
+        java { srcDirs = [] }
+        groovy { srcDirs += ["src/main/java"] }
+    }
+}
+
+dependencies {
+    implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation project(":spring-boot-starter-data-jdbc-plus-sql")
+    implementation("org.springframework.boot:spring-boot-starter-actuator")
+    implementation("org.codehaus.groovy:groovy:2.5.8")
+    implementation("com.h2database:h2")
+
+    implementation("org.springframework.data:spring-data-jdbc:2.0.0.RC2")
+    implementation("org.springframework.data:spring-data-relational:2.0.0.RC2")
+    implementation("org.springframework.data:spring-data-commons:2.3.0.RC2")
+
+    implementation project(":spring-data-plus-sql-gen")
+    annotationProcessor project(":spring-data-plus-sql-gen")
+    annotationProcessor("org.springframework.data:spring-data-jdbc:2.0.0.RC2")
+    annotationProcessor("org.springframework.data:spring-data-relational:2.0.0.RC2")
+    annotationProcessor("org.springframework.data:spring-data-commons:2.3.0.RC2")
+
+    compileOnly("org.projectlombok:lombok")
+    annotationProcessor("org.projectlombok:lombok")
+
+    testImplementation("org.springframework.boot:spring-boot-starter-test") {
+        exclude group: "org.junit.vintage", module: "junit-vintage-engine"
+    }
+    testCompileOnly("org.projectlombok:lombok")
+    testAnnotationProcessor("org.projectlombok:lombok")
+}
+
+uploadArchives.enabled = false
