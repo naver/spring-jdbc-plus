@@ -49,8 +49,8 @@ dependencies {
 </repositories>
 
 <dependency>
-	<groupId>org.springframework.boot</groupId>
-	<artifactId>com.navercorp.spring:spring-boot-starter-data-jdbc-plus-sql</artifactId>
+	<groupId>com.navercorp.spring</groupId>
+	<artifactId>spring-boot-starter-data-jdbc-plus-sql</artifactId>
 	<version>2.0.0.RC2</version>
 </dependency>
 <dependency>
