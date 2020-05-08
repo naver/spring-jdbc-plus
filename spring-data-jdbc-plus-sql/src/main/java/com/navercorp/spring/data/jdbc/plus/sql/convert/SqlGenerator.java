@@ -877,10 +877,16 @@ class SqlGenerator {
 	}
 
 	private List<OrderByField> extractOrderByFields(Sort sort) {
-		return sort.stream()
-			.map(order -> OrderByField.from(Column.create(order.getProperty(), this.getTable()),
-				order.getDirection()))
+		return sort.stream() //
+			.map(this::orderToOrderByField) //
 			.collect(Collectors.toList());
+	}
+
+	private OrderByField orderToOrderByField(Sort.Order order) {
+
+		SqlIdentifier columnName = this.entity.getRequiredPersistentProperty(order.getProperty()).getColumnName();
+		Column column = Column.create(columnName, this.getTable());
+		return OrderByField.from(column, order.getDirection());
 	}
 
 	private Expression getColumnExpression(
