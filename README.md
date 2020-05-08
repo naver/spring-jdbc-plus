@@ -1,5 +1,5 @@
 # Spring JDBC Plus [![Gitter chat](https://badges.gitter.im/gitterHQ/gitter.png)](https://gitter.im/naver/spring-jdbc-plus)
-Spring JDBC SQL provides [Spring Data JDBC](https://github.com/spring-projects/spring-data-jdbc) based extension.
+Spring JDBC Plus provides [Spring Data JDBC](https://github.com/spring-projects/spring-data-jdbc) based extension.
 It provides necessary features when writing more complex SQL than the functions supported by `CrudRepository`.
 If you need to use Spring Data JDBC's Persistence features and SQL execution function in combination, `Spring JDBC Plus` may be an appropriate choice.
 
@@ -125,9 +125,14 @@ class OrderSql extends SqlGeneratorSupport {
 }
 ```
 
-* Cautions when writing SQL
-- It is recommended to use NamedParameter for the parameter to be bound to SQL.
-- SQL Injection vulnerability, Prepared Statement Cache, etc. are affected.
+### Cautions when writing SQL
+- Must use named parameters to pass parameters to SQL.
+- If parameter values are concatenated directly to String, it produces bad effects. 
+    - May cause SQL injection vulnerability.
+    - Reduce efficiency of caches in PreparedStatement and NamedParameterJdbcTemplate
+
+Be careful when use string interpolation in Groovy and Kotlin.
+
 
 * Bad  :-1:
 ```groovy
