@@ -167,7 +167,7 @@ class SqlGeneratorTest {
 	@Test // DATAJDBC-101
 	public void findAllSortedBySingleField() {
 
-		String sql = sqlGenerator.getFindAll(Sort.by("x_name"));
+		String sql = sqlGenerator.getFindAll(Sort.by("name"));
 
 		assertThat(sql).contains("SELECT", //
 			"dummy_entity.id1 AS id1", //
@@ -190,8 +190,8 @@ class SqlGeneratorTest {
 
 		String sql = sqlGenerator.getFindAll(
 			Sort.by(new Sort.Order(
-					Sort.Direction.DESC, "x_name"),
-				new Sort.Order(Sort.Direction.ASC, "x_other")));
+					Sort.Direction.DESC, "name"),
+				new Sort.Order(Sort.Direction.ASC, "other")));
 
 		assertThat(sql).contains("SELECT", //
 			"dummy_entity.id1 AS id1", //
@@ -243,7 +243,7 @@ class SqlGeneratorTest {
 	@Test // DATAJDBC-101
 	public void findAllPagedAndSorted() {
 
-		String sql = sqlGenerator.getFindAll(PageRequest.of(3, 10, Sort.by("x_name")));
+		String sql = sqlGenerator.getFindAll(PageRequest.of(3, 10, Sort.by("name")));
 
 		assertThat(sql).contains("SELECT", //
 			"dummy_entity.id1 AS id1", //
