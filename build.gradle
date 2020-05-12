@@ -75,6 +75,8 @@ subprojects {
         sign configurations.archives
     }
 
+    signArchives.enabled = false
+
     uploadArchives {
         repositories {
             mavenDeployer {
