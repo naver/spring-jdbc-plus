@@ -5,9 +5,9 @@ dependencies {
     implementation("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
 
-    implementation("org.springframework.data:spring-data-jdbc:2.0.0.RC2")
-    implementation("org.springframework.data:spring-data-relational:2.0.0.RC2")
-    implementation("org.springframework.data:spring-data-commons:2.3.0.RC2")
+    implementation("org.springframework.data:spring-data-jdbc:2.0.0.RELEASE")
+    implementation("org.springframework.data:spring-data-relational:2.0.0.RELEASE")
+    implementation("org.springframework.data:spring-data-commons:2.3.0.RELEASE")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude group: "org.junit.vintage", module: "junit-vintage-engine"
