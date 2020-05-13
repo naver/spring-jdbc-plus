@@ -56,9 +56,11 @@ import org.springframework.data.relational.core.sql.Delete;
 import org.springframework.data.relational.core.sql.DeleteBuilder;
 import org.springframework.data.relational.core.sql.Expression;
 import org.springframework.data.relational.core.sql.Expressions;
+import org.springframework.data.relational.core.sql.From;
 import org.springframework.data.relational.core.sql.Functions;
 import org.springframework.data.relational.core.sql.Insert;
 import org.springframework.data.relational.core.sql.InsertBuilder;
+import org.springframework.data.relational.core.sql.LockMode;
 import org.springframework.data.relational.core.sql.OrderByField;
 import org.springframework.data.relational.core.sql.SQL;
 import org.springframework.data.relational.core.sql.Select;
@@ -1040,7 +1042,8 @@ class SqlGenerator {
 	}
 
 	/**
-	 * DIFF
+	 * DIFF: org.springframework.data.relational.core.sql.DefaultSelect
+	 * Only support Select columns for selectColumns
 	 */
 	class SimpleSelect implements Select {
 
@@ -1065,6 +1068,11 @@ class SqlGenerator {
 		}
 
 		@Override
+		public From getFrom() {
+			throw new UnsupportedOperationException("SimpleSelect does not support from clause.");
+		}
+
+		@Override
 		public List<OrderByField> getOrderBy() {
 			return Collections.emptyList();
 		}
@@ -1082,6 +1090,11 @@ class SqlGenerator {
 		@Override
 		public boolean isDistinct() {
 			return false;
+		}
+
+		@Override
+		public LockMode getLockMode() {
+			return null;
 		}
 	}
 }

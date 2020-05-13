@@ -26,15 +26,15 @@ buildscript {
         }
     }
     dependencies {
-        classpath("org.springframework.boot:spring-boot-gradle-plugin:2.2.6.RELEASE")
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:2.2.7.RELEASE")
     }
 }
 
 dependencies {
-    implementation("com.navercorp.spring:spring-boot-starter-data-jdbc-plus-sql:2.0.0.RC2")
-    implementation("org.springframework.data:spring-data-jdbc:2.0.0.RC2")
-    implementation("org.springframework.data:spring-data-relational:2.0.0.RC2")
-    implementation("org.springframework.data:spring-data-commons:2.3.0.RC2")
+    implementation("com.navercorp.spring:spring-boot-starter-data-jdbc-plus-sql:2.0.0.RELEASE")
+    implementation("org.springframework.data:spring-data-jdbc:2.0.0.RELEASE")
+    implementation("org.springframework.data:spring-data-relational:2.0.0.RELEASE")
+    implementation("org.springframework.data:spring-data-commons:2.3.0.RELEASE")
 }
 ```
 
@@ -51,22 +51,22 @@ dependencies {
 <dependency>
 	<groupId>com.navercorp.spring</groupId>
 	<artifactId>spring-boot-starter-data-jdbc-plus-sql</artifactId>
-	<version>2.0.0.RC2</version>
+	<version>2.0.0.RELEASE</version>
 </dependency>
 <dependency>
 	<groupId>org.springframework.data</groupId>
 	<artifactId>spring-data-jdbc</artifactId>
-	<version>2.0.0.RC2</version>
+	<version>2.0.0.RELEASE</version>
 </dependency>
 <dependency>
 	<groupId>org.springframework.data</groupId>
 	<artifactId>spring-data-relational</artifactId>
-	<version>2.0.0.RC2</version>
+	<version>2.0.0.RELEASE</version>
 </dependency>
 <dependency>
 	<groupId>org.springframework.data</groupId>
 	<artifactId>spring-data-commons</artifactId>
-	<version>2.3.0.RC2</version>
+	<version>2.3.0.RELEASE</version>
 </dependency>
 ```
 

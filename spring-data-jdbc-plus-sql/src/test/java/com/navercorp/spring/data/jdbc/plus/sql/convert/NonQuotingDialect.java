@@ -4,6 +4,7 @@ import org.springframework.data.relational.core.dialect.AbstractDialect;
 import org.springframework.data.relational.core.dialect.Dialect;
 import org.springframework.data.relational.core.dialect.HsqlDbDialect;
 import org.springframework.data.relational.core.dialect.LimitClause;
+import org.springframework.data.relational.core.dialect.LockClause;
 import org.springframework.data.relational.core.sql.IdentifierProcessing;
 
 /**
@@ -23,9 +24,12 @@ public class NonQuotingDialect extends AbstractDialect implements Dialect {
 	}
 
 	@Override
+	public LockClause lock() {
+		return HsqlDbDialect.INSTANCE.lock();
+	}
+
+	@Override
 	public IdentifierProcessing getIdentifierProcessing() {
-		return IdentifierProcessing.create(
-			new IdentifierProcessing.Quoting(""),
-			IdentifierProcessing.LetterCasing.AS_IS);
+		return IdentifierProcessing.create(new IdentifierProcessing.Quoting(""), IdentifierProcessing.LetterCasing.AS_IS);
 	}
 }

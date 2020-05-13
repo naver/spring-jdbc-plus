@@ -3,7 +3,9 @@ package com.navercorp.spring.data.jdbc.plus.sql.convert;
 import org.springframework.data.relational.core.dialect.AbstractDialect;
 import org.springframework.data.relational.core.dialect.ArrayColumns;
 import org.springframework.data.relational.core.dialect.LimitClause;
+import org.springframework.data.relational.core.dialect.LockClause;
 import org.springframework.data.relational.core.sql.IdentifierProcessing;
+import org.springframework.data.relational.core.sql.LockOptions;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
@@ -18,6 +20,9 @@ public class AnsiDialect extends AbstractDialect {
 	 * Singleton instance.
 	 */
 	public static final AnsiDialect INSTANCE = new AnsiDialect();
+
+	protected AnsiDialect() {}
+
 	private static final LimitClause LIMIT_CLAUSE = new LimitClause() {
 
 		/*
@@ -56,10 +61,29 @@ public class AnsiDialect extends AbstractDialect {
 			return Position.AFTER_ORDER_BY;
 		}
 	};
-	private final AnsiArrayColumns arrayColumns = new AnsiArrayColumns();
 
-	protected AnsiDialect() {
-	}
+	static final LockClause LOCK_CLAUSE = new LockClause() {
+
+		/*
+		 * (non-Javadoc)
+		 * @see org.springframework.data.relational.core.dialect.LockClause#getLock(LockOptions)
+		 */
+		@Override
+		public String getLock(LockOptions lockOptions) {
+			return "FOR UPDATE";
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * @see org.springframework.data.relational.core.dialect.LimitClause#getClausePosition()
+		 */
+		@Override
+		public Position getClausePosition() {
+			return Position.AFTER_ORDER_BY;
+		}
+	};
+
+	private final AnsiArrayColumns ARRAY_COLUMNS = new AnsiArrayColumns();
 
 	/*
 	 * (non-Javadoc)
@@ -72,16 +96,20 @@ public class AnsiDialect extends AbstractDialect {
 
 	/*
 	 * (non-Javadoc)
+	 * @see org.springframework.data.relational.core.dialect.Dialect#lock()
+	 */
+	@Override
+	public LockClause lock() {
+		return LOCK_CLAUSE;
+	}
+
+	/*
+	 * (non-Javadoc)
 	 * @see org.springframework.data.relational.core.dialect.Dialect#getArraySupport()
 	 */
 	@Override
 	public ArrayColumns getArraySupport() {
-		return arrayColumns;
-	}
-
-	@Override
-	public IdentifierProcessing getIdentifierProcessing() {
-		return IdentifierProcessing.ANSI;
+		return ARRAY_COLUMNS;
 	}
 
 	static class AnsiArrayColumns implements ArrayColumns {
@@ -106,5 +134,10 @@ public class AnsiDialect extends AbstractDialect {
 
 			return ClassUtils.resolvePrimitiveIfNecessary(userType);
 		}
+	}
+
+	@Override
+	public IdentifierProcessing getIdentifierProcessing() {
+		return IdentifierProcessing.ANSI;
 	}
 }
