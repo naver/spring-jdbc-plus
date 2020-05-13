@@ -1,4 +1,7 @@
-# Spring JDBC Plus [![Gitter chat](https://badges.gitter.im/gitterHQ/gitter.png)](https://gitter.im/naver/spring-jdbc-plus)
+[![GitHub release](https://img.shields.io/github/v/release/naver/spring-jdbc-plus.svg?include_prereleases)](https://img.shields.io/github/v/release/naver/spring-jdbc-plus.svg?include_prereleases)
+[![GitHub license](https://img.shields.io/github/license/naver/spring-jdbc-plus.svg)](https://github.com/naver/spring-jdbc-plus.js/blob/master/LICENSE)
+
+# Spring JDBC Plus ![build](https://github.com/naver/spring-jdbc-plus/workflows/build/badge.svg) [![Gitter chat](https://badges.gitter.im/gitterHQ/gitter.png)](https://gitter.im/naver/spring-jdbc-plus)
 Spring JDBC Plus provides [Spring Data JDBC](https://github.com/spring-projects/spring-data-jdbc) based extension.
 It provides necessary features when writing more complex SQL than the functions supported by `CrudRepository`.
 If you need to use Spring Data JDBC's Persistence features and SQL execution function in combination, `Spring JDBC Plus` may be an appropriate choice.
