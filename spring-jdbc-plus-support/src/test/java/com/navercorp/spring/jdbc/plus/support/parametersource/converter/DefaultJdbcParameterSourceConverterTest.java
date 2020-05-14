@@ -59,7 +59,7 @@ class DefaultJdbcParameterSourceConverterTest {
 		Object uuid = sut.convert(paramName, UUID.randomUUID());
 
 		List<String> collections = (List<String>)sut.convert(paramName, Arrays.asList("1", "2", "3", "4", "5"));
-		List<String> arrays = (List<String>)sut.convert(paramName, new String[] {"1", "2", "3", "4", "5"});
+		Object[] arrays = (Object[])sut.convert(paramName, new String[] {"1", "2", "3", "4", "5"});
 
 		// then
 		assertThat(str).isEqualTo(":sample:");
@@ -76,11 +76,12 @@ class DefaultJdbcParameterSourceConverterTest {
 		assertThat(collections.get(3)).isEqualTo(":4:");
 		assertThat(collections.get(4)).isEqualTo(":5:");
 
-		assertThat(arrays.get(0)).isEqualTo(":1:");
-		assertThat(arrays.get(1)).isEqualTo(":2:");
-		assertThat(arrays.get(2)).isEqualTo(":3:");
-		assertThat(arrays.get(3)).isEqualTo(":4:");
-		assertThat(arrays.get(4)).isEqualTo(":5:");
+		assertThat(arrays).isNotNull();
+		assertThat(arrays[0]).isEqualTo(":1:");
+		assertThat(arrays[1]).isEqualTo(":2:");
+		assertThat(arrays[2]).isEqualTo(":3:");
+		assertThat(arrays[3]).isEqualTo(":4:");
+		assertThat(arrays[4]).isEqualTo(":5:");
 	}
 
 	@Test
@@ -135,6 +136,27 @@ class DefaultJdbcParameterSourceConverterTest {
 	}
 
 	@Test
+	void convertArrayOfEnumTest() {
+		// given
+		List<Converter<?, ?>> converters = new ArrayList<>();
+		converters.add(new SportsTypeConverter());
+		DefaultJdbcParameterSourceConverter sut = new DefaultJdbcParameterSourceConverter(converters);
+		Sports[] enumArray = {Sports.SOCCER, Sports.BASE_BALL};
+
+		// when
+		Object actualResult = sut.convert("name", enumArray);
+		Object convertedSoccer = sut.convert("name", Sports.SOCCER);
+		Object convertedBaseBall = sut.convert("name", Sports.BASE_BALL);
+
+		// then
+		assertThat(actualResult.getClass().isArray()).isTrue();
+		assertThat((Object[]) actualResult).allSatisfy(actual -> {
+			assertThat(actual).isExactlyInstanceOf(Integer.class);
+			assertThat(actual).isIn(convertedSoccer, convertedBaseBall);
+		});
+	}
+
+	@Test
 	@DisplayName("Uuid 타입 컨버터를 변경한다.")
 	void convertStringUuidConverterValue() {
 		// given
@@ -170,6 +192,33 @@ class DefaultJdbcParameterSourceConverterTest {
 		// then
 		assertThat(actual).isExactlyInstanceOf(String.class);
 		assertThat(actual).isEqualTo(source.get().toString());
+	}
+
+	@Test
+	@DisplayName("Unwrapper 가 등록되어 있고 Array 를 반납해도, 정상적으로 Convert 합니다.")
+	void convertWithUnwrapperReturnsArray() {
+		// given
+		List<Converter<?, ?>> converters = new ArrayList<>();
+		converters.add(new SportsTypeConverter());
+		List<Unwrapper<?>> unwrappers = new ArrayList<>();
+		unwrappers.add(new OptionalUnwrapper());
+
+		DefaultJdbcParameterSourceConverter sut =
+			new DefaultJdbcParameterSourceConverter(converters, unwrappers);
+
+		Optional<Sports[]> source = Optional.of(new Sports[] {Sports.SOCCER, Sports.BASE_BALL});
+
+		// when
+		Object actualResult = sut.convert("name", source);
+		Object convertedSoccer = sut.convert("name", Sports.SOCCER);
+		Object convertedBaseBall = sut.convert("name", Sports.BASE_BALL);
+
+		// then
+		assertThat(actualResult.getClass().isArray()).isTrue();
+		assertThat((Object[]) actualResult).allSatisfy(actual -> {
+			assertThat(actual).isExactlyInstanceOf(Integer.class);
+			assertThat(actual).isIn(convertedSoccer, convertedBaseBall);
+		});
 	}
 
 	@Test

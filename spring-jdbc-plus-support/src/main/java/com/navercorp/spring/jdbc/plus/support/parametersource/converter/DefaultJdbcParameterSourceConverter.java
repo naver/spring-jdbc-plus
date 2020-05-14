@@ -182,10 +182,10 @@ public class DefaultJdbcParameterSourceConverter implements JdbcParameterSourceC
 		return value;
 	}
 
-	private List<?> convertElements(Object[] array) {
-		List<Object> result = new ArrayList<>();
-		for (Object element : array) {
-			result.add(this.convert(element));
+	private Object[] convertElements(Object[] array) {
+		Object[] result = new Object[array.length];
+		for (int i = 0; i < array.length; i++) {
+			result[i] = this.convert(array[i]);
 		}
 		return result;
 	}
