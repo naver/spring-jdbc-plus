@@ -336,6 +336,26 @@ class SqlGenerator {
 	}
 
 	/**
+	 * Create a {@code SELECT count(id) FROM … WHERE :id = … (LOCK CLAUSE)} statement.
+	 *
+	 * @param lockMode Lock clause mode.
+	 * @return the statement as a {@link String}. Guaranteed to be not {@literal null}.
+	 */
+	String getAcquireLockById(LockMode lockMode) {
+		return this.createAcquireLockById(lockMode);
+	}
+
+	/**
+	 * Create a {@code SELECT count(id) FROM … (LOCK CLAUSE)} statement.
+	 *
+	 * @param lockMode Lock clause mode.
+	 * @return the statement as a {@link String}. Guaranteed to be not {@literal null}.
+	 */
+	String getAcquireLockAll(LockMode lockMode) {
+		return this.createAcquireLockAll(lockMode);
+	}
+
+	/**
 	 * Create a {@code INSERT INTO … (…) VALUES(…)} statement.
 	 *
 	 * @return the statement as a {@link String}. Guaranteed to be not {@literal null}.
@@ -435,6 +455,33 @@ class SqlGenerator {
 	private String createFindOneSql() {
 
 		Select select = selectBuilder().where(getIdColumn().isEqualTo(getBindMarker(ID_SQL_PARAMETER))) //
+			.build();
+
+		return render(select);
+	}
+
+	private String createAcquireLockById(LockMode lockMode) {
+
+		Table table = this.getTable();
+
+		Select select = StatementBuilder //
+			.select(getIdColumn()) //
+			.from(table) //
+			.where(getIdColumn().isEqualTo(getBindMarker(ID_SQL_PARAMETER))) //
+			.lock(lockMode) //
+			.build();
+
+		return render(select);
+	}
+
+	private String createAcquireLockAll(LockMode lockMode) {
+
+		Table table = this.getTable();
+
+		Select select = StatementBuilder //
+			.select(getIdColumn()) //
+			.from(table) //
+			.lock(lockMode) //
 			.build();
 
 		return render(select);
