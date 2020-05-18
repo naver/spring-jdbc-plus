@@ -25,10 +25,6 @@ tasks.withType(GroovyCompile) {
     options.annotationProcessorGeneratedSourcesDirectory = project.file("src/main/generated")
 }
 
-tasks.withType(JavaCompile) { task ->
-    dependsOn task.name.replace("Java", "Groovy")
-}
-
 sourceSets {
     main {
         java { srcDirs = [] }
