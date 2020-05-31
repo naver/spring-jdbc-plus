@@ -30,7 +30,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.function.Function;
 import java.util.stream.IntStream;
 
 import org.springframework.data.convert.CustomConversions;
@@ -53,7 +52,6 @@ import org.springframework.data.relational.core.mapping.RelationalPersistentProp
 import org.springframework.data.relational.core.sql.IdentifierProcessing;
 import org.springframework.data.util.ReflectionUtils;
 import org.springframework.data.util.Streamable;
-import org.springframework.data.util.TypeInformation;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
@@ -1182,17 +1180,7 @@ public class AggregateResultJdbcConverter extends BasicJdbcConverter {
 		}
 
 		private void populateProperties(Map<String, Object> map, @Nullable Object idValue) {
-			PreferredConstructor<?, RelationalPersistentProperty> persistenceConstructor =
-				entity.getPersistenceConstructor();
-
 			for (RelationalPersistentProperty property : entity) {
-
-				if (persistenceConstructor != null
-					&& persistenceConstructor.isConstructorParameter(property)) {
-
-					continue;
-				}
-
 				// skip absent simple properties
 				if (isSimpleProperty(property)) {
 
@@ -1298,22 +1286,9 @@ public class AggregateResultJdbcConverter extends BasicJdbcConverter {
 		}
 
 		private Map<String, Object> createInstanceInternal(@Nullable Object idValue) {
-			Map<String, Object> instance = new MapGeneratingEntityInstantiator().createMap(
-				entity, new ConvertingMapParameterValueProvider<>(parameter -> {
-					String parameterName = parameter.getName();
-
-					Assert.notNull(
-						parameterName,
-						"A constructor parameter name must not be null "
-							+ "to be used with Spring Data JDBC");
-
-					RelationalPersistentProperty property =
-						entity.getRequiredPersistentProperty(parameterName);
-
-					return readOrLoadProperty(idValue, property);
-				}));
-			populateProperties(instance, idValue);
-			return instance;
+			Map<String, Object> map = new HashMap<>();
+			populateProperties(map, idValue);
+			return map;
 		}
 
 	}
@@ -1573,89 +1548,7 @@ public class AggregateResultJdbcConverter extends BasicJdbcConverter {
 
 				return readOrLoadProperty(idValue, property);
 			});
-			return populateProperties(instance, idValue);
-		}
-	}
-
-	/**
-	 * The type Converting map parameter value provider.
-	 *
-	 * @param <P> the type parameter
-	 */
-	protected final class ConvertingMapParameterValueProvider<P extends PersistentProperty<P>>
-		implements MapParameterValueProvider<P> {
-
-		private final Function<PreferredConstructor.Parameter<?, P>, Object> delegate;
-
-		/**
-		 * Instantiates a new Converting map parameter value provider.
-		 *
-		 * @param delegate the delegate
-		 */
-		public ConvertingMapParameterValueProvider(
-			Function<PreferredConstructor.Parameter<?, P>, Object> delegate) {
-
-			this.delegate = delegate;
-		}
-
-		@Override
-		public Object getParameterValue(PreferredConstructor.Parameter<?, P> parameter) {
-			Object value = delegate.apply(parameter);
-			TypeInformation typeInformation = parameter.getType();
-
-			if (value != null
-				&& Map.class.isAssignableFrom(value.getClass())
-				&& !typeInformation.getType().isAssignableFrom(value.getClass())) {
-				return value;
-			}
-
-			return readValue(delegate.apply(parameter), typeInformation);
-		}
-	}
-
-	/**
-	 * The type Map generating entity instantiator.
-	 */
-	protected final class MapGeneratingEntityInstantiator {
-		/**
-		 * Instantiates a new Map generating entity instantiator.
-		 */
-		public MapGeneratingEntityInstantiator() {
-		}
-
-		/**
-		 * Create map map.
-		 *
-		 * @param <T>      the type parameter
-		 * @param <E>      the type parameter
-		 * @param <P>      the type parameter
-		 * @param entity   the entity
-		 * @param provider the provider
-		 * @return the map
-		 */
-		public <T, E extends PersistentEntity<? extends T, P>,
-			P extends PersistentProperty<P>> Map<String, Object> createMap(
-			E entity, MapParameterValueProvider<P> provider) {
-
-			PreferredConstructor<?, ?> constructor = entity.getPersistenceConstructor();
-
-			if (ReflectionUtils.isSupportedKotlinClass(entity.getType())
-				&& constructor != null) {
-
-				PreferredConstructor<?, ?> defaultConstructor =
-					new DefaultingKotlinConstructorResolver(entity).getDefaultConstructor();
-
-				if (defaultConstructor != null) {
-
-					MapInstantiator instantiator = new MapInstantiator(constructor);
-
-					return new KotlinMapInstantiatorAdapter(instantiator, constructor)
-						.createInstance(entity, provider);
-				}
-			}
-
-			return new MapInstantiatorAdapter(new MapInstantiator(constructor))
-				.createInstance(entity, provider);
+			return entity.requiresPropertyPopulation() ? populateProperties(instance, idValue) : instance;
 		}
 	}
 }
