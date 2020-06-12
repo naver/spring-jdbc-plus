@@ -29,47 +29,34 @@ buildscript {
         }
     }
     dependencies {
-        classpath("org.springframework.boot:spring-boot-gradle-plugin:2.3.0.RELEASE")
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:2.3.1.RELEASE")
     }
 }
 
 dependencies {
+    implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
     implementation("com.navercorp.spring:spring-boot-starter-data-jdbc-plus-sql:2.0.1.RELEASE")
-    implementation("org.springframework.data:spring-data-jdbc:2.0.1.RELEASE")
-    implementation("org.springframework.data:spring-data-relational:2.0.1.RELEASE")
-    implementation("org.springframework.data:spring-data-commons:2.3.1.RELEASE")
 }
 ```
 
 * Maven
 ```xml
-<repositories>
-    <repository>
-        <id>repository.spring.milestone</id>
-        <name>Spring Milestone Repository</name>
-        <url>http://repo.spring.io/milestone</url>
-    </repository>
-</repositories>
+<parent>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-parent</artifactId>
+    <version>2.3.1.RELEASE</version>
+    <relativePath/>
+</parent>
 
 <dependency>
-	<groupId>com.navercorp.spring</groupId>
-	<artifactId>spring-boot-starter-data-jdbc-plus-sql</artifactId>
-	<version>2.0.1.RELEASE</version>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-data-jdbc</artifactId>
 </dependency>
+
 <dependency>
-	<groupId>org.springframework.data</groupId>
-	<artifactId>spring-data-jdbc</artifactId>
-	<version>2.0.1.RELEASE</version>
-</dependency>
-<dependency>
-	<groupId>org.springframework.data</groupId>
-	<artifactId>spring-data-relational</artifactId>
-	<version>2.0.1.RELEASE</version>
-</dependency>
-<dependency>
-	<groupId>org.springframework.data</groupId>
-	<artifactId>spring-data-commons</artifactId>
-	<version>2.3.1.RELEASE</version>
+    <groupId>com.navercorp.spring</groupId>
+    <artifactId>spring-boot-starter-data-jdbc-plus-sql</artifactId>
+    <version>2.0.1.RELEASE</version>
 </dependency>
 ```
 
