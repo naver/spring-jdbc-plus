@@ -64,6 +64,44 @@ public abstract class JdbcReactiveDaoSupport extends JdbcDaoSupport {
 	 *
 	 * @param <R>            the type parameter
 	 * @param sql            the sql
+	 * @param params         the params
+	 * @param returnType     the return type
+	 * @return the flux
+	 */
+	protected <R> Flux<R> selectFlux(
+		String sql,
+		SqlParameterSource params,
+		Class<R> returnType) {
+
+		RowMapper<R> rowMapper = this.getRowMapper(returnType);
+		return this.jdbcReactiveTemplate.queryFlux(
+			sql, this.getEntityJdbcProvider().getJdbcOperations(), params, rowMapper);
+	}
+
+
+	/**
+	 * Select list.
+	 *
+	 * @param <R>       the type parameter
+	 * @param sql       the sql
+	 * @param params    the params
+	 * @param rowMapper the row mapper
+	 * @return the flux
+	 */
+	protected <R> Flux<R> selectFlux(
+		String sql,
+		SqlParameterSource params,
+		RowMapper<R> rowMapper) {
+
+		return this.jdbcReactiveTemplate.queryFlux(
+			sql, this.getEntityJdbcProvider().getJdbcOperations(), params, rowMapper);
+	}
+
+	/**
+	 * Select flux flux.
+	 *
+	 * @param <R>            the type parameter
+	 * @param sql            the sql
 	 * @param jdbcOperations the jdbc operations
 	 * @param params         the params
 	 * @param rowMapper      the row mapper
