@@ -5,9 +5,9 @@ dependencies {
     implementation project(":spring-data-jdbc-plus-sql")
     implementation project(":spring-data-jdbc-plus-repository")
 
-    implementation("org.springframework.data:spring-data-jdbc:2.0.1.RELEASE")
-    implementation("org.springframework.data:spring-data-relational:2.0.1.RELEASE")
-    implementation("org.springframework.data:spring-data-commons:2.3.1.RELEASE")
+    implementation("org.springframework.data:spring-data-jdbc:2.1.0-M1")
+    implementation("org.springframework.data:spring-data-relational:2.1.0-M1")
+    implementation("org.springframework.data:spring-data-commons:2.4.0-M1")
     implementation("io.projectreactor:reactor-core")
 
     testImplementation("org.junit.jupiter:junit-jupiter")
