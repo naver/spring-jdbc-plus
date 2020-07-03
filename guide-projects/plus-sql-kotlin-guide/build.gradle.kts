@@ -11,8 +11,8 @@ buildscript {
 
 plugins {
     id("org.jlleitschuh.gradle.ktlint") version "9.1.0"
-    kotlin("jvm") version "1.3.61"
-    kotlin("plugin.spring") version "1.3.61"
+    kotlin("jvm") version "1.3.72"
+    kotlin("plugin.spring") version "1.3.72"
 }
 
 repositories {
