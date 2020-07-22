@@ -183,32 +183,34 @@ public class JdbcReactiveTemplate {
 		BlockingQueue<FluxItem<R>> queue = new LinkedBlockingQueue<>(queueSize);
 		AtomicBoolean isClosed = new AtomicBoolean(false);
 
-		scheduler.schedule(() -> {
-			try {
-				jdbcOperations.query(sql, params, new RowCountCallbackHandler() {
-					public void processRow(ResultSet resultSet, int rowNum) throws SQLException {
-						if (isClosed.get()) {
-							throw new DataAccessResourceFailureException(
-								"Connection closed by client.");
-						}
-
-						FluxItem<R> item = new FluxItem<>(rowMapper.mapRow(resultSet, rowNum));
-						insertToBlockingQueue(queue, item, isClosed, bufferTimeout);
-					}
-				});
-			} catch (UncategorizedSQLException e) {
-				/* Sort of db timeout. */
-				isClosed.set(true);
-				return;
-			}
-
-			if (!isClosed.get()) {
-				insertToBlockingQueue(queue, endItem(), isClosed, bufferTimeout);
-			}
-		});
-
 		return generateFluxFromQueue(queue, isClosed)
-			.doOnCancel(() -> isClosed.set(true));
+			.doOnCancel(() -> isClosed.set(true))
+			.doFirst(() -> scheduler.schedule(() -> {
+				try {
+					jdbcOperations.query(sql, params, new RowCountCallbackHandler() {
+						public void processRow(ResultSet resultSet, int rowNum) throws SQLException {
+							if (isClosed.get()) {
+								throw new DataAccessResourceFailureException(
+									"Connection closed by client.");
+							}
+
+							FluxItem<R> item = new FluxItem<>(rowMapper.mapRow(resultSet, rowNum));
+							insertToBlockingQueue(queue, item, isClosed, bufferTimeout);
+						}
+					});
+				} catch (UncategorizedSQLException e) {
+					/* Sort of db timeout. */
+					isClosed.set(true);
+					return;
+				} catch (Exception e) {
+					isClosed.set(true);
+					throw e; /* To propagate exception to subscriber */
+				}
+
+				if (!isClosed.get()) {
+					insertToBlockingQueue(queue, endItem(), isClosed, bufferTimeout);
+				}
+			}));
 	}
 
 	private <R> void insertToBlockingQueue(
