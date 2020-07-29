@@ -188,10 +188,10 @@ public class JdbcReactiveTemplate {
 			.doFirst(() -> scheduler.schedule(() -> {
 				try {
 					jdbcOperations.query(sql, params, new RowCountCallbackHandler() {
+						@Override
 						public void processRow(ResultSet resultSet, int rowNum) throws SQLException {
 							if (isClosed.get()) {
-								throw new DataAccessResourceFailureException(
-									"Connection closed by client.");
+								throw new DataAccessResourceFailureException("Connection closed by client.");
 							}
 
 							FluxItem<R> item = new FluxItem<>(rowMapper.mapRow(resultSet, rowNum));
