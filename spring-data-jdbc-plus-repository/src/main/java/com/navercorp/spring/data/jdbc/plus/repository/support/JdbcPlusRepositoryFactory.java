@@ -26,6 +26,7 @@ import org.springframework.data.jdbc.repository.support.JdbcRepositoryFactory;
 import org.springframework.data.mapping.callback.EntityCallbacks;
 import org.springframework.data.relational.core.dialect.Dialect;
 import org.springframework.data.relational.core.mapping.RelationalMappingContext;
+import org.springframework.data.relational.core.mapping.RelationalPersistentEntity;
 import org.springframework.data.repository.core.RepositoryInformation;
 import org.springframework.data.repository.core.RepositoryMetadata;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
@@ -75,14 +76,13 @@ public class JdbcPlusRepositoryFactory extends JdbcRepositoryFactory {
 		JdbcAggregateTemplate template = new JdbcAggregateTemplate(
 			publisher, context, converter, accessStrategy);
 
-		JdbcPlusRepository<?, Object> repository = new JdbcPlusRepository<>(template,
-			context.getRequiredPersistentEntity(repositoryInformation.getDomainType()));
-
 		if (entityCallbacks != null) {
 			template.setEntityCallbacks(entityCallbacks);
 		}
 
-		return repository;
+		RelationalPersistentEntity<?> persistentEntity = context.getRequiredPersistentEntity(repositoryInformation.getDomainType());
+
+		return getTargetRepositoryViaReflection(repositoryInformation.getRepositoryBaseClass(), template, persistentEntity);
 	}
 
 	@Override
