@@ -30,6 +30,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.jdbc.repository.support.JdbcRepositoryFactoryBean;
 
+import com.navercorp.spring.data.jdbc.plus.repository.support.JdbcPlusRepository;
 import com.navercorp.spring.data.jdbc.plus.repository.support.JdbcPlusRepositoryFactoryBean;
 
 /**
@@ -94,20 +95,14 @@ public @interface EnableJdbcPlusReactiveSupportRepositories {
 	ComponentScan.Filter[] excludeFilters() default {};
 
 	/**
-	 * Configures whether nested repository-interfaces (e.g. defined as inner classes)
-	 * should be discovered by the repositories infrastructure.
+	 * Returns the postfix to be used when looking up custom repository implementations.
+	 * Defaults to {@literal Impl}. So for a repository named {@code PersonRepository}
+	 * the corresponding implementation class will be looked up scanning
+	 * for {@code PersonRepositoryImpl}.
 	 *
-	 * @return considerNestedRepositories
+	 * @return repositoryImplementationPostfix
 	 */
-	boolean considerNestedRepositories() default false;
-
-	/**
-	 * Returns the {@link FactoryBean} class to be used for each repository instance.
-	 * Defaults to {@link JdbcRepositoryFactoryBean}.
-	 *
-	 * @return repositoryFactoryBeanClass
-	 */
-	Class<?> repositoryFactoryBeanClass() default JdbcPlusRepositoryFactoryBean.class;
+	String repositoryImplementationPostfix() default "Impl";
 
 	/**
 	 * Configures the location of where to find the Spring Data named queries properties file.
@@ -118,14 +113,27 @@ public @interface EnableJdbcPlusReactiveSupportRepositories {
 	String namedQueriesLocation() default "";
 
 	/**
-	 * Returns the postfix to be used when looking up custom repository implementations.
-	 * Defaults to {@literal Impl}. So for a repository named {@code PersonRepository}
-	 * the corresponding implementation class will be looked up scanning
-	 * for {@code PersonRepositoryImpl}.
+	 * Returns the {@link FactoryBean} class to be used for each repository instance. Defaults to
+	 * {@link JdbcRepositoryFactoryBean}.
 	 *
-	 * @return repositoryImplementationPostfix
+	 * @return repositoryFactoryBeanClass
 	 */
-	String repositoryImplementationPostfix() default "Impl";
+	Class<?> repositoryFactoryBeanClass() default JdbcPlusRepositoryFactoryBean.class;
+
+	/**
+	 * Repository base class class.
+	 *
+	 * @return the class
+	 */
+	Class<?> repositoryBaseClass() default JdbcPlusRepository.class;
+
+	/**
+	 * Configures whether nested repository-interfaces (e.g. defined as inner classes)
+	 * should be discovered by the repositories infrastructure.
+	 *
+	 * @return considerNestedRepositories
+	 */
+	boolean considerNestedRepositories() default false;
 
 	/**
 	 * Configures the name of the
