@@ -29,7 +29,7 @@ buildscript {
         }
     }
     dependencies {
-        classpath("org.springframework.boot:spring-boot-gradle-plugin:2.3.1.RELEASE")
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:2.3.2.RELEASE")
     }
 }
 
@@ -44,7 +44,7 @@ dependencies {
 <parent>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>
-    <version>2.3.1.RELEASE</version>
+    <version>2.3.2.RELEASE</version>
     <relativePath/>
 </parent>
 
