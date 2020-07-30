@@ -291,7 +291,15 @@ public abstract class JdbcDaoSupport {
 		}
 
 		if (list.size() > 1) {
-			throw new IncorrectResultSizeDataAccessException(1, list.size());
+			String message = new StringBuilder()
+				.append("Result size must be one or zero for findOne operation. result size: ")
+				.append(list.size())
+				.append(", sql: ")
+				.append(sql)
+				.append(", params:")
+				.append(params.toString())
+				.toString();
+			throw new IncorrectResultSizeDataAccessException(message, 1, list.size());
 		}
 		return Optional.ofNullable(list.get(0));
 	}

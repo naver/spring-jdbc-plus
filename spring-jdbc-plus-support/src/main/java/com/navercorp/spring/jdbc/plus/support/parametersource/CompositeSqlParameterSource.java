@@ -74,4 +74,11 @@ public class CompositeSqlParameterSource implements SqlParameterSource {
 		throw new IllegalArgumentException(
 			"Can not find '" + paramName + "' parameter in CompositeSqlParameterSource.");
 	}
+
+	@Override
+	public String toString() {
+		return "CompositeSqlParameterSource{" +
+			"sqlParameterSources=" + sqlParameterSources +
+			'}';
+	}
 }
