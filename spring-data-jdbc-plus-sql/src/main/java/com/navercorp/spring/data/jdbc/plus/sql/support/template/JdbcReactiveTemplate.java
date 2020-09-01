@@ -183,7 +183,7 @@ public class JdbcReactiveTemplate {
 		BlockingQueue<FluxItem<R>> queue = new LinkedBlockingQueue<>(queueSize);
 		AtomicBoolean isClosed = new AtomicBoolean(false);
 
-		return generateFluxFromQueue(queue, isClosed)
+		return generateFluxFromQueue(queue, bufferTimeout, isClosed)
 			.doOnCancel(() -> isClosed.set(true))
 			.doFirst(() -> scheduler.schedule(() -> {
 				try {
@@ -201,9 +201,13 @@ public class JdbcReactiveTemplate {
 				} catch (UncategorizedSQLException e) {
 					/* Sort of db timeout. */
 					isClosed.set(true);
+					insertToBlockingQueue(queue, endItem(), isClosed, bufferTimeout);
+					logger.error("Failed to generate flux.", e);
 					return;
 				} catch (Exception e) {
 					isClosed.set(true);
+					insertToBlockingQueue(queue, endItem(), isClosed, bufferTimeout);
+					logger.error("Failed to generate flux.", e);
 					throw e; /* To propagate exception to subscriber */
 				}
 
@@ -223,7 +227,7 @@ public class JdbcReactiveTemplate {
 			if (!queue.offer(item, bufferTimeout, TimeUnit.MILLISECONDS)) {
 				/* Close the flux. */
 				isClosed.set(true);
-				throw new TimeoutException("Can't insert into blocking queue.");
+				throw new TimeoutException("Cannot insert into blocking queue.");
 			}
 		} catch (InterruptedException e) {
 			Thread.currentThread().interrupt();
@@ -234,7 +238,7 @@ public class JdbcReactiveTemplate {
 	}
 
 	private <R> Flux<R> generateFluxFromQueue(
-		BlockingQueue<FluxItem<R>> queue, AtomicBoolean isClosed) {
+		BlockingQueue<FluxItem<R>> queue, long bufferTimeout, AtomicBoolean isClosed) {
 
 		return Flux.generate(sink -> {
 			if (isClosed.get()) {
@@ -243,7 +247,12 @@ public class JdbcReactiveTemplate {
 					"Database Connection is closed."));
 			}
 			try {
-				FluxItem<R> row = queue.take();
+				FluxItem<R> row = queue.poll(bufferTimeout, TimeUnit.MILLISECONDS);
+				if (row == null) {
+					sink.error(new DataAccessResourceFailureException(
+						"Cannot take element from blocking queue."));
+					return;
+				}
 				if (row.isEnd()) {
 					sink.complete();
 					return;
