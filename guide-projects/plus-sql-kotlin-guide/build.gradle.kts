@@ -27,9 +27,9 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("com.h2database:h2")
 
-    implementation("org.springframework.data:spring-data-jdbc:2.0.2.RELEASE")
-    implementation("org.springframework.data:spring-data-relational:2.0.2.RELEASE")
-    implementation("org.springframework.data:spring-data-commons:2.3.2.RELEASE")
+    implementation("org.springframework.data:spring-data-jdbc:2.0.3.RELEASE")
+    implementation("org.springframework.data:spring-data-relational:2.0.3.RELEASE")
+    implementation("org.springframework.data:spring-data-commons:2.3.3.RELEASE")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(group = "org.junit.vintage", module = "junit-vintage-engine")
