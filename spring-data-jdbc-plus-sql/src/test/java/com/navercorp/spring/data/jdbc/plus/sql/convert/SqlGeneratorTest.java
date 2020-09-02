@@ -178,9 +178,9 @@ class SqlGeneratorTest {
 			"ref_further.x_l2id AS ref_further_x_l2id", //
 			"ref_further.x_something AS ref_further_x_something", //
 			"FROM dummy_entity ", //
-			"LEFT OUTER JOIN referenced_entity AS ref "
+			"LEFT OUTER JOIN referenced_entity ref "
 				+ "ON ref.dummy_entity = dummy_entity.id1", //
-			"LEFT OUTER JOIN second_level_referenced_entity AS ref_further "
+			"LEFT OUTER JOIN second_level_referenced_entity ref_further "
 				+ "ON ref_further.referenced_entity = ref.x_l1id", //
 			"ORDER BY x_name ASC");
 	}
@@ -202,9 +202,9 @@ class SqlGeneratorTest {
 			"ref_further.x_l2id AS ref_further_x_l2id", //
 			"ref_further.x_something AS ref_further_x_something", //
 			"FROM dummy_entity ", //
-			"LEFT OUTER JOIN referenced_entity AS ref "
+			"LEFT OUTER JOIN referenced_entity ref "
 				+ "ON ref.dummy_entity = dummy_entity.id1", //
-			"LEFT OUTER JOIN second_level_referenced_entity AS ref_further "
+			"LEFT OUTER JOIN second_level_referenced_entity ref_further "
 				+ "ON ref_further.referenced_entity = ref.x_l1id", //
 			"ORDER BY x_name DESC", //
 			"x_other ASC");
@@ -232,9 +232,9 @@ class SqlGeneratorTest {
 			"ref_further.x_l2id AS ref_further_x_l2id", //
 			"ref_further.x_something AS ref_further_x_something", //
 			"FROM dummy_entity ", //
-			"LEFT OUTER JOIN referenced_entity AS ref "
+			"LEFT OUTER JOIN referenced_entity ref "
 				+ "ON ref.dummy_entity = dummy_entity.id1", //
-			"LEFT OUTER JOIN second_level_referenced_entity AS ref_further "
+			"LEFT OUTER JOIN second_level_referenced_entity ref_further "
 				+ "ON ref_further.referenced_entity = ref.x_l1id", //
 			"OFFSET 40", //
 			"LIMIT 20");
@@ -254,9 +254,9 @@ class SqlGeneratorTest {
 			"ref_further.x_l2id AS ref_further_x_l2id", //
 			"ref_further.x_something AS ref_further_x_something", //
 			"FROM dummy_entity ", //
-			"LEFT OUTER JOIN referenced_entity AS ref "
+			"LEFT OUTER JOIN referenced_entity ref "
 				+ "ON ref.dummy_entity = dummy_entity.id1", //
-			"LEFT OUTER JOIN second_level_referenced_entity AS ref_further "
+			"LEFT OUTER JOIN second_level_referenced_entity ref_further "
 				+ "ON ref_further.referenced_entity = ref.x_l1id", //
 			"ORDER BY x_name ASC", //
 			"OFFSET 30", //
@@ -278,9 +278,9 @@ class SqlGeneratorTest {
 			"ref_further.x_l2id AS ref_further_x_l2id", //
 			"ref_further.x_something AS ref_further_x_something", //
 			"FROM dummy_entity ", //
-			"LEFT OUTER JOIN referenced_entity AS ref "
+			"LEFT OUTER JOIN referenced_entity ref "
 				+ "ON ref.dummy_entity = dummy_entity.id1", //
-			"LEFT OUTER JOIN second_level_referenced_entity AS ref_further "
+			"LEFT OUTER JOIN second_level_referenced_entity ref_further "
 				+ "ON ref_further.referenced_entity = ref.x_l1id", //
 			"WHERE dummy_entity.backref = :backref");
 	}
@@ -302,8 +302,8 @@ class SqlGeneratorTest {
 			"ref_further.x_l2id AS ref_further_x_l2id", //
 			"ref_further.x_something AS ref_further_x_something", //
 			"FROM dummy_entity ", //
-			"LEFT OUTER JOIN referenced_entity AS ref ON ref.dummy_entity = dummy_entity.id1", //
-			"LEFT OUTER JOIN second_level_referenced_entity AS ref_further "
+			"LEFT OUTER JOIN referenced_entity ref ON ref.dummy_entity = dummy_entity.id1", //
+			"LEFT OUTER JOIN second_level_referenced_entity ref_further "
 				+ "ON ref_further.referenced_entity = ref.x_l1id", //
 			"dummy_entity.backref = :backref", //
 			"dummy_entity.backref_key = :backref_key");
@@ -324,9 +324,9 @@ class SqlGeneratorTest {
 				+ "AS ref_further_x_something, " //
 				+ "dummy_entity.key-column AS key-column " //
 				+ "FROM dummy_entity " //
-				+ "LEFT OUTER JOIN referenced_entity AS ref "
+				+ "LEFT OUTER JOIN referenced_entity ref "
 				+ "ON ref.dummy_entity = dummy_entity.id1 " //
-				+ "LEFT OUTER JOIN second_level_referenced_entity AS ref_further "
+				+ "LEFT OUTER JOIN second_level_referenced_entity ref_further "
 				+ "ON ref_further.referenced_entity = ref.x_l1id " //
 				+ "WHERE dummy_entity.backref = :backref");
 	}
@@ -350,8 +350,8 @@ class SqlGeneratorTest {
 			+ "AS ref_further_x_something, " //
 			+ "dummy_entity.key-column AS key-column " //
 			+ "FROM dummy_entity " //
-			+ "LEFT OUTER JOIN referenced_entity AS ref ON ref.dummy_entity = dummy_entity.id1 " //
-			+ "LEFT OUTER JOIN second_level_referenced_entity AS ref_further "
+			+ "LEFT OUTER JOIN referenced_entity ref ON ref.dummy_entity = dummy_entity.id1 " //
+			+ "LEFT OUTER JOIN second_level_referenced_entity ref_further "
 			+ "ON ref_further.referenced_entity = ref.x_l1id " //
 			+ "WHERE dummy_entity.backref = :backref " + "ORDER BY key-column");
 	}

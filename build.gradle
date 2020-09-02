@@ -9,13 +9,13 @@ buildscript {
         }
     }
     dependencies {
-        classpath("org.springframework.boot:spring-boot-gradle-plugin:2.3.2.RELEASE")
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:2.4.0-M2")
     }
 }
 
 allprojects {
     group = "com.navercorp.spring"
-    version = "2.1.0-M1"
+    version = "2.1.0-M2"
 }
 
 subprojects {
