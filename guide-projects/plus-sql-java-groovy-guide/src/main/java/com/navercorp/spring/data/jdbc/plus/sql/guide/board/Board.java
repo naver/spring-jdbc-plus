@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Embedded;
 import org.springframework.data.relational.core.mapping.MappedCollection;
@@ -117,6 +118,19 @@ public class Board {
 		Long id;
 
 		String content;
+
+		@Transient
+		String description;
+
+		public Tag(
+			Long id,
+			String content,
+			@org.springframework.beans.factory.annotation.Value("#root.content") String description
+		) {
+			this.id = id;
+			this.content = content;
+			this.description = description;
+		}
 	}
 
 	@Table("n_comment")
