@@ -108,6 +108,8 @@ public class JdbcPlusRepositoryFactoryBean<T extends Repository<S, ID>, S, ID ex
 	@Autowired
 	protected void setMappingContext(RelationalMappingContext mappingContext) {
 
+		Assert.notNull(mappingContext, "MappingContext must not be null");
+
 		super.setMappingContext(mappingContext);
 		this.mappingContext = mappingContext;
 	}
@@ -119,6 +121,9 @@ public class JdbcPlusRepositoryFactoryBean<T extends Repository<S, ID>, S, ID ex
 	 */
 	@Autowired
 	protected void setDialect(Dialect dialect) {
+
+		Assert.notNull(dialect, "Dialect must not be null");
+
 		this.dialect = dialect;
 	}
 
@@ -128,6 +133,9 @@ public class JdbcPlusRepositoryFactoryBean<T extends Repository<S, ID>, S, ID ex
 	 * @param dataAccessStrategy can be {@literal null}.
 	 */
 	public void setDataAccessStrategy(DataAccessStrategy dataAccessStrategy) {
+
+		Assert.notNull(dataAccessStrategy, "DataAccessStrategy must not be null");
+
 		this.dataAccessStrategy = dataAccessStrategy;
 	}
 
@@ -140,6 +148,9 @@ public class JdbcPlusRepositoryFactoryBean<T extends Repository<S, ID>, S, ID ex
 	 */
 	@Autowired(required = false)
 	public void setQueryMappingConfiguration(QueryMappingConfiguration queryMappingConfiguration) {
+
+		Assert.notNull(queryMappingConfiguration, "QueryMappingConfiguration must not be null");
+
 		this.queryMappingConfiguration = queryMappingConfiguration;
 	}
 
@@ -149,6 +160,9 @@ public class JdbcPlusRepositoryFactoryBean<T extends Repository<S, ID>, S, ID ex
 	 * @param operations the operations
 	 */
 	public void setJdbcOperations(NamedParameterJdbcOperations operations) {
+
+		Assert.notNull(operations, "NamedParameterJdbcOperations must not be null");
+
 		this.operations = operations;
 	}
 
@@ -159,6 +173,9 @@ public class JdbcPlusRepositoryFactoryBean<T extends Repository<S, ID>, S, ID ex
 	 */
 	@Autowired
 	public void setConverter(JdbcConverter converter) {
+
+		Assert.notNull(converter, "JdbcConverter must not be null");
+
 		this.converter = converter;
 	}
 
