@@ -584,6 +584,7 @@ public class BoardRepositoryTest {
 		for (int i = 0; i < actualTags.size(); i++) {
 			assertThat(actualTags.get(i).getId()).isEqualTo(postTags.get(i).getId());
 			assertThat(actualTags.get(i).getContent()).isEqualTo(postTags.get(i).getContent());
+			assertThat(actualTags.get(i).getContent()).isEqualTo(actualTags.get(i).getDescription());
 		}
 
 		List<Comment> actualComments = actualPost.getComments();

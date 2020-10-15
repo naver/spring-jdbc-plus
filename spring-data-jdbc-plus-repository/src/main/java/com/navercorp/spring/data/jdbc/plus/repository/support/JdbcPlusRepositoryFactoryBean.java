@@ -96,6 +96,7 @@ public class JdbcPlusRepositoryFactoryBean<T extends Repository<S, ID>, S, ID ex
 			dataAccessStrategy, mappingContext, converter, dialect, publisher, operations);
 		jdbcRepositoryFactory.setQueryMappingConfiguration(queryMappingConfiguration);
 		jdbcRepositoryFactory.setEntityCallbacks(entityCallbacks);
+		jdbcRepositoryFactory.setBeanFactory(beanFactory);
 
 		return jdbcRepositoryFactory;
 	}

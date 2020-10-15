@@ -20,37 +20,36 @@ package com.navercorp.spring.data.jdbc.plus.sql.convert;
 
 import static java.util.stream.Collectors.*;
 
-import java.lang.reflect.Constructor;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.stream.IntStream;
 
+import org.springframework.context.ApplicationContext;
 import org.springframework.data.convert.CustomConversions;
 import org.springframework.data.jdbc.core.convert.BasicJdbcConverter;
 import org.springframework.data.jdbc.core.convert.Identifier;
 import org.springframework.data.jdbc.core.convert.JdbcTypeFactory;
 import org.springframework.data.jdbc.core.convert.RelationResolver;
 import org.springframework.data.mapping.MappingException;
-import org.springframework.data.mapping.PersistentEntity;
 import org.springframework.data.mapping.PersistentProperty;
 import org.springframework.data.mapping.PersistentPropertyAccessor;
 import org.springframework.data.mapping.PersistentPropertyPath;
 import org.springframework.data.mapping.PreferredConstructor;
 import org.springframework.data.mapping.context.MappingContext;
-import org.springframework.data.mapping.model.KotlinDefaultMask;
-import org.springframework.data.mapping.model.MappingInstantiationException;
+import org.springframework.data.mapping.model.DefaultSpELExpressionEvaluator;
+import org.springframework.data.mapping.model.ParameterValueProvider;
+import org.springframework.data.mapping.model.SpELContext;
+import org.springframework.data.mapping.model.SpELExpressionEvaluator;
+import org.springframework.data.mapping.model.SpELExpressionParameterValueProvider;
 import org.springframework.data.relational.core.mapping.PersistentPropertyPathExtension;
 import org.springframework.data.relational.core.mapping.RelationalPersistentEntity;
 import org.springframework.data.relational.core.mapping.RelationalPersistentProperty;
 import org.springframework.data.relational.core.sql.IdentifierProcessing;
-import org.springframework.data.util.ReflectionUtils;
 import org.springframework.data.util.Streamable;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
@@ -58,18 +57,14 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
-import kotlin.reflect.KFunction;
-import kotlin.reflect.KParameter;
-import kotlin.reflect.jvm.ReflectJvmMapping;
-
 /**
  * The type Aggregate result jdbc converter.
  *
  * @author Myeonghyeon Lee
  */
 public class AggregateResultJdbcConverter extends BasicJdbcConverter {
-	private static final Object[] EMPTY_ARGS = new Object[0];
 	private final IdentifierProcessing identifierProcessing;
+	private SpELContext spElContext;
 
 	/**
 	 * Instantiates a new Aggregate result jdbc converter.
@@ -83,6 +78,7 @@ public class AggregateResultJdbcConverter extends BasicJdbcConverter {
 
 		super(context, relationResolver);
 		this.identifierProcessing = IdentifierProcessing.ANSI;
+		this.spElContext = new SpELContext(ResultMapPropertyAccessor.INSTANCE);
 	}
 
 	/**
@@ -103,10 +99,12 @@ public class AggregateResultJdbcConverter extends BasicJdbcConverter {
 
 		super(context, relationResolver, conversions, typeFactory, identifierProcessing);
 		this.identifierProcessing = identifierProcessing;
+		this.spElContext = new SpELContext(ResultMapPropertyAccessor.INSTANCE);
 	}
 
-	private static Object[] allocateArguments(int argumentCount) {
-		return argumentCount == 0 ? EMPTY_ARGS : new Object[argumentCount];
+	@Override
+	public void setApplicationContext(ApplicationContext applicationContext) {
+		this.spElContext = new SpELContext(this.spElContext, applicationContext);
 	}
 
 	/**
@@ -806,289 +804,6 @@ public class AggregateResultJdbcConverter extends BasicJdbcConverter {
 		}
 	}
 
-	private static class MapInstantiator {
-		private final PreferredConstructor<?, ?> constructor;
-
-		/**
-		 * Instantiates a new Map instantiator.
-		 *
-		 * @param constructor the constructor
-		 */
-		public MapInstantiator(PreferredConstructor<?, ?> constructor) {
-			this.constructor = constructor;
-		}
-
-		/**
-		 * New instance map.
-		 *
-		 * @param args the args
-		 * @return the map
-		 */
-		public Map<String, Object> newInstance(Object... args) {
-			Map<String, Object> result = new HashMap<>();
-			List<? extends PreferredConstructor.Parameter<Object, ?>> parameters =
-				constructor.getParameters();
-			for (int i = 0; i < parameters.size(); i++) {
-				result.put(parameters.get(i).getName(), args[i]);
-			}
-			return result;
-		}
-	}
-
-	private static class MapInstantiatorAdapter {
-
-		private final MapInstantiator instantiator;
-
-		/**
-		 * Instantiates a new Map instantiator adapter.
-		 *
-		 * @param instantiator the instantiator
-		 */
-		public MapInstantiatorAdapter(MapInstantiator instantiator) {
-			this.instantiator = instantiator;
-		}
-
-		/**
-		 * Create instance map.
-		 *
-		 * @param <T>      the type parameter
-		 * @param <E>      the type parameter
-		 * @param <P>      the type parameter
-		 * @param entity   the entity
-		 * @param provider the provider
-		 * @return the map
-		 */
-		public <T, E extends PersistentEntity<? extends T, P>,
-			P extends PersistentProperty<P>> Map<String, Object> createInstance(
-			E entity, MapParameterValueProvider<P> provider) {
-
-			Object[] params = extractInvocationArguments(entity.getPersistenceConstructor(), provider);
-
-			try {
-				return instantiator.newInstance(params);
-			} catch (Exception e) {
-				throw new MappingInstantiationException(entity, Arrays.asList(params), e);
-			}
-		}
-
-		private <P extends PersistentProperty<P>, T> Object[] extractInvocationArguments(
-			@Nullable PreferredConstructor<? extends T, P> constructor,
-			MapParameterValueProvider<P> provider) {
-
-			if (constructor == null || !constructor.hasParameters()) {
-				return allocateArguments(0);
-			}
-
-			Object[] params = allocateArguments(constructor.getConstructor().getParameterCount());
-
-			int index = 0;
-			for (PreferredConstructor.Parameter<?, P> parameter : constructor.getParameters()) {
-				params[index++] = provider.getParameterValue(parameter);
-			}
-
-			return params;
-		}
-	}
-
-	private static class DefaultingKotlinConstructorResolver {
-
-		@Nullable
-		private final PreferredConstructor<?, ?> defaultConstructor;
-
-		/**
-		 * Instantiates a new Defaulting kotlin constructor resolver.
-		 *
-		 * @param entity the entity
-		 */
-		@SuppressWarnings("unchecked")
-		DefaultingKotlinConstructorResolver(PersistentEntity<?, ?> entity) {
-
-			Constructor<?> hit = resolveDefaultConstructor(entity);
-			PreferredConstructor<?, ?> persistenceConstructor = entity.getPersistenceConstructor();
-
-			if (hit != null && persistenceConstructor != null) {
-				this.defaultConstructor = new PreferredConstructor<>(hit,
-					persistenceConstructor.getParameters().toArray(
-						new PreferredConstructor.Parameter[0]));
-			} else {
-				this.defaultConstructor = null;
-			}
-		}
-
-		@Nullable
-		private static Constructor<?> resolveDefaultConstructor(PersistentEntity<?, ?> entity) {
-
-			PreferredConstructor<?, ?> persistenceConstructor = entity.getPersistenceConstructor();
-
-			if (persistenceConstructor == null) {
-				return null;
-			}
-
-			Constructor<?> hit = null;
-			Constructor<?> constructor = persistenceConstructor.getConstructor();
-
-			for (Constructor<?> candidate : entity.getType().getDeclaredConstructors()) {
-
-				// use only synthetic constructors
-				if (!candidate.isSynthetic()) {
-					continue;
-				}
-
-				// candidates must contain at least two additional parameters
-				// (int, DefaultConstructorMarker).
-				// Number of defaulting masks derives from the original constructor arg count
-				int syntheticParameters = KotlinDefaultMask.getMaskCount(
-					constructor.getParameterCount()) + /* DefaultConstructorMarker */ 1;
-
-				if (constructor.getParameterCount() + syntheticParameters
-					!= candidate.getParameterCount()) {
-
-					continue;
-				}
-
-				java.lang.reflect.Parameter[] constructorParameters = constructor.getParameters();
-				java.lang.reflect.Parameter[] candidateParameters = candidate.getParameters();
-
-				if (!candidateParameters[candidateParameters.length - 1].getType().getName()
-					.equals("kotlin.jvm.internal.DefaultConstructorMarker")) {
-					continue;
-				}
-
-				if (parametersMatch(constructorParameters, candidateParameters)) {
-					hit = candidate;
-					break;
-				}
-			}
-
-			return hit;
-		}
-
-		private static boolean parametersMatch(java.lang.reflect.Parameter[] constructorParameters,
-			java.lang.reflect.Parameter[] candidateParameters) {
-
-			return IntStream.range(0, constructorParameters.length).allMatch(i ->
-				constructorParameters[i].getType().equals(candidateParameters[i].getType()));
-		}
-
-		/**
-		 * Gets default constructor.
-		 *
-		 * @return the default constructor
-		 */
-		@Nullable
-		PreferredConstructor<?, ?> getDefaultConstructor() {
-			return defaultConstructor;
-		}
-	}
-
-	private static class KotlinMapInstantiatorAdapter {
-
-		private final MapInstantiator instantiator;
-		private final KFunction<?> constructor;
-		private final List<KParameter> kParameters;
-		private final Constructor<?> synthetic;
-
-		/**
-		 * Instantiates a new Kotlin map instantiator adapter.
-		 *
-		 * @param instantiator the instantiator
-		 * @param constructor  the constructor
-		 */
-		KotlinMapInstantiatorAdapter(
-			MapInstantiator instantiator, PreferredConstructor<?, ?> constructor) {
-
-			KFunction<?> kotlinConstructor = ReflectJvmMapping.getKotlinFunction(
-				constructor.getConstructor());
-
-			if (kotlinConstructor == null) {
-				throw new IllegalArgumentException(
-					"No corresponding Kotlin constructor found for "
-						+ constructor.getConstructor());
-			}
-
-			this.instantiator = instantiator;
-			this.constructor = kotlinConstructor;
-			this.kParameters = kotlinConstructor.getParameters();
-			this.synthetic = constructor.getConstructor();
-		}
-
-		/**
-		 * Create instance map.
-		 *
-		 * @param <T>      the type parameter
-		 * @param <E>      the type parameter
-		 * @param <P>      the type parameter
-		 * @param entity   the entity
-		 * @param provider the provider
-		 * @return the map
-		 */
-		public <T, E extends PersistentEntity<? extends T, P>,
-			P extends PersistentProperty<P>> Map<String, Object> createInstance(
-			E entity, MapParameterValueProvider<P> provider) {
-
-			Object[] params = extractInvocationArguments(
-				entity.getPersistenceConstructor(), provider);
-
-			try {
-				return instantiator.newInstance(params);
-			} catch (Exception e) {
-				throw new MappingInstantiationException(entity, Arrays.asList(params), e);
-			}
-		}
-
-		private <P extends PersistentProperty<P>, T> Object[] extractInvocationArguments(
-			@Nullable PreferredConstructor<? extends T, P> preferredConstructor,
-			MapParameterValueProvider<P> provider) {
-
-			if (preferredConstructor == null) {
-				throw new IllegalArgumentException("PreferredConstructor must not be null!");
-			}
-
-			Object[] params = allocateArguments(
-				synthetic.getParameterCount()
-					+ KotlinDefaultMask.getMaskCount(synthetic.getParameterCount())
-					+ /* DefaultConstructorMarker */1);
-			int userParameterCount = kParameters.size();
-
-			List<PreferredConstructor.Parameter<Object, P>> parameters =
-				preferredConstructor.getParameters();
-
-			// Prepare user-space arguments
-			for (int i = 0; i < userParameterCount; i++) {
-
-				PreferredConstructor.Parameter<Object, P> parameter = parameters.get(i);
-				params[i] = provider.getParameterValue(parameter);
-			}
-
-			KotlinDefaultMask defaultMask = KotlinDefaultMask.from(constructor, it -> {
-
-				int index = kParameters.indexOf(it);
-
-				PreferredConstructor.Parameter<Object, P> parameter = parameters.get(index);
-				Class<Object> type = parameter.getType().getType();
-
-				if (it.isOptional() && params[index] == null) {
-					if (type.isPrimitive()) {
-
-						// apply primitive defaulting to prevent NPE on primitive downcast
-						params[index] = ReflectionUtils.getPrimitiveDefault(type);
-					}
-					return false;
-				}
-
-				return true;
-			});
-
-			int[] defaulting = defaultMask.getDefaulting();
-			// append nullability masks to creation arguments
-			for (int i = 0; i < defaulting.length; i++) {
-				params[userParameterCount + i] = defaulting[i];
-			}
-
-			return params;
-		}
-	}
-
 	private class SingleTableMapReadingContext {
 
 		private final RelationalPersistentEntity<?> entity;
@@ -1100,6 +815,7 @@ public class AggregateResultJdbcConverter extends BasicJdbcConverter {
 
 		private final JdbcPropertyValueProvider propertyValueProvider;
 		private final JdbcBackReferencePropertyValueProvider backReferencePropertyValueProvider;
+		private final ResultSetAccessor accessor;
 
 		private SingleTableMapReadingContext(
 			PersistentPropertyPathExtension rootPath,
@@ -1121,6 +837,7 @@ public class AggregateResultJdbcConverter extends BasicJdbcConverter {
 			this.backReferencePropertyValueProvider = new JdbcBackReferencePropertyValueProvider(
 				identifierProcessing, path,
 				accessor);
+			this.accessor = accessor;
 		}
 
 		private SingleTableMapReadingContext(
@@ -1139,13 +856,15 @@ public class AggregateResultJdbcConverter extends BasicJdbcConverter {
 				identifierProcessing, path, accessor);
 			this.backReferencePropertyValueProvider = new JdbcBackReferencePropertyValueProvider(
 				identifierProcessing, path, accessor);
+			this.accessor = accessor;
 		}
 
 		private SingleTableMapReadingContext(
 			RelationalPersistentEntity<?> entity, PersistentPropertyPathExtension rootPath,
 			PersistentPropertyPathExtension path, Identifier identifier, Object key,
 			JdbcPropertyValueProvider propertyValueProvider,
-			JdbcBackReferencePropertyValueProvider backReferencePropertyValueProvider) {
+			JdbcBackReferencePropertyValueProvider backReferencePropertyValueProvider,
+			ResultSetAccessor accessor) {
 
 			this.entity = entity;
 			this.rootPath = rootPath;
@@ -1155,6 +874,7 @@ public class AggregateResultJdbcConverter extends BasicJdbcConverter {
 
 			this.propertyValueProvider = propertyValueProvider;
 			this.backReferencePropertyValueProvider = backReferencePropertyValueProvider;
+			this.accessor = accessor;
 		}
 
 		private SingleTableMapReadingContext extendBy(RelationalPersistentProperty property) {
@@ -1162,7 +882,7 @@ public class AggregateResultJdbcConverter extends BasicJdbcConverter {
 				getMappingContext().getRequiredPersistentEntity(property.getActualType()),
 				/* rootPath.extendBy(property)*/ rootPath, path.extendBy(property), identifier, key,
 				propertyValueProvider.extendBy(property),
-				backReferencePropertyValueProvider.extendBy(property));
+				backReferencePropertyValueProvider.extendBy(property), accessor);
 		}
 
 		/**
@@ -1534,21 +1254,65 @@ public class AggregateResultJdbcConverter extends BasicJdbcConverter {
 
 		private T createInstanceInternal(@Nullable Object idValue) {
 
-			T instance = createInstance(entity, parameter -> {
+			PreferredConstructor<?, RelationalPersistentProperty> persistenceConstructor = entity.getPersistenceConstructor();
+			ParameterValueProvider<RelationalPersistentProperty> provider;
+
+			if (persistenceConstructor != null && persistenceConstructor.hasParameters()) {
+				SpELExpressionEvaluator expressionEvaluator = new DefaultSpELExpressionEvaluator(this.entityMap, spElContext);
+				provider = new SpELExpressionParameterValueProvider<>(expressionEvaluator, getConversionService(),
+					new ResultSetParameterValueProvider(idValue, entity));
+			} else {
+				provider = NoOpParameterValueProvider.INSTANCE;
+			}
+
+			T instance = createInstance(entity, provider::getParameterValue);
+
+			return entity.requiresPropertyPopulation() ? populateProperties(instance, idValue) : instance;
+		}
+
+		/**
+		 * {@link ParameterValueProvider} that reads a simple property or materializes an object for a
+		 * {@link RelationalPersistentProperty}.
+		 *
+		 * @see #readOrLoadProperty(Object, RelationalPersistentProperty)
+		 * @since 2.1
+		 */
+		private class ResultSetParameterValueProvider implements ParameterValueProvider<RelationalPersistentProperty> {
+
+			private final @Nullable
+			Object idValue;
+			private final RelationalPersistentEntity<?> entity;
+
+			public ResultSetParameterValueProvider(@Nullable Object idValue, RelationalPersistentEntity<?> entity) {
+				this.idValue = idValue;
+				this.entity = entity;
+			}
+
+			/*
+			 * (non-Javadoc)
+			 * @see org.springframework.data.mapping.model.ParameterValueProvider#getParameterValue(org.springframework.data.mapping.PreferredConstructor.Parameter)
+			 */
+			@Override
+			@Nullable
+			public <T> T getParameterValue(PreferredConstructor.Parameter<T, RelationalPersistentProperty> parameter) {
 
 				String parameterName = parameter.getName();
 
-				Assert.notNull(
-					parameterName,
-					"A constructor parameter name must not be null "
-						+ "to be used with Spring Data JDBC");
+				Assert.notNull(parameterName, "A constructor parameter name must not be null to be used with Spring Data JDBC");
 
-				RelationalPersistentProperty property =
-					entity.getRequiredPersistentProperty(parameterName);
+				RelationalPersistentProperty property = entity.getRequiredPersistentProperty(parameterName);
+				return (T)readOrLoadProperty(idValue, property);
+			}
+		}
+	}
 
-				return readOrLoadProperty(idValue, property);
-			});
-			return entity.requiresPropertyPopulation() ? populateProperties(instance, idValue) : instance;
+	enum NoOpParameterValueProvider implements ParameterValueProvider<RelationalPersistentProperty> {
+
+		INSTANCE;
+
+		@Override
+		public <T> T getParameterValue(PreferredConstructor.Parameter<T, RelationalPersistentProperty> parameter) {
+			return null;
 		}
 	}
 }
