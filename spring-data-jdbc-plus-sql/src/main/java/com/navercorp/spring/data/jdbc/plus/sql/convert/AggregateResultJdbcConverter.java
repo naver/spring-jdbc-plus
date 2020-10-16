@@ -104,6 +104,7 @@ public class AggregateResultJdbcConverter extends BasicJdbcConverter {
 
 	@Override
 	public void setApplicationContext(ApplicationContext applicationContext) {
+		super.setApplicationContext(applicationContext);
 		this.spElContext = new SpELContext(this.spElContext, applicationContext);
 	}
 
