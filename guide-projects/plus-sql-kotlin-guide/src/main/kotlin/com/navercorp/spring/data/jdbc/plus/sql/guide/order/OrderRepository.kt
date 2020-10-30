@@ -46,7 +46,8 @@ class OrderRepositoryImpl(entityProvider: EntityJdbcProvider) : JdbcRepositorySu
     override fun findByPurchaserNo(purchaserNo: String): List<Order> {
         val sql = this.sqls.selectByPurchaserNo()
         return find(
-            sql, mapParameterSource()
+            sql,
+            mapParameterSource()
                 .addValue("purchaserNo", purchaserNo)
         )
     }
@@ -54,7 +55,8 @@ class OrderRepositoryImpl(entityProvider: EntityJdbcProvider) : JdbcRepositorySu
     override fun search(criteria: OrderCriteria): List<Order> {
         val sql = this.sqls.search(criteria)
         return find(
-            sql, mapParameterSource()
+            sql,
+            mapParameterSource()
                 .addValue("purchaserNo", criteria.purchaserNo)
                 .addValue("status", criteria.status.name)
         )
@@ -63,7 +65,8 @@ class OrderRepositoryImpl(entityProvider: EntityJdbcProvider) : JdbcRepositorySu
     override fun countByPurchaserNo(purchaserNo: String): Long {
         val sql = this.sqls.countByPurchaserNo()
         return selectSingleValue(
-            sql, mapParameterSource()
+            sql,
+            mapParameterSource()
                 .addValue("purchaserNo", purchaserNo),
             Long::class.java
         )

@@ -45,7 +45,8 @@ class BoardRepositoryImpl(entityProvider: EntityJdbcProvider) : JdbcRepositorySu
     override fun findGraphById(id: Long): Board? {
         val sql = this.sqls.selectGraphById()
         return findOne(
-            sql, mapParameterSource()
+            sql,
+            mapParameterSource()
                 .addValue("boardId", id)
         ).orElse(null)
     }
@@ -53,14 +54,16 @@ class BoardRepositoryImpl(entityProvider: EntityJdbcProvider) : JdbcRepositorySu
     override fun findAllGraph(): List<Board> {
         val sql = this.sqls.selectAllGraph()
         return find(
-            sql, mapParameterSource()
+            sql,
+            mapParameterSource()
         )
     }
 
     override fun findPostDtoByPostId(postId: Long): PostDto? {
         val sql = this.sqls.selectPostDtoByPostId()
         return findOne(
-            sql, mapParameterSource()
+            sql,
+            mapParameterSource()
                 .addValue("postId", postId),
             PostDto::class.java
         ).orElse(null)

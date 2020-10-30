@@ -2,11 +2,11 @@ compileJava.dependsOn(processResources)
 
 dependencies {
     compile project(":spring-jdbc-plus-support")
-    compile("org.springframework.data:spring-data-jdbc:2.1.0-RC2")
-    compile("org.springframework.data:spring-data-relational:2.1.0-RC2")
-    compile("org.springframework.data:spring-data-commons:2.4.0-RC2")
-    compileOnly("org.jetbrains.kotlin:kotlin-stdlib:1.3.72")
-    compileOnly("org.jetbrains.kotlin:kotlin-reflect:1.3.72")
+    compile("org.springframework.data:spring-data-jdbc:2.1.0")
+    compile("org.springframework.data:spring-data-relational:2.1.0")
+    compile("org.springframework.data:spring-data-commons:2.4.0")
+    compileOnly("org.jetbrains.kotlin:kotlin-stdlib:1.4.10")
+    compileOnly("org.jetbrains.kotlin:kotlin-reflect:1.4.10")
     compileOnly("io.projectreactor:reactor-core")
 
     testImplementation("org.junit.jupiter:junit-jupiter")
