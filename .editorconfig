@@ -2,7 +2,8 @@
 root = true
 
 [*.{kt, kts}]
-disabled_rules = import-ordering
+disabled_rules = import-ordering, indent
+# disable indent rule until https://github.com/pinterest/ktlint/issues/764 is fixed.
 
 [*]
 # [encoding-utf8]

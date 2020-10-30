@@ -154,4 +154,12 @@ public @interface EnableJdbcPlusReactiveSupportRepositories {
 	 * @return dataAccessStrategyRef
 	 */
 	String dataAccessStrategyRef() default "";
+
+	/**
+	 * Configures the name of the {@link org.springframework.jdbc.datasource.DataSourceTransactionManager} bean definition to be used to create repositories
+	 * discovered through this annotation. Defaults to {@code transactionManager}.
+	 *
+	 * @return transactionManager
+	 */
+	String transactionManagerRef() default "transactionManager";
 }
