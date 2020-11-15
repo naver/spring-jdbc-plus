@@ -31,9 +31,7 @@ dependencies {
     implementation("org.springframework.data:spring-data-relational:2.1.1")
     implementation("org.springframework.data:spring-data-commons:2.4.1")
 
-    testImplementation("org.springframework.boot:spring-boot-starter-test") {
-        exclude(group = "org.junit.vintage", module = "junit-vintage-engine")
-    }
+    testImplementation("org.springframework.boot:spring-boot-starter-test")
 }
 
 tasks.withType<KotlinCompile> {
