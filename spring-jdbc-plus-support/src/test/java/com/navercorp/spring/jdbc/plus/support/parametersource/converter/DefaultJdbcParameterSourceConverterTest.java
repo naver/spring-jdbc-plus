@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -150,7 +151,7 @@ class DefaultJdbcParameterSourceConverterTest {
 
 		// then
 		assertThat(actualResult.getClass().isArray()).isTrue();
-		assertThat((Object[]) actualResult).allSatisfy(actual -> {
+		assertThat((Object[])actualResult).allSatisfy(actual -> {
 			assertThat(actual).isExactlyInstanceOf(Integer.class);
 			assertThat(actual).isIn(convertedSoccer, convertedBaseBall);
 		});
@@ -215,10 +216,76 @@ class DefaultJdbcParameterSourceConverterTest {
 
 		// then
 		assertThat(actualResult.getClass().isArray()).isTrue();
-		assertThat((Object[]) actualResult).allSatisfy(actual -> {
+		assertThat((Object[])actualResult).allSatisfy(actual -> {
 			assertThat(actual).isExactlyInstanceOf(Integer.class);
 			assertThat(actual).isIn(convertedSoccer, convertedBaseBall);
 		});
+	}
+
+	@Test
+	@DisplayName("같은 타입에 대해서는 Converter/Unwapper 와 ConditionalConverter/ConditionalUnwrapper 중 Non-Conditional이 우선합니다.")
+	void convertSameType() {
+		// given
+		List<Converter<?, ?>> converters = new ArrayList<>();
+		converters.add(new JsonNodeConverter());
+		converters.add(new JsonNodeConditionalConverter());
+
+		List<Unwrapper<?>> unwrappers = new ArrayList<>();
+		unwrappers.add(new JsonNodeUnwrapper());
+		unwrappers.add(new JsonNodeConditionalUnwrapper());
+
+		DefaultJdbcParameterSourceConverter sut = new DefaultJdbcParameterSourceConverter(converters, unwrappers);
+
+		// when
+		Object actual = sut.convert("name", new JsonNode("hello"));
+
+		// then
+		assertThat(actual).isExactlyInstanceOf(String.class);
+		assertThat(actual).isEqualTo("unwrapped hello");
+	}
+
+	@Test
+	@DisplayName("Conditional/Unwrapper 등록한 타입이 아닌 Value는, ConditionalConverter/Unwrapper가 처리합니다.")
+	void convertInheritedTypeUsingConditionalConverterAndUnwrapper() {
+		// given
+		List<Converter<?, ?>> converters = new ArrayList<>();
+		converters.add(new JsonNodeConverter());
+		converters.add(new JsonNodeConditionalConverter());
+
+		List<Unwrapper<?>> unwrappers = new ArrayList<>();
+		unwrappers.add(new JsonNodeUnwrapper());
+		unwrappers.add(new JsonNodeConditionalUnwrapper());
+
+		DefaultJdbcParameterSourceConverter sut = new DefaultJdbcParameterSourceConverter(converters, unwrappers);
+
+		// when
+		Object actual = sut.convert("name", new JsonValue("hello"));
+
+		// then
+		assertThat(actual).isExactlyInstanceOf(String.class);
+		assertThat(actual).isEqualTo("conditional converted conditional unwrapped hello");
+	}
+
+	@Test
+	@DisplayName("Iterator / Array 보다 ConditionalConverter/Unwapper가 우선합니다.")
+	void convertIterableConditionalConverterValue() {
+		// given
+		List<Converter<?, ?>> converters = new ArrayList<>();
+		converters.add(new JsonNodeConverter());
+		converters.add(new JsonNodeConditionalConverter());
+
+		List<Unwrapper<?>> unwrappers = new ArrayList<>();
+		unwrappers.add(new JsonNodeUnwrapper());
+		unwrappers.add(new JsonNodeConditionalUnwrapper());
+
+		DefaultJdbcParameterSourceConverter sut = new DefaultJdbcParameterSourceConverter(converters, unwrappers);
+
+		// when
+		Object actual = sut.convert("name", new JsonArray("hello"));
+
+		// then
+		assertThat(actual).isExactlyInstanceOf(String.class);
+		assertThat(actual).isEqualTo("conditional converted conditional unwrapped hello");
 	}
 
 	@Test
@@ -322,6 +389,84 @@ class DefaultJdbcParameterSourceConverterTest {
 		@Override
 		public Object unwrap(Optional source) {
 			return source.orElse(null);
+		}
+	}
+
+	private static class JsonNodeUnwrapper implements Unwrapper<JsonNode> {
+		@Override
+		public Object unwrap(JsonNode value) {
+			return new JsonNode("unwrapped " + value.value);
+		}
+	}
+
+	private static class JsonNodeConditionalUnwrapper implements ConditionalUnwrapper<JsonNode> {
+
+		@Override
+		public boolean matches(Object value) {
+			return value instanceof JsonNode;
+		}
+
+		@Override
+		public Object unwrap(JsonNode value) {
+			if (value instanceof JsonArray) {
+				return new JsonArray("conditional unwrapped " + value.value);
+			} else if (value instanceof JsonValue) {
+					return new JsonValue("conditional unwrapped " + value.value);
+			} else {
+				return new JsonNode("conditional unwrapped " + value.value);
+			}
+		}
+	}
+
+	private static class JsonNodeConverter implements Converter<JsonNode, String> {
+
+		@Override
+		public String convert(JsonNode source) {
+			return source.toString();
+		}
+
+	}
+
+	private static class JsonNodeConditionalConverter implements ConditionalConverter<JsonNode, String> {
+
+		@Override
+		public boolean matches(Object value) {
+			return value instanceof JsonNode;
+		}
+
+		@Override
+		public String convert(JsonNode source) {
+			return "conditional converted " + source.toString();
+		}
+
+	}
+
+	static class JsonNode {
+		private String value;
+
+		public JsonNode(String value) {
+			this.value = value;
+		}
+
+		public String toString() {
+			return value;
+		}
+	}
+
+	static class JsonArray extends JsonNode implements Iterable<String> {
+		public JsonArray(String value) {
+			super(value);
+		}
+
+		@Override
+		public Iterator<String> iterator() {
+			return Collections.emptyIterator();
+		}
+	}
+
+	static class JsonValue extends JsonNode {
+		public JsonValue(String value) {
+			super(value);
 		}
 	}
 }
