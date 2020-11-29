@@ -26,6 +26,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.core.ResolvableType;
 import org.springframework.core.convert.converter.Converter;
@@ -40,8 +41,10 @@ import com.navercorp.spring.jdbc.plus.support.parametersource.converter.EnumPara
  */
 public class DefaultJdbcParameterSourceConverter implements JdbcParameterSourceConverter {
 	private final Map<Class<?>, Converter<?, ?>> converters;
-	private final Converter<Enum, Object> enumConverter;
+	private final List<ConditionalConverter> conditionalConverters;
+	private final Converter<Enum<?>, Object> enumConverter;
 	private final Map<Class<?>, Unwrapper<?>> unwrappers;
+	private final List<ConditionalUnwrapper> conditionalUnwrappers;
 
 	/**
 	 * Instantiates a new Default jdbc parameter source converter.
@@ -68,14 +71,25 @@ public class DefaultJdbcParameterSourceConverter implements JdbcParameterSourceC
 	@SuppressWarnings("unchecked")
 	public DefaultJdbcParameterSourceConverter(List<Converter<?, ?>> converters, List<Unwrapper<?>> unwrappers) {
 		this.converters = getConvertersMap(converters);
+		this.conditionalConverters = converters.stream()
+			.filter(ConditionalConverter.class::isInstance)
+			.map(ConditionalConverter.class::cast)
+			.collect(Collectors.toList());
 		Converter enumConverter = this.converters.get(Enum.class);
 		this.enumConverter = defaultIfNull(enumConverter, EnumToNameConverter.INSTANCE);
 		this.unwrappers = getUnwrappersMap(unwrappers);
+		this.conditionalUnwrappers = unwrappers.stream()
+			.filter(ConditionalUnwrapper.class::isInstance)
+			.map(ConditionalUnwrapper.class::cast)
+			.collect(Collectors.toList());
 	}
 
 	private static Map<Class<?>, Converter<?, ?>> getConvertersMap(List<Converter<?, ?>> converters) {
 		Map<Class<?>, Converter<?, ?>> converterMap = new HashMap<>();
 		for (Converter<?, ?> converter : converters) {
+			if (converter instanceof ValueMatcher) {
+				continue;
+			}
 			Class<?> generics = resolveConverterGenerics(converter.getClass()).get(0);
 			if (generics == Object.class) {
 				throw new ParameterTypeConverterResolveException(
@@ -104,6 +118,7 @@ public class DefaultJdbcParameterSourceConverter implements JdbcParameterSourceC
 		return Collections.unmodifiableMap(result);
 	}
 
+	@SuppressWarnings("CollectionAddAllCanBeReplacedWithConstructor")
 	private static Map<Class<?>, Converter<?, ?>> getDefaultConverters() {
 		List<Converter<?, ?>> converters = new ArrayList<>();
 		converters.addAll(Java8TimeParameterTypeConverter.getConvertersToRegister());
@@ -115,6 +130,9 @@ public class DefaultJdbcParameterSourceConverter implements JdbcParameterSourceC
 	private static Map<Class<?>, Unwrapper<?>> getUnwrappersMap(List<Unwrapper<?>> unwrappers) {
 		Map<Class<?>, Unwrapper<?>> unwrapperMap = new HashMap<>();
 		for (Unwrapper<?> unwrapper : unwrappers) {
+			if (unwrapper instanceof ValueMatcher) {
+				continue;
+			}
 			Class<?> generics = resolveUnwrapperGenerics(unwrapper.getClass()).get(0);
 			if (generics == Object.class) {
 				throw new ParameterTypeConverterResolveException(
@@ -158,7 +176,7 @@ public class DefaultJdbcParameterSourceConverter implements JdbcParameterSourceC
 
 	@SuppressWarnings("unchecked")
 	private Object convert(Object value) {
-		Unwrapper unwrapper = this.unwrappers.get(value.getClass());
+		Unwrapper unwrapper = resolveUnwrapper(value);
 		if (unwrapper != null) {
 			value = unwrapper.unwrap(value);
 		}
@@ -167,19 +185,52 @@ public class DefaultJdbcParameterSourceConverter implements JdbcParameterSourceC
 			return null;
 		}
 
-		if (value instanceof Iterable) {
-			value = this.convertElements((Iterable)value);
-		} else if (value.getClass().isArray()) {
-			value = this.convertElements((Object[])value);
-		}
-
-		Converter converter = this.converters.get(value.getClass());
+		Converter converter = resolveConverter(value);
 		if (converter != null) {
 			value = converter.convert(value);
-		} else if (value instanceof Enum) {
-			value = enumConverter.convert((Enum)value);
+		} else {
+			if (value instanceof Iterable) {
+				value = this.convertElements((Iterable)value);
+			} else if (value.getClass().isArray()) {
+				value = this.convertElements((Object[])value);
+			} else if (value instanceof Enum) {
+				value = enumConverter.convert((Enum)value);
+			}
 		}
+
 		return value;
+	}
+
+	@Nullable
+	private Unwrapper resolveUnwrapper(Object value) {
+		Class<?> clazz = value.getClass();
+		Unwrapper unwrapper = this.unwrappers.get(clazz);
+		if (unwrapper != null) {
+			return unwrapper;
+		}
+
+		for (ConditionalUnwrapper each : this.conditionalUnwrappers) {
+			if (each.matches(value)) {
+				return each;
+			}
+		}
+		return null;
+	}
+
+	@Nullable
+	private Converter resolveConverter(Object value) {
+		Class<?> clazz = value.getClass();
+		Converter converter = this.converters.get(clazz);
+		if (converter != null) {
+			return converter;
+		}
+
+		for (ConditionalConverter each : this.conditionalConverters) {
+			if (each.matches(value)) {
+				return each;
+			}
+		}
+		return null;
 	}
 
 	private Object[] convertElements(Object[] array) {
