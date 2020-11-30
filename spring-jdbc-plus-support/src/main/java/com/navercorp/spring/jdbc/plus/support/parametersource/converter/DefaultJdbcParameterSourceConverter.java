@@ -26,7 +26,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.springframework.core.ResolvableType;
 import org.springframework.core.convert.converter.Converter;
@@ -38,13 +37,14 @@ import com.navercorp.spring.jdbc.plus.support.parametersource.converter.EnumPara
  * The type Default jdbc parameter source converter.
  *
  * @author Myeonghyeon Lee
+ * @author JunHo Yoon
  */
 public class DefaultJdbcParameterSourceConverter implements JdbcParameterSourceConverter {
 	private final Map<Class<?>, Converter<?, ?>> converters;
-	private final List<ConditionalConverter> conditionalConverters;
+	private final List<ConditionalConverter<?, ?>> conditionalConverters;
 	private final Converter<Enum<?>, Object> enumConverter;
 	private final Map<Class<?>, Unwrapper<?>> unwrappers;
-	private final List<ConditionalUnwrapper> conditionalUnwrappers;
+	private final List<ConditionalUnwrapper<?>> conditionalUnwrappers;
 
 	/**
 	 * Instantiates a new Default jdbc parameter source converter.
@@ -70,24 +70,28 @@ public class DefaultJdbcParameterSourceConverter implements JdbcParameterSourceC
 	 */
 	@SuppressWarnings("unchecked")
 	public DefaultJdbcParameterSourceConverter(List<Converter<?, ?>> converters, List<Unwrapper<?>> unwrappers) {
-		this.converters = getConvertersMap(converters);
-		this.conditionalConverters = converters.stream()
-			.filter(ConditionalConverter.class::isInstance)
-			.map(ConditionalConverter.class::cast)
-			.collect(Collectors.toList());
+		this.converters = getConvertersMapExcludeConditional(converters);
+		this.conditionalConverters = getConditionalConverters(converters);
 		Converter enumConverter = this.converters.get(Enum.class);
 		this.enumConverter = defaultIfNull(enumConverter, EnumToNameConverter.INSTANCE);
-		this.unwrappers = getUnwrappersMap(unwrappers);
-		this.conditionalUnwrappers = unwrappers.stream()
-			.filter(ConditionalUnwrapper.class::isInstance)
-			.map(ConditionalUnwrapper.class::cast)
-			.collect(Collectors.toList());
+		this.unwrappers = getUnwrappersMapExcludeConditional(unwrappers);
+		this.conditionalUnwrappers = getConditionalUnwrappers(unwrappers);
 	}
 
-	private static Map<Class<?>, Converter<?, ?>> getConvertersMap(List<Converter<?, ?>> converters) {
+	private static List<ConditionalConverter<?, ?>> getConditionalConverters(List<Converter<?, ?>> converters) {
+		List<ConditionalConverter<?, ?>> conditionalConverters = new ArrayList<>();
+		for (Converter<?, ?> converter : converters) {
+			if (converter instanceof ConditionalConverter) {
+				conditionalConverters.add((ConditionalConverter<?, ?>)converter);
+			}
+		}
+		return conditionalConverters;
+	}
+
+	private static Map<Class<?>, Converter<?, ?>> getConvertersMapExcludeConditional(List<Converter<?, ?>> converters) {
 		Map<Class<?>, Converter<?, ?>> converterMap = new HashMap<>();
 		for (Converter<?, ?> converter : converters) {
-			if (converter instanceof ValueMatcher) {
+			if (converter instanceof ConditionalConverter) {
 				continue;
 			}
 			Class<?> generics = resolveConverterGenerics(converter.getClass()).get(0);
@@ -118,6 +122,16 @@ public class DefaultJdbcParameterSourceConverter implements JdbcParameterSourceC
 		return Collections.unmodifiableMap(result);
 	}
 
+	private static List<ConditionalUnwrapper<?>> getConditionalUnwrappers(List<Unwrapper<?>> unwrappers) {
+		List<ConditionalUnwrapper<?>> conditionalUnwrappers = new ArrayList<>();
+		for (Unwrapper<?> unwrapper : unwrappers) {
+			if (unwrapper instanceof ConditionalUnwrapper) {
+				conditionalUnwrappers.add((ConditionalUnwrapper<?>)unwrapper);
+			}
+		}
+		return conditionalUnwrappers;
+	}
+
 	@SuppressWarnings("CollectionAddAllCanBeReplacedWithConstructor")
 	private static Map<Class<?>, Converter<?, ?>> getDefaultConverters() {
 		List<Converter<?, ?>> converters = new ArrayList<>();
@@ -127,10 +141,10 @@ public class DefaultJdbcParameterSourceConverter implements JdbcParameterSourceC
 			.collect(toMap(c -> resolveConverterGenerics(c.getClass()).get(0), c -> c));
 	}
 
-	private static Map<Class<?>, Unwrapper<?>> getUnwrappersMap(List<Unwrapper<?>> unwrappers) {
+	private static Map<Class<?>, Unwrapper<?>> getUnwrappersMapExcludeConditional(List<Unwrapper<?>> unwrappers) {
 		Map<Class<?>, Unwrapper<?>> unwrapperMap = new HashMap<>();
 		for (Unwrapper<?> unwrapper : unwrappers) {
-			if (unwrapper instanceof ValueMatcher) {
+			if (unwrapper instanceof ConditionalUnwrapper) {
 				continue;
 			}
 			Class<?> generics = resolveUnwrapperGenerics(unwrapper.getClass()).get(0);

@@ -18,9 +18,6 @@
 
 package com.navercorp.spring.jdbc.plus.support.parametersource.converter;
 
-import org.springframework.core.convert.TypeDescriptor;
-import org.springframework.lang.Nullable;
-
 /**
  * The interface ConditionalMatcher.
  * provide custom match functionality to make converters applied by custom matching logic.
