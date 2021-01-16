@@ -29,13 +29,13 @@ buildscript {
         }
     }
     dependencies {
-        classpath("org.springframework.boot:spring-boot-gradle-plugin:2.4.1")
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:2.4.2")
     }
 }
 
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
-    implementation("com.navercorp.spring:spring-boot-starter-data-jdbc-plus-sql:2.1.2")
+    implementation("com.navercorp.spring:spring-boot-starter-data-jdbc-plus-sql:2.1.3")
 }
 ```
 
@@ -56,7 +56,7 @@ dependencies {
 <dependency>
     <groupId>com.navercorp.spring</groupId>
     <artifactId>spring-boot-starter-data-jdbc-plus-sql</artifactId>
-    <version>2.1.2</version>
+    <version>2.1.3</version>
 </dependency>
 ```
 
