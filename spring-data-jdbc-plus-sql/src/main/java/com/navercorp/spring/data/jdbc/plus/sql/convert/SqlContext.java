@@ -15,11 +15,18 @@
  */
 package com.navercorp.spring.data.jdbc.plus.sql.convert;
 
+import javax.annotation.Nullable;
+
+import org.springframework.data.mapping.PersistentPropertyPath;
 import org.springframework.data.relational.core.mapping.PersistentPropertyPathExtension;
 import org.springframework.data.relational.core.mapping.RelationalPersistentEntity;
+import org.springframework.data.relational.core.mapping.RelationalPersistentProperty;
 import org.springframework.data.relational.core.sql.Column;
 import org.springframework.data.relational.core.sql.SqlIdentifier;
 import org.springframework.data.relational.core.sql.Table;
+import org.springframework.util.Assert;
+
+import com.navercorp.spring.data.jdbc.plus.sql.annotation.SqlTableAlias;
 
 /**
  * Utility to get from path to SQL DSL elements.
@@ -60,8 +67,7 @@ class SqlContext implements SqlContexts {
 
 	@Override
 	public Table getTable(PersistentPropertyPathExtension path) {
-
-		SqlIdentifier tableAlias = path.getTableAlias();
+		SqlIdentifier tableAlias = this.getTableAlias(path);
 		Table table = Table.create(path.getTableName());
 		return tableAlias == null ? table : table.as(tableAlias);
 	}
@@ -74,5 +80,53 @@ class SqlContext implements SqlContexts {
 	@Override
 	public Column getReverseColumn(PersistentPropertyPathExtension path) {
 		return getTable(path).column(path.getReverseColumnName()).as(path.getReverseColumnNameAlias());
+	}
+
+	// Refer from PersistentPropertyPathExtension#getTableAlias
+	@Nullable
+	private SqlIdentifier getTableAlias(PersistentPropertyPathExtension path) {
+		PersistentPropertyPathExtension tableOwner = getTableOwningAncestor(path);
+		if (tableOwner.getLength() > 0) {	// path != null
+			return this.assembleTableAlias(tableOwner);
+		}
+
+		// path == null : root
+		SqlTableAlias sqlTableAlias = tableOwner.getLeafEntity().findAnnotation(SqlTableAlias.class);
+		if (sqlTableAlias != null) {
+			return this.table.as(sqlTableAlias.value()).getReferenceName();
+		}
+
+		return null;
+	}
+
+	private PersistentPropertyPathExtension getTableOwningAncestor(PersistentPropertyPathExtension path) {
+		return path.isEntity() && !path.isEmbedded() ? path : this.getTableOwningAncestor(path.getParentPath());
+	}
+
+	private SqlIdentifier assembleTableAlias(PersistentPropertyPathExtension path) {
+
+		Assert.state(path != null, "Path is null");
+
+		PersistentPropertyPath<? extends RelationalPersistentProperty> propertyPath = path.getRequiredPersistentPropertyPath();
+		RelationalPersistentProperty leafProperty = propertyPath.getRequiredLeafProperty();
+
+		String prefix;
+		if (path.isEmbedded()) {
+			prefix = leafProperty.getEmbeddedPrefix();
+		} else {
+			SqlTableAlias sqlTableAlias = leafProperty.findPropertyOrOwnerAnnotation(SqlTableAlias.class);
+			prefix = sqlTableAlias != null ? sqlTableAlias.value() : leafProperty.getName();
+		}
+
+		if (path.getLength() == 1) {
+			Assert.notNull(prefix, "Prefix mus not be null.");
+			return SqlIdentifier.quoted(prefix);
+		}
+
+		PersistentPropertyPathExtension parentPath = path.getParentPath();
+		SqlIdentifier sqlIdentifier = this.assembleTableAlias(parentPath);
+
+		return parentPath.isEmbedded() ? sqlIdentifier.transform(name -> name.concat(prefix))
+			: sqlIdentifier.transform(name -> name + "_" + prefix);
 	}
 }
