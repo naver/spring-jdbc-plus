@@ -577,7 +577,7 @@ class SqlGenerator {
 				new PersistentPropertyPathExtension(mappingContext, path);
 			Column column = getColumn(extPath);
 			if (column != null) {
-				columnExpressions.add(column);
+				columnExpressions.add(getColumnExpression(extPath, column));
 			}
 		}
 
@@ -610,10 +610,10 @@ class SqlGenerator {
 			if (join != null) {
 				joinTables.add(join);
 			}
-
+			
 			Column column = getColumn(extPath);
 			if (column != null) {
-				columnExpressions.add(column);
+				columnExpressions.add(getColumnExpression(extPath, column));
 			}
 		}
 
