@@ -36,6 +36,8 @@ import lombok.Getter;
 import lombok.Value;
 import lombok.With;
 
+import com.navercorp.spring.data.jdbc.plus.sql.annotation.SqlTableAlias;
+
 /**
  * @author Myeonghyeon Lee
  */
@@ -56,6 +58,7 @@ public class Board {
 	@Builder.Default
 	private List<Post> posts = new ArrayList<>();
 
+	@SqlTableAlias("b_audit")
 	@Column("board_id")
 	private Audit audit;
 

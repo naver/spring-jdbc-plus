@@ -18,6 +18,7 @@
 
 package com.navercorp.spring.data.jdbc.plus.sql.guide.board
 
+import com.navercorp.spring.data.jdbc.plus.sql.annotation.SqlTableAlias
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Column
 import org.springframework.data.relational.core.mapping.Embedded
@@ -41,6 +42,7 @@ data class Board(
     @MappedCollection(idColumn = "board_id", keyColumn = "board_index")
     val posts: List<Post>,
 
+    @SqlTableAlias("b_audit")
     @Column("board_id")
     val audit: Audit?,
 

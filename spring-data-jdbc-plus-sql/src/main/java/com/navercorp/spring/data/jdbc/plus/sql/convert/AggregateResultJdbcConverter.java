@@ -471,13 +471,14 @@ public class AggregateResultJdbcConverter extends BasicJdbcConverter {
 		return Identifier.of(relationPath.getReverseColumnName(), id, Object.class);
 	}
 
-	private String getIdColumnAlias(PersistentPropertyPathExtension relationPath) {
-		return relationPath.extendBy(relationPath.getLeafEntity().getRequiredIdProperty())
-			.getColumnAlias().getReference(identifierProcessing);
+	protected String getIdColumnAlias(PersistentPropertyPathExtension relationPath) {
+		return PropertyPathUtils.getColumnAlias(
+			relationPath.extendBy(relationPath.getLeafEntity().getRequiredIdProperty())
+		).getReference(identifierProcessing);
 	}
 
-	private String getQualifierColumnAlias(PersistentPropertyPathExtension relationPath) {
-		return relationPath.getTableAlias().getReference(identifierProcessing)
+	protected String getQualifierColumnAlias(PersistentPropertyPathExtension relationPath) {
+		return PropertyPathUtils.getTableAlias(relationPath).getReference(identifierProcessing)
 			+ "_" + relationPath.getQualifierColumn().getReference(identifierProcessing);
 	}
 

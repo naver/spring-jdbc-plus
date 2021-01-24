@@ -22,8 +22,10 @@ import static org.assertj.core.api.AssertionsForClassTypes.*;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.jdbc.core.convert.BasicJdbcConverter;
 import org.springframework.data.jdbc.core.convert.JdbcConverter;
+import org.springframework.data.relational.core.dialect.MySqlDialect;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Embedded;
 import org.springframework.data.relational.core.mapping.NamingStrategy;
@@ -74,10 +76,10 @@ class SqlProviderTest {
 		// then
 		assertThat(columns).contains(
 			"ts.tester_id AS tester_id, "
-			+ "address.tester_outer_id AS testInner_tester_outer_id, "
+			+ "address.tester_outer_id AS address_tester_outer_id, "
 			+ "ts.tester_nm AS tester_nm, "
-			+ "address.cty AS testInner_cty, "
-			+ "address.state AS testInner_state, "
+			+ "address.cty AS address_cty, "
+			+ "address.state AS address_state, "
 			+ "ts.adr_cty AS adr_cty, "
 			+ "ts.adr_state AS adr_state"
 		);
@@ -100,19 +102,19 @@ class SqlProviderTest {
 		assertThat(columns).contains(
 			"test_entity_no_root_table_alias.root_id AS root_id, "
 				+ "test_entity_no_root_table_alias.root_name AS root_name, "
-				+ "tOuter.test_root_id AS testOuter_test_root_id, "
-				+ "tOuter.tester_id AS testOuter_tester_id, "
-				+ "tOuter_address.tester_outer_id AS testOuter_testInner_tester_outer_id, "
-				+ "tOuter.tester_nm AS testOuter_tester_nm, "
+				+ "tOuter.test_root_id AS tOuter_test_root_id, "
+				+ "tOuter.tester_id AS tOuter_tester_id, "
+				+ "tOuter_address.tester_outer_id AS tOuter_address_tester_outer_id, "
+				+ "tOuter.tester_nm AS tOuter_tester_nm, "
 				+ "test_entity_no_root_table_alias.outer_tester_id AS outer_tester_id, "
-				+ "outer_address.tester_outer_id AS outer_testInner_tester_outer_id, "
+				+ "outer_address.tester_outer_id AS outer_address_tester_outer_id, "
 				+ "test_entity_no_root_table_alias.outer_tester_nm AS outer_tester_nm, "
-				+ "tOuter_address.cty AS testOuter_testInner_cty, "
-				+ "tOuter_address.state AS testOuter_testInner_state, "
-				+ "tOuter.adr_cty AS testOuter_adr_cty, "
-				+ "tOuter.adr_state AS testOuter_adr_state, "
-				+ "outer_address.cty AS outer_testInner_cty, "
-				+ "outer_address.state AS outer_testInner_state, "
+				+ "tOuter_address.cty AS tOuter_address_cty, "
+				+ "tOuter_address.state AS tOuter_address_state, "
+				+ "tOuter.adr_cty AS tOuter_adr_cty, "
+				+ "tOuter.adr_state AS tOuter_adr_state, "
+				+ "outer_address.cty AS outer_address_cty, "
+				+ "outer_address.state AS outer_address_state, "
 				+ "test_entity_no_root_table_alias.outer_adr_cty AS outer_adr_cty, "
 				+ "test_entity_no_root_table_alias.outer_adr_state AS outer_adr_state"
 		);
@@ -140,17 +142,17 @@ class SqlProviderTest {
 				+ "teie.tester_id AS tester_id, "
 				+ "teie.tester_nm AS tester_nm, "
 				+ "testOuter.tester_id AS testOuter_tester_id, "
-				+ "testOuter_address.tester_outer_id AS testOuter_testInner_tester_outer_id, "
+				+ "testOuter_address.tester_outer_id AS testOuter_address_tester_outer_id, "
 				+ "testOuter.tester_nm AS testOuter_tester_nm, "
 				+ "teie.outer_tester_id AS outer_tester_id, "
-				+ "outer_address.tester_outer_id AS outer_testInner_tester_outer_id, "
+				+ "outer_address.tester_outer_id AS outer_address_tester_outer_id, "
 				+ "teie.outer_tester_nm AS outer_tester_nm, "
-				+ "testOuter_address.cty AS testOuter_testInner_cty, "
-				+ "testOuter_address.state AS testOuter_testInner_state, "
+				+ "testOuter_address.cty AS testOuter_address_cty, "
+				+ "testOuter_address.state AS testOuter_address_state, "
 				+ "testOuter.adr_cty AS testOuter_adr_cty, "
 				+ "testOuter.adr_state AS testOuter_adr_state, "
-				+ "outer_address.cty AS outer_testInner_cty, "
-				+ "outer_address.state AS outer_testInner_state, "
+				+ "outer_address.cty AS outer_address_cty, "
+				+ "outer_address.state AS outer_address_state, "
 				+ "teie.outer_adr_cty AS outer_adr_cty, "
 				+ "teie.outer_adr_state AS outer_adr_state"
 		);
@@ -193,12 +195,36 @@ class SqlProviderTest {
 		// then
 		assertThat(columns).contains(
 			"ts.x_tester_id AS x_tester_id, "
-				+ "address.tester_outer_id AS testInner_tester_outer_id, "
+				+ "address.tester_outer_id AS address_tester_outer_id, "
 				+ "ts.tester_nm AS tester_nm, "
-				+ "address.cty AS testInner_cty, "
-				+ "address.x_state AS testInner_x_state, "
+				+ "address.cty AS address_cty, "
+				+ "address.x_state AS address_x_state, "
 				+ "ts.adr_cty AS adr_cty, "
 				+ "ts.adr_x_state AS adr_x_state");
+	}
+
+	@Test
+	@DisplayName("@SqlTableAlias 와 Quoting 확인")
+	void quotingWithTableAlias() {
+		// given
+		RelationalMappingContext context = new RelationalMappingContext(new PrefixingNamingStrategy());
+		JdbcConverter converter = new BasicJdbcConverter(context, (identifier, path) -> {
+			throw new UnsupportedOperationException();
+		});
+		SqlProvider sut = new SqlProvider(context, converter, MySqlDialect.INSTANCE);
+
+		// when
+		String columns = sut.columns(TestOuterEntity.class);
+
+		// then
+		assertThat(columns).contains(
+			"`ts`.`x_tester_id` AS `x_tester_id`, "
+				+ "`address`.`tester_outer_id` AS `address_tester_outer_id`, "
+				+ "`ts`.`tester_nm` AS `tester_nm`, "
+				+ "`address`.`cty` AS `address_cty`, "
+				+ "`address`.`x_state` AS `address_x_state`, "
+				+ "`ts`.`adr_cty` AS `adr_cty`, "
+				+ "`ts`.`adr_x_state` AS `adr_x_state`");
 	}
 
 	@SqlTableAlias("ts")
@@ -253,6 +279,7 @@ class SqlProviderTest {
 
 	@Table("teie")
 	static class TestEmbeddedNested {
+		@Id
 		private Long rootId;
 
 		@Column("root_name")

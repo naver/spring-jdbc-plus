@@ -18,6 +18,7 @@
 
 package com.navercorp.spring.data.jdbc.plus.sql.guide.board
 
+import com.navercorp.spring.data.jdbc.plus.sql.annotation.SqlTableAlias
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Column
 import org.springframework.data.relational.core.mapping.MappedCollection
@@ -34,6 +35,7 @@ data class PostDto(
     @Column
     val post: Post,
 
+    @SqlTableAlias("p_labels")
     @MappedCollection(idColumn = "board_id")
     val labels: Set<Label>
 )
