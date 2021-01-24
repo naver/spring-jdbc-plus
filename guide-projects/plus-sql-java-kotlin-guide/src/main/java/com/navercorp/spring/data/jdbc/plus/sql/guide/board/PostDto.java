@@ -28,6 +28,8 @@ import org.springframework.data.relational.core.mapping.Table;
 import lombok.Builder;
 import lombok.Value;
 
+import com.navercorp.spring.data.jdbc.plus.sql.annotation.SqlTableAlias;
+
 /**
  * @author Myeonghyeon Lee
  */
@@ -41,6 +43,7 @@ public class PostDto {
 	@Column
 	Board.Post post;
 
+	@SqlTableAlias("p_labels")
 	@MappedCollection(idColumn = "board_id")
 	Set<Board.Label> labels;
 }

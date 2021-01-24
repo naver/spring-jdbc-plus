@@ -117,8 +117,8 @@ class BoardSql extends SqlGeneratorSupport {
         LEFT OUTER JOIN n_config AS post_configMap
         ON post_configMap.post_id = post.id
         
-        LEFT OUTER JOIN n_label AS labels
-        ON post.board_id = labels.board_id
+        LEFT OUTER JOIN n_label AS p_labels
+        ON post.board_id = p_labels.board_id
         
         WHERE post.id = :postId
         """
