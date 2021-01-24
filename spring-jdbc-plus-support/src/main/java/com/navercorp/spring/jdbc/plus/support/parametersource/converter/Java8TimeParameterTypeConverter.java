@@ -34,7 +34,9 @@ import org.springframework.core.convert.converter.Converter;
  * The type Java 8 time parameter type converter.
  *
  * @author Myeonghyeon Lee
+ * @deprecated use {@link Jsr310TimestampBasedConverters}
  */
+@Deprecated
 public class Java8TimeParameterTypeConverter {
 	/**
 	 * Gets converters to register.
