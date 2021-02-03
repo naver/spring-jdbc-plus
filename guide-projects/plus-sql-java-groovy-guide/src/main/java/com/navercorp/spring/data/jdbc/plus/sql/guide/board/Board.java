@@ -43,6 +43,7 @@ import com.navercorp.spring.data.jdbc.plus.sql.annotation.SqlTableAlias;
  * @author Myeonghyeon Lee
  */
 @Table("n_board")
+@SqlTableAlias("n_bd")
 @Getter
 @Builder
 public class Board {
