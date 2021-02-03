@@ -18,14 +18,10 @@ package com.navercorp.spring.data.jdbc.plus.sql.convert;
 
 import javax.annotation.Nullable;
 
-import org.springframework.data.mapping.PersistentPropertyPath;
 import org.springframework.data.relational.core.mapping.PersistentPropertyPathExtension;
-import org.springframework.data.relational.core.mapping.RelationalPersistentProperty;
 import org.springframework.data.relational.core.sql.IdentifierProcessing;
 import org.springframework.data.relational.core.sql.SqlIdentifier;
 import org.springframework.util.Assert;
-
-import com.navercorp.spring.data.jdbc.plus.sql.annotation.SqlTableAlias;
 
 /**
  * PropertyPathUtils to get ColumnAlias and TableAlias applied @SqlTableAlias
@@ -107,12 +103,7 @@ public class PropertyPathUtils {
 		}
 
 		// path == null : root
-		SqlTableAlias sqlTableAlias = tableOwner.getLeafEntity().findAnnotation(SqlTableAlias.class);
-		if (sqlTableAlias != null) {
-			return SqlIdentifier.quoted(sqlTableAlias.value());
-		}
-
-		return null;
+		return TableAliasUtils.getTableAlias(tableOwner.getLeafEntity());
 	}
 
 	private static PersistentPropertyPathExtension getTableOwningAncestor(PersistentPropertyPathExtension path) {
@@ -123,21 +114,9 @@ public class PropertyPathUtils {
 
 		Assert.state(path != null, "Path is null");
 
-		PersistentPropertyPath<? extends RelationalPersistentProperty> propertyPath = path.getRequiredPersistentPropertyPath();
-		RelationalPersistentProperty leafProperty = propertyPath.getRequiredLeafProperty();
-
-		String prefix;
-		if (path.isEmbedded()) {
-			prefix = leafProperty.getEmbeddedPrefix();
-		} else {
-			SqlTableAlias sqlTableAlias = leafProperty.findPropertyOrOwnerAnnotation(SqlTableAlias.class);
-			prefix = sqlTableAlias != null
-				? sqlTableAlias.value()
-				: leafProperty.getName();
-		}
-
+		String prefix = TableAliasUtils.getTableAliasPropertyPathPrefix(path);
 		if (path.getLength() == 1) {
-			Assert.notNull(prefix, "Prefix mus not be null.");
+			Assert.notNull(prefix, "Prefix must not be null.");
 			return SqlIdentifier.quoted(prefix);
 		}
 

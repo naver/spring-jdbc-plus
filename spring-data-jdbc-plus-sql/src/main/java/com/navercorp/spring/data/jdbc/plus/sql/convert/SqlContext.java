@@ -40,7 +40,12 @@ class SqlContext implements SqlContexts {
 
 	SqlContext(RelationalPersistentEntity<?> entity) {
 		this.entity = entity;
-		this.table = Table.create(entity.getTableName());
+		Table table = Table.create(entity.getTableName());
+		SqlIdentifier tableAlias = TableAliasUtils.getTableAlias(entity);
+		if (tableAlias != null) {
+			table = table.as(tableAlias);
+		}
+		this.table = table;
 	}
 
 	@Override

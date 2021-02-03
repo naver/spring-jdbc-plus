@@ -79,7 +79,7 @@ class BoardSql extends SqlGeneratorSupport {
 
         FROM ${sql.aggregateTables(Board)} 
 
-        WHERE n_board.id = :boardId
+        WHERE n_bd.id = :boardId
         ORDER BY posts.board_index, posts_comments.post_index
         """
     }
@@ -90,7 +90,7 @@ class BoardSql extends SqlGeneratorSupport {
 
         FROM ${sql.aggregateTables(Board)}
         
-        ORDER BY n_board.id, posts.board_index, posts_comments.post_index
+        ORDER BY n_bd.id, posts.board_index, posts_comments.post_index
         """
     }
 

@@ -159,6 +159,30 @@ class SqlProviderTest {
 	}
 
 	@Test
+	@DisplayName("Nested 복합 클래스 테이블 추출")
+	void tablesEmbeddedNestedTableAlias() {
+		// given
+		RelationalMappingContext context = new RelationalMappingContext();
+		JdbcConverter converter = new BasicJdbcConverter(context, (identifier, path) -> {
+			throw new UnsupportedOperationException();
+		});
+		SqlProvider sut = new SqlProvider(context, converter, NonQuotingDialect.INSTANCE);
+
+		// when
+		String tables = sut.tables(TestEmbeddedNested.class);
+
+		// then
+		assertThat(tables).contains(
+			"teie LEFT OUTER JOIN test_outer_entity testOuter "
+				+ "ON testOuter.test_root_id = teie.root_id "
+				+ "LEFT OUTER JOIN test_inner_entity testOuter_address "
+				+ "ON testOuter_address.tester_outer_id = teie.root_id "
+				+ "LEFT OUTER JOIN test_inner_entity outer_address "
+				+ "ON outer_address.tester_outer_id = teie.root_id"
+		);
+	}
+
+	@Test
 	@DisplayName("@SqlFunction 은 Column 변환식을 사용한다")
 	void columnsWithNonNullValue() {
 		// given
@@ -204,8 +228,8 @@ class SqlProviderTest {
 	}
 
 	@Test
-	@DisplayName("@SqlTableAlias 와 Quoting 확인")
-	void quotingWithTableAlias() {
+	@DisplayName("column 생성의 @SqlTableAlias 와 Quoting 확인")
+	void columnsQuotingWithTableAlias() {
 		// given
 		RelationalMappingContext context = new RelationalMappingContext(new PrefixingNamingStrategy());
 		JdbcConverter converter = new BasicJdbcConverter(context, (identifier, path) -> {
@@ -225,6 +249,56 @@ class SqlProviderTest {
 				+ "`address`.`x_state` AS `address_x_state`, "
 				+ "`ts`.`adr_cty` AS `adr_cty`, "
 				+ "`ts`.`adr_x_state` AS `adr_x_state`");
+	}
+
+	@Test
+	@DisplayName("Root 에 @SqlTableAlias 이 있으면, column 에 Alias 가 포함된다.")
+	void columnsWithRootTableAlias() {
+		// given
+		RelationalMappingContext context = new RelationalMappingContext();
+		JdbcConverter converter = new BasicJdbcConverter(context, (identifier, path) -> {
+			throw new UnsupportedOperationException();
+		});
+		SqlProvider sut = new SqlProvider(context, converter, NonQuotingDialect.INSTANCE);
+
+		// when
+		String columns = sut.columns(TestWithEntityTableAlias.class);
+
+		// then
+		assertThat(columns).contains(
+			"tweta.root_id AS root_id, "
+				+ "testOuter.test_root_id AS testOuter_test_root_id, "
+				+ "testOuter.tester_id AS testOuter_tester_id, "
+				+ "testOuter_address.tester_outer_id AS testOuter_address_tester_outer_id, "
+				+ "testOuter.tester_nm AS testOuter_tester_nm, "
+				+ "testOuter_address.cty AS testOuter_address_cty, "
+				+ "testOuter_address.state AS testOuter_address_state, "
+				+ "testOuter.adr_cty AS testOuter_adr_cty, "
+				+ "testOuter.adr_state AS testOuter_adr_state"
+		);
+	}
+
+	@Test
+	@DisplayName("Root 에 @SqlTableAlias 이 있으면, table 에 Alias 가 포함된다.")
+	void tablesWithRootTableAlias() {
+		// given
+		RelationalMappingContext context = new RelationalMappingContext();
+		JdbcConverter converter = new BasicJdbcConverter(context, (identifier, path) -> {
+			throw new UnsupportedOperationException();
+		});
+		SqlProvider sut = new SqlProvider(context, converter, NonQuotingDialect.INSTANCE);
+
+		// when
+		String tables = sut.tables(TestWithEntityTableAlias.class);
+
+		// then
+		assertThat(tables).contains(
+			"test_table tweta "
+			+ "LEFT OUTER JOIN test_outer_entity testOuter "
+			+ "ON testOuter.test_root_id = tweta.root_id "
+			+ "LEFT OUTER JOIN test_inner_entity testOuter_address "
+			+ "ON testOuter_address.tester_outer_id = tweta.root_id"
+		);
 	}
 
 	@SqlTableAlias("ts")
@@ -293,6 +367,16 @@ class SqlProviderTest {
 
 		@Embedded.Nullable
 		private TestEntityWithNonNullValue function;
+	}
+
+	@Table("test_table")
+	@SqlTableAlias("tweta")
+	static class TestWithEntityTableAlias {
+		@Id
+		private Long rootId;
+
+		@Column("test_root_id")
+		private TestOuterEntity testOuter;
 	}
 
 	private static class PrefixingNamingStrategy implements NamingStrategy {
