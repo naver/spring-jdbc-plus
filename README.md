@@ -35,7 +35,7 @@ buildscript {
 
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
-    implementation("com.navercorp.spring:spring-boot-starter-data-jdbc-plus-sql:2.1.5")
+    implementation("com.navercorp.spring:spring-boot-starter-data-jdbc-plus-sql:2.1.6")
 }
 ```
 
@@ -56,7 +56,7 @@ dependencies {
 <dependency>
     <groupId>com.navercorp.spring</groupId>
     <artifactId>spring-boot-starter-data-jdbc-plus-sql</artifactId>
-    <version>2.1.5</version>
+    <version>2.1.6</version>
 </dependency>
 ```
 
