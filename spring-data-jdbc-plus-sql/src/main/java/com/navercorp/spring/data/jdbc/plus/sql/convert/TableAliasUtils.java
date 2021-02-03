@@ -16,7 +16,7 @@ import com.navercorp.spring.data.jdbc.plus.sql.annotation.SqlTableAlias;
  *
  * @author Myeonghyeon Lee
  */
-public class TableAliasUtils {
+class TableAliasUtils {
 	/**
 	 * getTableAlias applied @SqlTableAlias
 	 *
