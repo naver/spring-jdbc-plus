@@ -135,7 +135,7 @@ public class DefaultJdbcParameterSourceConverter implements JdbcParameterSourceC
 	@SuppressWarnings("CollectionAddAllCanBeReplacedWithConstructor")
 	private static Map<Class<?>, Converter<?, ?>> getDefaultConverters() {
 		List<Converter<?, ?>> converters = new ArrayList<>();
-		converters.addAll(Java8TimeParameterTypeConverter.getConvertersToRegister());
+		converters.addAll(Jsr310TimestampBasedConverters.getConvertersToRegister());
 		converters.add(UuidParameterTypeConverter.UuidToStringTypeConverter.INSTANCE);
 		return converters.stream()
 			.collect(toMap(c -> resolveConverterGenerics(c.getClass()).get(0), c -> c));
