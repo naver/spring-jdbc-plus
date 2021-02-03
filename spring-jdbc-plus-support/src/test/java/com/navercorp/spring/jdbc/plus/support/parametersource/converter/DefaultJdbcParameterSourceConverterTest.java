@@ -20,13 +20,13 @@ package com.navercorp.spring.jdbc.plus.support.parametersource.converter;
 
 import static org.assertj.core.api.Assertions.*;
 
+import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
@@ -64,10 +64,10 @@ class DefaultJdbcParameterSourceConverterTest {
 
 		// then
 		assertThat(str).isEqualTo(":sample:");
-		assertThat(instant).isExactlyInstanceOf(Date.class);
-		assertThat(localDateTime).isExactlyInstanceOf(Date.class);
-		assertThat(localDate).isExactlyInstanceOf(Date.class);
-		assertThat(zonedDateTime).isExactlyInstanceOf(Date.class);
+		assertThat(instant).isExactlyInstanceOf(Timestamp.class);
+		assertThat(localDateTime).isExactlyInstanceOf(Timestamp.class);
+		assertThat(localDate).isExactlyInstanceOf(Timestamp.class);
+		assertThat(zonedDateTime).isExactlyInstanceOf(Timestamp.class);
 		assertThat(enumName).isExactlyInstanceOf(String.class);
 		assertThat(uuid).isExactlyInstanceOf(String.class);
 
@@ -90,7 +90,7 @@ class DefaultJdbcParameterSourceConverterTest {
 	void convertNullValue() {
 		// given
 		DefaultJdbcParameterSourceConverter sut = new DefaultJdbcParameterSourceConverter(
-			Java8TimeParameterTypeConverter.getConvertersToRegister());
+			Jsr310TimestampBasedConverters.getConvertersToRegister());
 		String paramName = "name";
 		Instant value = null;
 
@@ -106,7 +106,7 @@ class DefaultJdbcParameterSourceConverterTest {
 	void convertUnregisteredTypeValue() {
 		// given
 		DefaultJdbcParameterSourceConverter sut = new DefaultJdbcParameterSourceConverter(
-			Java8TimeParameterTypeConverter.getConvertersToRegister());
+			Jsr310TimestampBasedConverters.getConvertersToRegister());
 		String paramName = "name";
 		String value = "sample";
 
