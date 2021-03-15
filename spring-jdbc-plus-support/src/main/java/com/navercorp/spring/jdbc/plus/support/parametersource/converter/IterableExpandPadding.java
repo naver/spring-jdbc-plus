@@ -128,7 +128,7 @@ public class IterableExpandPadding {
 			}
 		}
 
-		return (((num - 1) / 100) + 1) * 100;
+		return num;
 	}
 
 	/**
