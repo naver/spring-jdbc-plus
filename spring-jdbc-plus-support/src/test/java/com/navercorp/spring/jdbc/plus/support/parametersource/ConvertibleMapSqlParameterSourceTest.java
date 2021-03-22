@@ -29,8 +29,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import org.javaunit.autoparams.AutoSource;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
 
 import com.navercorp.spring.jdbc.plus.support.parametersource.converter.DefaultJdbcParameterSourceConverter;
 import com.navercorp.spring.jdbc.plus.support.parametersource.converter.JdbcParameterSourceConverter;
@@ -52,10 +54,10 @@ class ConvertibleMapSqlParameterSourceTest {
 			.hasMessageContaining("Converter must not be null");
 	}
 
-	@Test
-	void getValue() {
+	@ParameterizedTest
+	@AutoSource
+	void getValue(String paramName) {
 		// given
-		String paramName = "paramName";
 		Instant value = Instant.now();
 		Map<String, Object> map = Collections.singletonMap(paramName, value);
 		ConvertibleMapSqlParameterSource sut = new ConvertibleMapSqlParameterSource(map, this.converter);
@@ -70,12 +72,11 @@ class ConvertibleMapSqlParameterSourceTest {
 			InstantParameterTypeConverter.INSTANCE.convert(value));
 	}
 
-	@Test
 	@DisplayName("value 타입의 Converter 가 등록되지 않았다면, 그대로 반환합니다.")
-	void getValueNotRegisteredType() {
+	@ParameterizedTest
+	@AutoSource
+	void getValueNotRegisteredType(String paramName, String value) {
 		// given
-		String paramName = "paramName";
-		String value = "not-registered-name";
 		Map<String, Object> map = Collections.singletonMap(paramName, value);
 		ConvertibleMapSqlParameterSource sut = new ConvertibleMapSqlParameterSource(map, this.converter);
 
@@ -86,11 +87,11 @@ class ConvertibleMapSqlParameterSourceTest {
 		assertThat(actual).isEqualTo(value);
 	}
 
-	@Test
 	@DisplayName("Map 의 value 가 null 이면, null 을 반환합니다.")
-	void getValueHasParamButNullValue() {
+	@ParameterizedTest
+	@AutoSource
+	void getValueHasParamButNullValue(String paramName) {
 		// given
-		String paramName = "paramName";
 		Instant value = null;
 		Map<String, Object> map = Collections.singletonMap(paramName, value);
 		ConvertibleMapSqlParameterSource sut = new ConvertibleMapSqlParameterSource(map, this.converter);
@@ -102,10 +103,10 @@ class ConvertibleMapSqlParameterSourceTest {
 		assertThat(actual).isNull();
 	}
 
-	@Test
 	@DisplayName("Map 의 key 가 존재하지 않으면, IllegalArgumentException 이 발생합니다.")
-	void getValueNoParam() {
-		String paramName = "paramName";
+	@ParameterizedTest
+	@AutoSource
+	void getValueNoParam(String paramName) {
 		Instant value = null;
 		Map<String, Object> map = Collections.singletonMap(paramName, value);
 		ConvertibleMapSqlParameterSource sut = new ConvertibleMapSqlParameterSource(map, this.converter);
@@ -131,12 +132,12 @@ class ConvertibleMapSqlParameterSourceTest {
 		assertThat(actual).isEqualTo("fallback");
 	}
 
-	@Test
 	@DisplayName("Iterable 한 값은, element 를 컨버팅한 후 expand padding 을 수행한다.")
+	@ParameterizedTest
+	@AutoSource
 	@SuppressWarnings("unchecked")
-	void getValueIterablePadding() {
+	void getValueIterablePadding(String paramName) {
 		// given
-		String paramName = "paramName";
 		Instant now = Instant.now();
 		List<Instant> value = Arrays.asList(now.minusSeconds(300), now.minusSeconds(240),
 			now.minusSeconds(180), now.minusSeconds(120), now.minusSeconds(60));
@@ -159,12 +160,12 @@ class ConvertibleMapSqlParameterSourceTest {
 			InstantParameterTypeConverter.INSTANCE.convert(value.get(4)));
 	}
 
-	@Test
 	@DisplayName("iterablePaddingBoundaries 를 주입하더라도 paddingIterableParam 이 false 면 padding 하지 않는다.")
+	@ParameterizedTest
+	@AutoSource
 	@SuppressWarnings("unchecked")
-	void getValueIterablePaddingBoundariesButFalse() {
+	void getValueIterablePaddingBoundariesButFalse(String paramName) {
 		// given
-		String paramName = "paramName";
 		Instant now = Instant.now();
 		List<Instant> value = Arrays.asList(now.minusSeconds(300), now.minusSeconds(240),
 			now.minusSeconds(180), now.minusSeconds(120), now.minusSeconds(60));
