@@ -32,8 +32,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.javaunit.autoparams.AutoSource;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
 import org.springframework.core.convert.converter.Converter;
 
 import com.navercorp.spring.jdbc.plus.support.parametersource.converter.Java8TimeParameterTypeConverter.InstantParameterTypeConverter;
@@ -157,14 +159,14 @@ class DefaultJdbcParameterSourceConverterTest {
 		});
 	}
 
-	@Test
 	@DisplayName("Uuid 타입 컨버터를 변경한다.")
-	void convertStringUuidConverterValue() {
+	@ParameterizedTest
+	@AutoSource
+	void convertStringUuidConverterValue(UUID source) {
 		// given
 		List<Converter<?, ?>> converters = new ArrayList<>();
 		converters.add(UuidParameterTypeConverter.UuidToStringTypeConverter.INSTANCE);
 		DefaultJdbcParameterSourceConverter sut = new DefaultJdbcParameterSourceConverter(converters);
-		UUID source = UUID.randomUUID();
 
 		// when
 		Object actual = sut.convert("name", source);
@@ -174,9 +176,10 @@ class DefaultJdbcParameterSourceConverterTest {
 		assertThat(actual).isEqualTo(source.toString());
 	}
 
-	@Test
 	@DisplayName("Unwrapper 가 등록되어 있다면, Unwrapping 실행 후 Convert 합니다.")
-	void convertWithUnwrapper() {
+	@ParameterizedTest
+	@AutoSource
+	void convertWithUnwrapper(UUID uuid) {
 		// given
 		List<Converter<?, ?>> converters = new ArrayList<>();
 		converters.add(UuidParameterTypeConverter.UuidToStringTypeConverter.INSTANCE);
@@ -185,7 +188,7 @@ class DefaultJdbcParameterSourceConverterTest {
 		unwrappers.add(new OptionalUnwrapper());
 		DefaultJdbcParameterSourceConverter sut =
 			new DefaultJdbcParameterSourceConverter(converters, unwrappers);
-		Optional<UUID> source = Optional.of(UUID.randomUUID());
+		Optional<UUID> source = Optional.of(uuid);
 
 		// when
 		Object actual = sut.convert("name", source);

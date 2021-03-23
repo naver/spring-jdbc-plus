@@ -23,7 +23,9 @@ import static org.assertj.core.api.Assertions.*;
 import java.nio.ByteBuffer;
 import java.util.UUID;
 
+import org.javaunit.autoparams.AutoSource;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
 
 import com.navercorp.spring.jdbc.plus.support.parametersource.converter.UuidParameterTypeConverter.UuidToByteTypeConverter;
 import com.navercorp.spring.jdbc.plus.support.parametersource.converter.UuidParameterTypeConverter.UuidToStringTypeConverter;
@@ -39,11 +41,11 @@ class UuidParameterTypeConverterTest {
 		return new UUID(high, low);
 	}
 
-	@Test
-	void uuidToByte() {
+	@ParameterizedTest
+	@AutoSource
+	void uuidToByte(UUID source) {
 		// given
 		UuidToByteTypeConverter sut = UuidToByteTypeConverter.INSTANCE;
-		UUID source = UUID.randomUUID();
 
 		// when
 		byte[] actual = sut.convert(source);
@@ -52,11 +54,11 @@ class UuidParameterTypeConverterTest {
 		assertThat(getUuidFromBytes(actual)).isEqualTo(source);
 	}
 
-	@Test
-	void uuidToString() {
+	@ParameterizedTest
+	@AutoSource
+	void uuidToString(UUID source) {
 		// given
 		UuidToStringTypeConverter sut = UuidToStringTypeConverter.INSTANCE;
-		UUID source = UUID.randomUUID();
 
 		// when
 		String actual = sut.convert(source);

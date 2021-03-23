@@ -7,6 +7,7 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-engine")
     testImplementation("org.assertj:assertj-core:3.6.2")
     testImplementation("org.mockito:mockito-junit-jupiter")
+    testImplementation("io.github.javaunit:autoparams:0.1.1")
 
     testRuntime("org.junit.platform:junit-platform-launcher")
     testRuntime("org.junit.platform:junit-platform-commons")
