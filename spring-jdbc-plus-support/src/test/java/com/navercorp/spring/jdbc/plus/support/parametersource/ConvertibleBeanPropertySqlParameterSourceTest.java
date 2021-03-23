@@ -27,8 +27,10 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
+import org.javaunit.autoparams.AutoSource;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
 
 import com.navercorp.spring.jdbc.plus.support.parametersource.converter.DefaultJdbcParameterSourceConverter;
 import com.navercorp.spring.jdbc.plus.support.parametersource.converter.Java8TimeParameterTypeConverter.InstantParameterTypeConverter;
@@ -42,10 +44,11 @@ class ConvertibleBeanPropertySqlParameterSourceTest {
 	private final JdbcParameterSourceConverter converter = new DefaultJdbcParameterSourceConverter(
 		Collections.singletonList(InstantParameterTypeConverter.INSTANCE));
 
-	@Test
 	@DisplayName("생성자에 Converter 로 null 을 넘기면 NullPointerException 이 발생합니다.")
-	void constructorNullConverter() {
-		Criteria criteria = Criteria.of("sample", Instant.now());
+	@ParameterizedTest
+	@AutoSource
+	void constructorNullConverter(String name) {
+		Criteria criteria = Criteria.of(name, Instant.now());
 		assertThatThrownBy(() -> new ConvertibleBeanPropertySqlParameterSource(criteria, null))
 			.isExactlyInstanceOf(NullPointerException.class)
 			.hasMessageContaining("Converter must not be null");
@@ -101,10 +104,10 @@ class ConvertibleBeanPropertySqlParameterSourceTest {
 		assertThat(actual).isNull();
 	}
 
-	@Test
 	@DisplayName("Object 의 field 가 존재하지 않으면, IllegalArgumentException 이 발생합니다.")
-	void getValueNoParam() {
-		String paramName = "not-exist";
+	@ParameterizedTest
+	@AutoSource
+	void getValueNoParam(String paramName) {
 		Criteria criteria = Criteria.of(null, Instant.now());
 		ConvertibleBeanPropertySqlParameterSource sut = new ConvertibleBeanPropertySqlParameterSource(
 			criteria, this.converter);
@@ -129,12 +132,12 @@ class ConvertibleBeanPropertySqlParameterSourceTest {
 		assertThat(actual).isEqualTo("fallback");
 	}
 
-	@Test
 	@DisplayName("Iterable 한 값은, element 를 컨버팅한 후 expand padding 을 수행한다.")
+	@ParameterizedTest
+	@AutoSource
 	@SuppressWarnings("unchecked")
-	void getValueIterablePadding() {
+	void getValueIterablePadding(String name) {
 		// given
-		String name = "sample";
 		Instant now = Instant.now();
 		List<Instant> value = Arrays.asList(now.minusSeconds(300), now.minusSeconds(240),
 			now.minusSeconds(180), now.minusSeconds(120), now.minusSeconds(60));
@@ -155,12 +158,12 @@ class ConvertibleBeanPropertySqlParameterSourceTest {
 		assertThat(list.get(7)).isEqualTo(InstantParameterTypeConverter.INSTANCE.convert(value.get(4)));
 	}
 
-	@Test
 	@DisplayName("iterablePaddingBoundaries 를 주입하더라도 paddingIterableParam 이 false 면 padding 하지 않는다.")
+	@ParameterizedTest
+	@AutoSource
 	@SuppressWarnings("unchecked")
-	void getValueIterablePaddingBoundariesButFalse() {
+	void getValueIterablePaddingBoundariesButFalse(String name) {
 		// given
-		String name = "sample";
 		Instant now = Instant.now();
 		List<Instant> value = Arrays.asList(now.minusSeconds(300), now.minusSeconds(240),
 			now.minusSeconds(180), now.minusSeconds(120), now.minusSeconds(60));
