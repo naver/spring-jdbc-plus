@@ -18,102 +18,106 @@ If you need to use Spring Data JDBC's Persistence features and SQL execution fun
 - [User Guide](https://github.com/naver/spring-jdbc-plus/wiki)
 
 ## Getting Started (Spring Boot Starter Data JDBC Plus SQL)
+
 * Gradle
-```gradle
-buildscript {
-    repositories {
-        mavenCentral()
-        mavenLocal()
-        maven {
-            url "https://repo.spring.io/milestone/"
+
+    ```gradle
+    buildscript {
+        repositories {
+            mavenCentral()
+            mavenLocal()
+            maven {
+                url "https://repo.spring.io/milestone/"
+            }
+        }
+        dependencies {
+            classpath("org.springframework.boot:spring-boot-gradle-plugin:2.4.2")
         }
     }
-    dependencies {
-        classpath("org.springframework.boot:spring-boot-gradle-plugin:2.4.2")
-    }
-}
 
-dependencies {
-    implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
-    implementation("com.navercorp.spring:spring-boot-starter-data-jdbc-plus-sql:2.1.6")
-}
-```
+    dependencies {
+        implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
+        implementation("com.navercorp.spring:spring-boot-starter-data-jdbc-plus-sql:2.1.6")
+    }
+    ```
 
 * Maven
-```xml
-<parent>
-    <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-starter-parent</artifactId>
-    <version>2.4.2</version>
-    <relativePath/>
-</parent>
 
-<dependency>
-    <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-starter-data-jdbc</artifactId>
-</dependency>
+    ```xml
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.4.2</version>
+        <relativePath/>
+    </parent>
 
-<dependency>
-    <groupId>com.navercorp.spring</groupId>
-    <artifactId>spring-boot-starter-data-jdbc-plus-sql</artifactId>
-    <version>2.1.6</version>
-</dependency>
-```
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-data-jdbc</artifactId>
+    </dependency>
+
+    <dependency>
+        <groupId>com.navercorp.spring</groupId>
+        <artifactId>spring-boot-starter-data-jdbc-plus-sql</artifactId>
+        <version>2.1.6</version>
+    </dependency>
+    ```
 
 * Java Codes
 
-```java
-@Table("n_order")
-@Data
-public class Order {
-    @Id
-    @Column("order_no")
-    private Long orderNo;
+    ```java
+    @Table("n_order")
+    @Data
+    public class Order {
+        @Id
+        @Column("order_no")
+        private Long orderNo;
 
-    @Column("price")
-    private long price;
+        @Column("price")
+        private long price;
 
-    @Column("purchaser_no")
-    private String purchaserNo;
-}
+        @Column("purchaser_no")
+        private String purchaserNo;
+    }
 
-public interface OrderRepository extends CrudRepository<Order, Long>, OrderRepositoryCustom {
-}
+    public interface OrderRepository extends CrudRepository<Order, Long>, OrderRepositoryCustom {
+    }
 
-public interface OrderRepositoryCustom {
-    List<Order> findByPurchaserNo(String purchaserNo);
-}
+    public interface OrderRepositoryCustom {
+        List<Order> findByPurchaserNo(String purchaserNo);
+    }
 
-public class OrderRepositoryImpl extends JdbcRepositorySupport<Order> implements OrderRepositoryCustom {
-	private final OrderSql sqls;
+    public class OrderRepositoryImpl extends JdbcRepositorySupport<Order> implements OrderRepositoryCustom {
+        private final OrderSql sqls;
 
-	public OrderRepositoryImpl(EntityJdbcProvider entityJdbcProvider) {
-		super(Order.class, entityJdbcProvider);
-		this.sql = sqls(OrderSql::new);
-	}
+        public OrderRepositoryImpl(EntityJdbcProvider entityJdbcProvider) {
+            super(Order.class, entityJdbcProvider);
+            this.sql = sqls(OrderSql::new);
+        }
 
-	@Override
-	public List<Order> findByPurchaserNo(String purchaserNo) {
-		String sql = this.sql.selectByPurchaserNo();
-		return find(sql, mapParameterSource()
-			.addValue("purchaserNo", purchaserNo));
-	}
-}
-```
+        @Override
+        public List<Order> findByPurchaserNo(String purchaserNo) {
+            String sql = this.sql.selectByPurchaserNo();
+            return find(sql, mapParameterSource()
+                .addValue("purchaserNo", purchaserNo));
+        }
+    }
+    ```
 
 * Groovy codes for SQL
-```groovy
-class OrderSql extends SqlGeneratorSupport {
 
-    String selectByPurchaserNo() {
-        """
-        SELECT ${sql.columns(Order)}
-        FROM n_order
-        WHERE purchaser_no = :purchaserNo
-        """
+    ```groovy
+    class OrderSql extends SqlGeneratorSupport {
+
+        String selectByPurchaserNo() {
+            """
+            SELECT ${sql.columns(Order)}
+            FROM n_order
+            WHERE purchaser_no = :purchaserNo
+            """
+        }
     }
-}
-```
+    ```
 
 ### Cautions when writing SQL
 - Must use named parameters to pass parameters to SQL.
@@ -125,32 +129,32 @@ Be careful when use string interpolation in Groovy and Kotlin.
 
 
 * Bad  :-1:
-```groovy
-class OrderSql extends SqlGeneratorSupport {
+    ```groovy
+    class OrderSql extends SqlGeneratorSupport {
 
-    String selectByPurchaserNo(String purchaserNo) {
+        String selectByPurchaserNo(String purchaserNo) {
         """
         SELECT ${sql.columns(Order)}
         FROM n_order
         WHERE purchaser_no = '${purchaserNo}'
         """
+        }
     }
-}
-```
+    ```
 
 * Good :+1:
-```groovy
-class OrderSql extends SqlGeneratorSupport {
+    ```groovy
+    class OrderSql extends SqlGeneratorSupport {
 
-    String selectByPurchaserNo() {
+        String selectByPurchaserNo() {
         """
         SELECT ${sql.columns(Order)}
         FROM n_order
         WHERE purchaser_no = :purchaserNo
         """
+        }
     }
-}
-```
+    ```
 
 ## Examples
 * [Java + Groovy SQL Example](./guide-projects/plus-sql-java-groovy-guide)
@@ -163,11 +167,12 @@ class OrderSql extends SqlGeneratorSupport {
 
 ## Coding Convention
 - [naver hackday-conventions-java](https://naver.github.io/hackday-conventions-java/)
-- https://github.com/naver/hackday-conventions-java)
+- [naver/hackday-conventions-java](https://github.com/naver/hackday-conventions-java)
 - checkstyle: ./rule/naver-checkstyle-rules.xml
 - intellij-formatter: ./rule/naver-intellij-formatter.xml (https://naver.github.io/hackday-conventions-java/#editor-config)
 
 ## Building from Source
+
 ```
 $  ./gradlew clean build
 ```
