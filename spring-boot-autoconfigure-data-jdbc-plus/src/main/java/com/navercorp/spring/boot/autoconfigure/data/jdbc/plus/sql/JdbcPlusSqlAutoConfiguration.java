@@ -35,7 +35,6 @@ import org.springframework.data.jdbc.core.convert.RelationResolver;
 import org.springframework.data.jdbc.core.mapping.JdbcMappingContext;
 import org.springframework.data.jdbc.repository.QueryMappingConfiguration;
 import org.springframework.data.jdbc.repository.config.AbstractJdbcConfiguration;
-import org.springframework.data.mapping.callback.EntityCallbacks;
 import org.springframework.data.relational.core.dialect.Dialect;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
 import org.springframework.transaction.PlatformTransactionManager;
