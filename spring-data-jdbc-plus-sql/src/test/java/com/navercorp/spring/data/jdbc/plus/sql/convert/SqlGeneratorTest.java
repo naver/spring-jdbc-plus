@@ -417,6 +417,29 @@ class SqlGeneratorTest {
 			"\"id1\" = :id1");
 	}
 
+	@Test
+	public void getUpsert() {
+
+		SqlGenerator sqlGenerator = createSqlGenerator(DummyEntity.class, AnsiDialect.INSTANCE);
+
+		assertThat(sqlGenerator.getUpsert(emptySet())).isEqualTo( //
+			"INSERT INTO \"DUMMY_ENTITY\" (\"X_NAME\", \"X_OTHER\") VALUES (:x_name, :x_other)"
+				+ " ON DUPLICATE KEY UPDATE \"X_NAME\" = :x_name, \"X_OTHER\" = :x_other");
+	}
+
+	@Test
+	public void getUpsertForQuotedColumnName() {
+
+		SqlGenerator sqlGenerator = createSqlGenerator(
+			EntityWithQuotedColumnName.class, AnsiDialect.INSTANCE);
+
+		String upsert = sqlGenerator.getUpsert(emptySet());
+
+		assertThat(upsert).isEqualTo(
+			"INSERT INTO \"ENTITY_WITH_QUOTED_COLUMN_NAME\" (\"test\"\"_@123\") VALUES (:test_123)"
+		+ " ON DUPLICATE KEY UPDATE \"test\"\"_@123\" = :test_123");
+	}
+
 	@Test // DATAJDBC-324
 	public void readOnlyPropertyExcludedFromQuery_when_generateUpdateSql() {
 
