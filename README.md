@@ -31,7 +31,7 @@ If you need to use Spring Data JDBC's Persistence features and SQL execution fun
             }
         }
         dependencies {
-            classpath("org.springframework.boot:spring-boot-gradle-plugin:2.4.2")
+            classpath("org.springframework.boot:spring-boot-gradle-plugin:2.4.4")
         }
     }
 
@@ -47,7 +47,7 @@ If you need to use Spring Data JDBC's Persistence features and SQL execution fun
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.4.2</version>
+        <version>2.4.4</version>
         <relativePath/>
     </parent>
 
