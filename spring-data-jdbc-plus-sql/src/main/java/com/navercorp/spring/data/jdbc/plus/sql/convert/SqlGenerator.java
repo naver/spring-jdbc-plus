@@ -58,9 +58,11 @@ import org.springframework.data.relational.core.sql.Expression;
 import org.springframework.data.relational.core.sql.Expressions;
 import org.springframework.data.relational.core.sql.From;
 import org.springframework.data.relational.core.sql.Functions;
+import org.springframework.data.relational.core.sql.IdentifierProcessing;
 import org.springframework.data.relational.core.sql.Insert;
 import org.springframework.data.relational.core.sql.InsertBuilder;
 import org.springframework.data.relational.core.sql.LockMode;
+import org.springframework.data.relational.core.sql.Named;
 import org.springframework.data.relational.core.sql.OrderByField;
 import org.springframework.data.relational.core.sql.SQL;
 import org.springframework.data.relational.core.sql.Select;
@@ -74,6 +76,7 @@ import org.springframework.data.relational.core.sql.Update;
 import org.springframework.data.relational.core.sql.UpdateBuilder;
 import org.springframework.data.relational.core.sql.Visitor;
 import org.springframework.data.relational.core.sql.render.RenderContext;
+import org.springframework.data.relational.core.sql.render.RenderNamingStrategy;
 import org.springframework.data.relational.core.sql.render.SqlRenderer;
 import org.springframework.data.util.Lazy;
 import org.springframework.data.util.ReflectionUtils;
@@ -125,6 +128,7 @@ class SqlGenerator {
 
 	private final Lazy<String> updateSql = Lazy.of(this::createUpdateSql);
 	private final Lazy<String> updateWithVersionSql = Lazy.of(this::createUpdateWithVersionSql);
+	private final Lazy<String> upsertUpdatableAssignmentsSql = Lazy.of(this::createUpsertUpdatableAssignmentsSql);
 
 	private final Lazy<String> deleteByIdSql = Lazy.of(this::createDeleteSql);
 	private final Lazy<String> deleteByIdAndVersionSql = Lazy.of(this::createDeleteByIdAndVersionSql);
@@ -381,6 +385,17 @@ class SqlGenerator {
 	 */
 	String getUpdateWithVersion() {
 		return updateWithVersionSql.get();
+	}
+
+	/**
+	 * Create a {@code INSERT INTO … (…) VALUES(…) ON DUPLICATE KEY UPDATE …} statement.
+	 * ON DUPLICATE KEY UPDATE of this statement supports MySQL Dialect.
+	 * Don't use it as it provides an experimental method.
+	 *
+	 * @return the statement as a {@link String}. Guaranteed to be not {@literal null}.
+	 */
+	String getUpsert(Set<SqlIdentifier> additionalColumns) {
+		return this.createUpsertSql(additionalColumns);
 	}
 
 	/**
@@ -834,6 +849,25 @@ class SqlGenerator {
 			.table(table) //
 			.set(assignments) //
 			.where(getIdColumn().isEqualTo(getBindMarker(entity.getIdColumn())));
+	}
+
+	private String createUpsertSql(Set<SqlIdentifier> additionalColumns) {
+		String insertSql = this.createInsertSql(additionalColumns);
+		String upsertAssignmentsSql = this.upsertUpdatableAssignmentsSql.get();
+		return insertSql + " ON DUPLICATE KEY UPDATE " + upsertAssignmentsSql;
+	}
+
+	private String createUpsertUpdatableAssignmentsSql() {
+		Table table = getDmlTable();
+		RenderNamingStrategy namingStrategy = this.renderContext.getNamingStrategy();
+		IdentifierProcessing identifierProcessing = this.renderContext.getIdentifierProcessing();
+		return columns.getUpdateableColumns().stream()
+			.map(columnName -> {
+				String name = namingStrategy.getName(table.column(columnName)).toSql(identifierProcessing);
+				String bindMarkerName = ((Named)getBindMarker(columnName)).getName().toSql(identifierProcessing);
+				return name + " = " + bindMarkerName;
+			})
+			.collect(Collectors.joining(", "));
 	}
 
 	private String createDeleteSql() {
