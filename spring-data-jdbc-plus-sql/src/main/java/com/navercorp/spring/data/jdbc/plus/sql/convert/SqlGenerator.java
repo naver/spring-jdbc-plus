@@ -31,6 +31,7 @@ import java.util.TreeSet;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -128,7 +129,8 @@ class SqlGenerator {
 
 	private final Lazy<String> updateSql = Lazy.of(this::createUpdateSql);
 	private final Lazy<String> updateWithVersionSql = Lazy.of(this::createUpdateWithVersionSql);
-	private final Lazy<String> upsertUpdatableAssignmentsSql = Lazy.of(this::createUpsertUpdatableAssignmentsSql);
+
+	private final Lazy<String> upsertSql = Lazy.of(this::createUpsertSql);
 
 	private final Lazy<String> deleteByIdSql = Lazy.of(this::createDeleteSql);
 	private final Lazy<String> deleteByIdAndVersionSql = Lazy.of(this::createDeleteByIdAndVersionSql);
@@ -388,14 +390,14 @@ class SqlGenerator {
 	}
 
 	/**
-	 * Create a {@code INSERT INTO … (…) VALUES(…) ON DUPLICATE KEY UPDATE …} statement.
+	 * Create a {@code INSERT INTO … SET ID = :id,… ON DUPLICATE KEY UPDATE …} statement.
 	 * ON DUPLICATE KEY UPDATE of this statement supports MySQL Dialect.
 	 * Don't use it as it provides an experimental method.
 	 *
 	 * @return the statement as a {@link String}. Guaranteed to be not {@literal null}.
 	 */
-	String getUpsert(Set<SqlIdentifier> additionalColumns) {
-		return this.createUpsertSql(additionalColumns);
+	String getUpsert() {
+		return upsertSql.get();
 	}
 
 	/**
@@ -851,23 +853,32 @@ class SqlGenerator {
 			.where(getIdColumn().isEqualTo(getBindMarker(entity.getIdColumn())));
 	}
 
-	private String createUpsertSql(Set<SqlIdentifier> additionalColumns) {
-		String insertSql = this.createInsertSql(additionalColumns);
-		String upsertAssignmentsSql = this.upsertUpdatableAssignmentsSql.get();
-		return insertSql + " ON DUPLICATE KEY UPDATE " + upsertAssignmentsSql;
-	}
-
-	private String createUpsertUpdatableAssignmentsSql() {
+	private String createUpsertSql() {
 		Table table = getDmlTable();
 		RenderNamingStrategy namingStrategy = this.renderContext.getNamingStrategy();
 		IdentifierProcessing identifierProcessing = this.renderContext.getIdentifierProcessing();
-		return columns.getUpdateableColumns().stream()
+
+		String tableName = namingStrategy.getName(table).toSql(identifierProcessing);
+		String insertableAssignmentsSql = Stream.concat(
+			columns.idColumnNames.stream(),
+			columns.getInsertableColumns().stream()
+		)
 			.map(columnName -> {
 				String name = namingStrategy.getName(table.column(columnName)).toSql(identifierProcessing);
 				String bindMarkerName = ((Named)getBindMarker(columnName)).getName().toSql(identifierProcessing);
 				return name + " = " + bindMarkerName;
 			})
 			.collect(Collectors.joining(", "));
+		String updatableAssignmentsSql = columns.getUpdateableColumns().stream()
+			.map(columnName -> {
+				String name = namingStrategy.getName(table.column(columnName)).toSql(identifierProcessing);
+				String bindMarkerName = ((Named)getBindMarker(columnName)).getName().toSql(identifierProcessing);
+				return name + " = " + bindMarkerName;
+			})
+			.collect(Collectors.joining(", "));
+
+		return "INSERT INTO " + tableName + " SET " + insertableAssignmentsSql
+			+ " ON DUPLICATE KEY UPDATE " + updatableAssignmentsSql;
 	}
 
 	private String createDeleteSql() {
