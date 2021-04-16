@@ -422,8 +422,8 @@ class SqlGeneratorTest {
 
 		SqlGenerator sqlGenerator = createSqlGenerator(DummyEntity.class, AnsiDialect.INSTANCE);
 
-		assertThat(sqlGenerator.getUpsert(emptySet())).isEqualTo( //
-			"INSERT INTO \"DUMMY_ENTITY\" (\"X_NAME\", \"X_OTHER\") VALUES (:x_name, :x_other)"
+		assertThat(sqlGenerator.getUpsert()).isEqualTo( //
+			"INSERT INTO \"DUMMY_ENTITY\" SET \"id1\" = :id1, \"X_NAME\" = :x_name, \"X_OTHER\" = :x_other"
 				+ " ON DUPLICATE KEY UPDATE \"X_NAME\" = :x_name, \"X_OTHER\" = :x_other");
 	}
 
@@ -433,10 +433,10 @@ class SqlGeneratorTest {
 		SqlGenerator sqlGenerator = createSqlGenerator(
 			EntityWithQuotedColumnName.class, AnsiDialect.INSTANCE);
 
-		String upsert = sqlGenerator.getUpsert(emptySet());
+		String upsert = sqlGenerator.getUpsert();
 
 		assertThat(upsert).isEqualTo(
-			"INSERT INTO \"ENTITY_WITH_QUOTED_COLUMN_NAME\" (\"test\"\"_@123\") VALUES (:test_123)"
+			"INSERT INTO \"ENTITY_WITH_QUOTED_COLUMN_NAME\" SET \"test\"\"_@id\" = :test_id, \"test\"\"_@123\" = :test_123"
 		+ " ON DUPLICATE KEY UPDATE \"test\"\"_@123\" = :test_123");
 	}
 
