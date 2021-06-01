@@ -69,7 +69,7 @@ class EntitySqlParameterSourceApplier {
 			? persistentEntity.getPropertyAccessor(instance)
 			: NoValuePropertyAccessor.instance();
 
-		persistentEntity.doWithProperties((PropertyHandler<RelationalPersistentProperty>)property -> {
+		persistentEntity.doWithAll(property -> {
 			if (!property.isWritable()) {
 				return;
 			}

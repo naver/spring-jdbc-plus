@@ -1088,7 +1088,7 @@ class SqlGenerator {
 		private void populateColumnNameCache(
 			RelationalPersistentEntity<?> entity, String prefix) {
 
-			entity.doWithProperties((PropertyHandler<RelationalPersistentProperty>)property -> {
+			entity.doWithAll(property -> {
 
 				// the referencing column of referenced entity is expected to be on the other side
 				// of the relation

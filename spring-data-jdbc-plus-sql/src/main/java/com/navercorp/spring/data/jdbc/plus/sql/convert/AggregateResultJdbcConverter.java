@@ -902,18 +902,18 @@ public class AggregateResultJdbcConverter extends BasicJdbcConverter {
 		}
 
 		private void populateProperties(Map<String, Object> map, @Nullable Object idValue) {
-			for (RelationalPersistentProperty property : entity) {
+			entity.doWithAll(property -> {
 				// skip absent simple properties
 				if (isSimpleProperty(property)) {
 
 					if (!propertyValueProvider.hasProperty(property)) {
-						continue;
+						return;
 					}
 				}
 
 				Object value = readOrLoadProperty(idValue, property);
 				map.put(property.getName(), value);
-			}
+			});
 		}
 
 		@Nullable
@@ -970,7 +970,7 @@ public class AggregateResultJdbcConverter extends BasicJdbcConverter {
 			for (RelationalPersistentProperty embeddedProperty : persistentEntity) {
 
 				// if the embedded contains Lists, Sets or Maps we consider it non-empty
-				if (embeddedProperty.isQualified() || embeddedProperty.isReference()) {
+				if (embeddedProperty.isQualified() || embeddedProperty.isAssociation()) {
 					return true;
 				}
 
@@ -1076,27 +1076,24 @@ public class AggregateResultJdbcConverter extends BasicJdbcConverter {
 			PreferredConstructor<T, RelationalPersistentProperty> persistenceConstructor =
 				entity.getPersistenceConstructor();
 
-			for (RelationalPersistentProperty property : entity) {
+			entity.doWithAll(property -> {
 
 				if (persistenceConstructor != null
 					&& persistenceConstructor.isConstructorParameter(property)) {
-
-					continue;
+					return;
 				}
 
 				// skip absent simple properties
 				if (isSimpleProperty(property)) {
-
 					if (this.entityMap == null
 						| !this.entityMap.containsKey(property.getName())) {
-
-						continue;
+						return;
 					}
 				}
 
 				Object value = readOrLoadProperty(idValue, property);
 				propertyAccessor.setProperty(property, value);
-			}
+			});
 
 			return propertyAccessor.getBean();
 		}
@@ -1156,7 +1153,7 @@ public class AggregateResultJdbcConverter extends BasicJdbcConverter {
 			for (RelationalPersistentProperty embeddedProperty : persistentEntity) {
 
 				// if the embedded contains Lists, Sets or Maps we consider it non-empty
-				if (embeddedProperty.isQualified() || embeddedProperty.isReference()) {
+				if (embeddedProperty.isQualified() || embeddedProperty.isAssociation()) {
 					return true;
 				}
 
