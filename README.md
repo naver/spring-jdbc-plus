@@ -37,7 +37,7 @@ If you need to use Spring Data JDBC's Persistence features and SQL execution fun
 
     dependencies {
         implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
-        implementation("com.navercorp.spring:spring-boot-starter-data-jdbc-plus-sql:2.1.6")
+        implementation("com.navercorp.spring:spring-boot-starter-data-jdbc-plus-sql:2.2.1")
     }
     ```
 
@@ -59,7 +59,7 @@ If you need to use Spring Data JDBC's Persistence features and SQL execution fun
     <dependency>
         <groupId>com.navercorp.spring</groupId>
         <artifactId>spring-boot-starter-data-jdbc-plus-sql</artifactId>
-        <version>2.1.6</version>
+        <version>2.2.1</version>
     </dependency>
     ```
 
