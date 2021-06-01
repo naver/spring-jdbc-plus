@@ -39,15 +39,15 @@ dependencies {
     implementation("org.codehaus.groovy:groovy:2.5.8")
     implementation("com.h2database:h2")
 
-    implementation("org.springframework.data:spring-data-jdbc:2.1.8")
-    implementation("org.springframework.data:spring-data-relational:2.1.8")
-    implementation("org.springframework.data:spring-data-commons:2.4.8")
+    implementation("org.springframework.data:spring-data-jdbc:2.2.1")
+    implementation("org.springframework.data:spring-data-relational:2.2.1")
+    implementation("org.springframework.data:spring-data-commons:2.5.1")
 
     implementation project(":spring-data-plus-sql-gen")
     annotationProcessor project(":spring-data-plus-sql-gen")
-    annotationProcessor("org.springframework.data:spring-data-jdbc:2.1.8")
-    annotationProcessor("org.springframework.data:spring-data-relational:2.1.8")
-    annotationProcessor("org.springframework.data:spring-data-commons:2.4.8")
+    annotationProcessor("org.springframework.data:spring-data-jdbc:2.2.1")
+    annotationProcessor("org.springframework.data:spring-data-relational:2.2.1")
+    annotationProcessor("org.springframework.data:spring-data-commons:2.5.1")
 
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
