@@ -294,7 +294,7 @@ public class JdbcReactiveTemplate {
 		 *
 		 * @param item the item
 		 */
-		FluxItem(R item) {
+		private FluxItem(R item) {
 			this.item = item;
 		}
 
@@ -303,7 +303,7 @@ public class JdbcReactiveTemplate {
 		 *
 		 * @return the boolean
 		 */
-		boolean isEnd() {
+		protected boolean isEnd() {
 			return false;
 		}
 
@@ -312,7 +312,7 @@ public class JdbcReactiveTemplate {
 		 *
 		 * @return the boolean
 		 */
-		boolean isError() {
+		protected boolean isError() {
 			return false;
 		}
 
@@ -321,7 +321,7 @@ public class JdbcReactiveTemplate {
 		 *
 		 * @return the item
 		 */
-		R getItem() {
+		private R getItem() {
 			return this.item;
 		}
 
@@ -331,11 +331,11 @@ public class JdbcReactiveTemplate {
 		 * @return the error
 		 */
 		@Nullable
-		Exception getError() {
+		protected Exception getError() {
 			return null;
 		}
 
-		static FluxItem errorInstance(Exception e) {
+		private static FluxItem errorInstance(Exception e) {
 			return new ErrorFluxItem(e);
 		}
 	}
@@ -346,7 +346,7 @@ public class JdbcReactiveTemplate {
 		}
 
 		@Override
-		boolean isEnd() {
+		protected boolean isEnd() {
 			return true;
 		}
 	}
@@ -360,12 +360,12 @@ public class JdbcReactiveTemplate {
 		}
 
 		@Override
-		boolean isError() {
+		protected boolean isError() {
 			return true;
 		}
 
 		@Override
-		boolean isEnd() {
+		protected boolean isEnd() {
 			return true;
 		}
 	}
