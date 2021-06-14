@@ -34,6 +34,7 @@ import org.springframework.jdbc.core.RowCountCallbackHandler;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
+import org.springframework.lang.Nullable;
 
 import reactor.core.publisher.Flux;
 import reactor.core.scheduler.Scheduler;
@@ -43,6 +44,7 @@ import reactor.core.scheduler.Schedulers;
  * The type Jdbc reactive template.
  *
  * @author Myeonghyeon Lee
+ * @author IAM20
  */
 public class JdbcReactiveTemplate {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -78,6 +80,11 @@ public class JdbcReactiveTemplate {
 	@SuppressWarnings("unchecked")
 	private static <R> FluxItem<R> endItem() {
 		return FluxItem.END_ITEM;
+	}
+
+	@SuppressWarnings("unchecked")
+	private static <R> FluxItem<R> errorItem(Exception e) {
+		return FluxItem.errorInstance(e);
 	}
 
 	/**
@@ -198,15 +205,9 @@ public class JdbcReactiveTemplate {
 							insertToBlockingQueue(queue, item, isClosed, bufferTimeout);
 						}
 					});
-				} catch (UncategorizedSQLException e) {
-					/* Sort of db timeout. */
-					isClosed.set(true);
-					insertToBlockingQueue(queue, endItem(), isClosed, bufferTimeout);
-					logger.error("Failed to generate flux.", e);
-					return;
 				} catch (Exception e) {
 					isClosed.set(true);
-					insertToBlockingQueue(queue, endItem(), isClosed, bufferTimeout);
+					insertToBlockingQueue(queue, errorItem(e), isClosed, bufferTimeout);
 					logger.error("Failed to generate flux.", e);
 					throw e; /* To propagate exception to subscriber */
 				}
@@ -215,6 +216,17 @@ public class JdbcReactiveTemplate {
 					insertToBlockingQueue(queue, endItem(), isClosed, bufferTimeout);
 				}
 			}));
+	}
+
+	/**
+	 * @param e the exception
+	 * @throws Exception will be propagated to flux.
+	 */
+	protected void handleError(Exception e) throws Exception {
+		if (e == null) {
+			return;
+		}
+		logger.error("Exception occured while reading flux", e);
 	}
 
 	private <R> void insertToBlockingQueue(
@@ -253,6 +265,13 @@ public class JdbcReactiveTemplate {
 						"Cannot take element from blocking queue."));
 					return;
 				}
+				if (row.isError()) {
+					try {
+						handleError(row.getError());
+					} catch (Exception e) {
+						sink.error(e);
+					}
+				}
 				if (row.isEnd()) {
 					sink.complete();
 					return;
@@ -275,7 +294,7 @@ public class JdbcReactiveTemplate {
 		 *
 		 * @param item the item
 		 */
-		FluxItem(R item) {
+		private FluxItem(R item) {
 			this.item = item;
 		}
 
@@ -284,7 +303,16 @@ public class JdbcReactiveTemplate {
 		 *
 		 * @return the boolean
 		 */
-		boolean isEnd() {
+		protected boolean isEnd() {
+			return false;
+		}
+
+		/**
+		 * Is error boolean.
+		 *
+		 * @return the boolean
+		 */
+		protected boolean isError() {
 			return false;
 		}
 
@@ -293,8 +321,22 @@ public class JdbcReactiveTemplate {
 		 *
 		 * @return the item
 		 */
-		R getItem() {
+		private R getItem() {
 			return this.item;
+		}
+
+		/**
+		 * Gets error.
+		 *
+		 * @return the error
+		 */
+		@Nullable
+		protected Exception getError() {
+			return null;
+		}
+
+		private static FluxItem errorInstance(Exception e) {
+			return new ErrorFluxItem(e);
 		}
 	}
 
@@ -304,7 +346,26 @@ public class JdbcReactiveTemplate {
 		}
 
 		@Override
-		boolean isEnd() {
+		protected boolean isEnd() {
+			return true;
+		}
+	}
+
+	private static class ErrorFluxItem<R> extends FluxItem<R> {
+		Exception error;
+
+		private ErrorFluxItem(Exception error) {
+			super(null);
+			this.error = error;
+		}
+
+		@Override
+		protected boolean isError() {
+			return true;
+		}
+
+		@Override
+		protected boolean isEnd() {
 			return true;
 		}
 	}
