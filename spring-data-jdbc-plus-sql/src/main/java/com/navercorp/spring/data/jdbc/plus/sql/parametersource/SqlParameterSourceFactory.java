@@ -39,6 +39,15 @@ public interface SqlParameterSourceFactory {
 	BeanPropertySqlParameterSource beanParameterSource(Object bean);
 
 	/**
+	 * Bean parameter source bean property sql parameter source.
+	 *
+	 * @param prefix the prefix
+	 * @param bean   the bean
+	 * @return the bean property sql parameter source
+	 */
+	BeanPropertySqlParameterSource beanParameterSource(String prefix, Object bean);
+
+	/**
 	 * Map parameter source map sql parameter source.
 	 *
 	 * @param map the map

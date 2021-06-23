@@ -70,7 +70,7 @@ public class ConvertibleBeanPropertySqlParameterSource extends BeanPropertySqlPa
 	/**
 	 * Instantiates a new Convertible bean property sql parameter source.
 	 *
-	 * @param prefix                   the prefix
+	 * @param prefix                  the prefix
 	 * @param bean                    the bean
 	 * @param converter               the converter
 	 */
@@ -85,7 +85,7 @@ public class ConvertibleBeanPropertySqlParameterSource extends BeanPropertySqlPa
 	/**
 	 * Instantiates a new Convertible bean property sql parameter source.
 	 *
-	 * @param prefix                   the prefix
+	 * @param prefix                  the prefix
 	 * @param bean                    the bean
 	 * @param converter               the converter
 	 * @param fallbackParameterSource the fallback parameter source

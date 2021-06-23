@@ -178,6 +178,18 @@ public abstract class JdbcRepositorySupport<T> {
 		return this.entityJdbcProvider.beanParameterSource(bean);
 	}
 
+
+	/**
+	 * Bean parameter source bean property sql parameter source.
+	 *
+	 * @param prefix the prefix
+	 * @param bean   the bean
+	 * @return the bean property sql parameter source
+	 */
+	protected BeanPropertySqlParameterSource beanParameterSource(String prefix, Object bean) {
+		return this.entityJdbcProvider.beanParameterSource(prefix, bean);
+	}
+
 	/**
 	 * Map parameter source map sql parameter source.
 	 *
