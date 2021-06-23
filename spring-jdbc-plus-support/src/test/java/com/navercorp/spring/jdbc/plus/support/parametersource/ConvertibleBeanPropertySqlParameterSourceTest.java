@@ -132,6 +132,21 @@ class ConvertibleBeanPropertySqlParameterSourceTest {
 		assertThat(actual).isEqualTo("fallback");
 	}
 
+	@Test
+	void getPrefixValue() {
+		// given
+		String paramName = "test.occurrenceTime";
+		Criteria criteria = Criteria.of("sample", Instant.now());
+		ConvertibleBeanPropertySqlParameterSource sut = new ConvertibleBeanPropertySqlParameterSource(
+			"test.", criteria, this.converter);
+
+		// when
+		Object actual = sut.getValue(paramName);
+
+		// then
+		assertThat(actual).isNotNull();
+	}
+
 	@DisplayName("Iterable 한 값은, element 를 컨버팅한 후 expand padding 을 수행한다.")
 	@ParameterizedTest
 	@AutoSource

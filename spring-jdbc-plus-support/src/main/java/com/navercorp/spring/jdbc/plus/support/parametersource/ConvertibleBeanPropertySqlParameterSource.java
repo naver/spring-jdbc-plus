@@ -22,6 +22,7 @@ import java.util.Objects;
 
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.lang.Nullable;
+import org.springframework.util.StringUtils;
 
 import com.navercorp.spring.jdbc.plus.support.parametersource.converter.IterableExpandPadding;
 import com.navercorp.spring.jdbc.plus.support.parametersource.converter.JdbcParameterSourceConverter;
@@ -31,10 +32,12 @@ import com.navercorp.spring.jdbc.plus.support.parametersource.fallback.FallbackP
  * The type Convertible bean property sql parameter source.
  *
  * @author Myeonghyeon Lee
+ * @author IAM20
  */
 public class ConvertibleBeanPropertySqlParameterSource extends BeanPropertySqlParameterSource {
 	private final JdbcParameterSourceConverter converter;
 	private final FallbackParameterSource fallbackParameterSource;
+	private final String prefix;
 
 	private boolean paddingIterableParams = false;
 	private int[] paddingIterableBoundaries = null;
@@ -61,7 +64,41 @@ public class ConvertibleBeanPropertySqlParameterSource extends BeanPropertySqlPa
 		JdbcParameterSourceConverter converter,
 		FallbackParameterSource fallbackParameterSource) {
 
+		this(null, bean, converter, fallbackParameterSource);
+	}
+
+	/**
+	 * Instantiates a new Convertible bean property sql parameter source.
+	 *
+	 * @param prefix                   the prefix
+	 * @param bean                    the bean
+	 * @param converter               the converter
+	 */
+	public ConvertibleBeanPropertySqlParameterSource(
+		String prefix,
+		Object bean,
+		JdbcParameterSourceConverter converter
+	) {
+		this(prefix, bean, converter, null);
+	}
+
+	/**
+	 * Instantiates a new Convertible bean property sql parameter source.
+	 *
+	 * @param prefix                   the prefix
+	 * @param bean                    the bean
+	 * @param converter               the converter
+	 * @param fallbackParameterSource the fallback parameter source
+	 */
+	public ConvertibleBeanPropertySqlParameterSource(
+		String prefix,
+		Object bean,
+		JdbcParameterSourceConverter converter,
+		FallbackParameterSource fallbackParameterSource
+	) {
+
 		super(bean);
+		this.prefix = prefix;
 		this.converter = Objects.requireNonNull(converter, "Converter must not be null.");
 		this.fallbackParameterSource = fallbackParameterSource;
 	}
@@ -69,20 +106,21 @@ public class ConvertibleBeanPropertySqlParameterSource extends BeanPropertySqlPa
 	@Nullable
 	@Override
 	public Object getValue(String paramName) {
+		String patchedParamName = this.patchParamName(paramName);
 		Object value = null;
 		try {
-			value = super.getValue(paramName);
+			value = super.getValue(patchedParamName);
 		} catch (IllegalArgumentException e) {
-			if (!this.isFallback(paramName)) {
+			if (!this.isFallback(patchedParamName)) {
 				throw e;
 			}
 		}
 
-		if (value == null && this.isFallback(paramName)) {
-			value = this.fallbackParameterSource.fallback(paramName);
+		if (value == null && this.isFallback(patchedParamName)) {
+			value = this.fallbackParameterSource.fallback(patchedParamName);
 		}
 
-		value = this.converter.convert(paramName, value);
+		value = this.converter.convert(patchedParamName, value);
 		if (this.paddingIterableParams) {
 			value = IterableExpandPadding.expandIfIterable(value, this.paddingIterableBoundaries);
 		}
@@ -110,5 +148,13 @@ public class ConvertibleBeanPropertySqlParameterSource extends BeanPropertySqlPa
 
 	private boolean isFallback(String paramName) {
 		return this.fallbackParameterSource != null && this.fallbackParameterSource.isFallback(paramName);
+	}
+
+	private String patchParamName(String paramName) {
+		if (!StringUtils.hasLength(prefix) || !paramName.startsWith(prefix)) {
+			return paramName;
+		}
+
+		return paramName.substring(prefix.length());
 	}
 }
