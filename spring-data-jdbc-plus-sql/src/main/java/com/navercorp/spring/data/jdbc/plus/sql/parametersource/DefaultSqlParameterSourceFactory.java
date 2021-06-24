@@ -61,11 +61,6 @@ public class DefaultSqlParameterSourceFactory implements SqlParameterSourceFacto
 	}
 
 	@Override
-	public BeanPropertySqlParameterSource beanParameterSource(String prefix, Object bean) {
-		throw new UnsupportedOperationException("Prefix saving is not supported as default.");
-	}
-
-	@Override
 	public MapSqlParameterSource mapParameterSource(Map<String, ?> map) {
 		return new MapSqlParameterSource(map);
 	}
