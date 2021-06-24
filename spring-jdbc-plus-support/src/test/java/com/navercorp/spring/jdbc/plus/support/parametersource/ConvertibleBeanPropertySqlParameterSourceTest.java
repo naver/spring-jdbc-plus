@@ -135,8 +135,9 @@ class ConvertibleBeanPropertySqlParameterSourceTest {
 	@Test
 	void getPrefixValue() {
 		// given
+		Instant now = Instant.now();
 		String paramName = "test.occurrenceTime";
-		Criteria criteria = Criteria.of("sample", Instant.now());
+		Criteria criteria = Criteria.of("sample", now);
 		ConvertibleBeanPropertySqlParameterSource sut = new ConvertibleBeanPropertySqlParameterSource(
 			"test.", criteria, this.converter);
 
@@ -144,7 +145,51 @@ class ConvertibleBeanPropertySqlParameterSourceTest {
 		Object actual = sut.getValue(paramName);
 
 		// then
-		assertThat(actual).isNotNull();
+		assertThat(actual).isEqualTo(Date.from(now));
+	}
+
+	@Test
+	void getValuePrefixNotMathced() {
+		String paramName = "occurrenceTime";
+		Criteria criteria = Criteria.of("sample", Instant.now());
+		ConvertibleBeanPropertySqlParameterSource sut = new ConvertibleBeanPropertySqlParameterSource(
+			"test.", criteria, this.converter);
+
+		assertThatThrownBy(() -> sut.getValue(paramName))
+			.isExactlyInstanceOf(IllegalArgumentException.class)
+			.hasMessage("Param name does not starts with test.");
+	}
+
+	@DisplayName("Prefix 가 없지만 fallback parameter 라면 Exception 이 발생하지 않습니다.")
+	@Test
+	void getValuePrefixNotMatchedButFallback() {
+		// given
+		String paramName = "none";
+		Criteria criteria = Criteria.of(null, Instant.now());
+		ConvertibleBeanPropertySqlParameterSource sut = new ConvertibleBeanPropertySqlParameterSource(
+			"test.", criteria, this.converter, new TestFallbackParamSource());
+
+		// when
+		Object actual = sut.getValue(paramName);
+
+		// then
+		assertThat(actual).isEqualTo("fallback");
+	}
+
+	@DisplayName("Object의 Field 가 존재하지 않지만, Prefix 가 있는 fallback parameter 라면 Exception 이 발생하지 않습니다.")
+	@Test
+	void getValueNoParamButFallbackInPrefixSource() {
+		// given
+		String paramName = "test.none";
+		Criteria criteria = Criteria.of(null, Instant.now());
+		ConvertibleBeanPropertySqlParameterSource sut = new ConvertibleBeanPropertySqlParameterSource(
+			"test.", criteria, this.converter, new TestFallbackParamSource());
+
+		// when
+		Object actual = sut.getValue(paramName);
+
+		// then
+		assertThat(actual).isEqualTo("fallback");
 	}
 
 	@DisplayName("Iterable 한 값은, element 를 컨버팅한 후 expand padding 을 수행한다.")

@@ -98,7 +98,7 @@ public class ConvertibleBeanPropertySqlParameterSource extends BeanPropertySqlPa
 	) {
 
 		super(bean);
-		this.prefix = prefix;
+		this.prefix = StringUtils.trimAllWhitespace(prefix);
 		this.converter = Objects.requireNonNull(converter, "Converter must not be null.");
 		this.fallbackParameterSource = fallbackParameterSource;
 	}
@@ -106,9 +106,11 @@ public class ConvertibleBeanPropertySqlParameterSource extends BeanPropertySqlPa
 	@Nullable
 	@Override
 	public Object getValue(String paramName) {
-		String patchedParamName = this.patchParamName(paramName);
+		String patchedParamName = paramName;
 		Object value = null;
+
 		try {
+			patchedParamName = this.patchParamName(paramName);
 			value = super.getValue(patchedParamName);
 		} catch (IllegalArgumentException e) {
 			if (!this.isFallback(patchedParamName)) {
@@ -151,8 +153,12 @@ public class ConvertibleBeanPropertySqlParameterSource extends BeanPropertySqlPa
 	}
 
 	private String patchParamName(String paramName) {
-		if (!StringUtils.hasLength(prefix) || !paramName.startsWith(prefix)) {
+		if (!StringUtils.hasLength(prefix)) {
 			return paramName;
+		}
+
+		if (!paramName.startsWith(prefix)) {
+			throw new IllegalArgumentException("Param name does not starts with " + this.prefix);
 		}
 
 		return paramName.substring(prefix.length());
