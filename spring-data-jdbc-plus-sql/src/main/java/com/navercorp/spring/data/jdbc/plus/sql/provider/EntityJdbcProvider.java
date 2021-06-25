@@ -34,6 +34,7 @@ import com.navercorp.spring.data.jdbc.plus.sql.convert.AggregateResultSetExtract
 import com.navercorp.spring.data.jdbc.plus.sql.convert.SqlProvider;
 import com.navercorp.spring.data.jdbc.plus.sql.parametersource.SqlParameterSourceFactory;
 import com.navercorp.spring.jdbc.plus.support.parametersource.CompositeSqlParameterSource;
+import com.navercorp.spring.jdbc.plus.support.parametersource.ConvertibleParameterSourceFactory;
 
 /**
  * The type Entity jdbc provider.
@@ -196,6 +197,21 @@ public class EntityJdbcProvider {
 	 */
 	public BeanPropertySqlParameterSource beanParameterSource(Object bean) {
 		return this.sqlParameterSourceFactory.beanParameterSource(bean);
+	}
+
+	/**
+	 * Bean parameter source bean property sql parameter source.
+	 *
+	 * @param prefix the prefix
+	 * @param bean   the bean
+	 * @return the bean property sql parameter source
+	 */
+	public BeanPropertySqlParameterSource beanParameterSource(String prefix, Object bean) {
+		if (this.sqlParameterSourceFactory instanceof ConvertibleParameterSourceFactory) {
+			return ((ConvertibleParameterSourceFactory) this.sqlParameterSourceFactory).beanParameterSource(prefix, bean);
+		} else {
+			throw new UnsupportedOperationException("Prefix saving is not supported as default.");
+		}
 	}
 
 	/**

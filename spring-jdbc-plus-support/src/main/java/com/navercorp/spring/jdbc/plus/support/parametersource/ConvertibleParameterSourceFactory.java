@@ -30,6 +30,7 @@ import com.navercorp.spring.jdbc.plus.support.parametersource.fallback.FallbackP
  * The type Convertible parameter source factory.
  *
  * @author Myeonghyeon Lee
+ * @author IAM20
  */
 public class ConvertibleParameterSourceFactory {
 	private final JdbcParameterSourceConverter converter;
@@ -68,6 +69,22 @@ public class ConvertibleParameterSourceFactory {
 		ConvertibleBeanPropertySqlParameterSource paramSource =
 			new ConvertibleBeanPropertySqlParameterSource(
 				bean, this.converter, this.fallbackParameterSource);
+		paramSource.setPaddingIterableParam(this.paddingIterableParams);
+		paramSource.setPaddingIterableBoundaries(this.paddingIterableBoundaries);
+		return paramSource;
+	}
+
+	/**
+	 * Bean parameter source bean property sql parameter source.
+	 *
+	 * @param prefix the prefix
+	 * @param bean   the bean
+	 * @return the bean property sql parameter source
+	 */
+	public BeanPropertySqlParameterSource beanParameterSource(String prefix, Object bean) {
+		ConvertibleBeanPropertySqlParameterSource paramSource =
+			new ConvertibleBeanPropertySqlParameterSource(
+				prefix, bean, this.converter, this.fallbackParameterSource);
 		paramSource.setPaddingIterableParam(this.paddingIterableParams);
 		paramSource.setPaddingIterableBoundaries(this.paddingIterableBoundaries);
 		return paramSource;
