@@ -126,6 +126,17 @@ public abstract class JdbcDaoSupport {
 	}
 
 	/**
+	 * Bean parameter source bean property sql parameter source.
+	 *
+	 * @param prefix the prefix
+	 * @param bean   the bean
+	 * @return the bean property sql parameter source
+	 */
+	protected BeanPropertySqlParameterSource beanParameterSource(String prefix, Object bean) {
+		return this.entityJdbcProvider.beanParameterSource(prefix, bean);
+	}
+
+	/**
 	 * Map parameter source map sql parameter source.
 	 *
 	 * @return the map sql parameter source
