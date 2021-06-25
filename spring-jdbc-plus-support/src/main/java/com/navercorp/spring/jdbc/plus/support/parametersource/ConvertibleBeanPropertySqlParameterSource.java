@@ -98,7 +98,7 @@ public class ConvertibleBeanPropertySqlParameterSource extends BeanPropertySqlPa
 	) {
 
 		super(bean);
-		this.prefix = StringUtils.trimAllWhitespace(prefix);
+		this.prefix = prefix != null ? prefix.trim() : null;
 		this.converter = Objects.requireNonNull(converter, "Converter must not be null.");
 		this.fallbackParameterSource = fallbackParameterSource;
 	}
@@ -153,7 +153,7 @@ public class ConvertibleBeanPropertySqlParameterSource extends BeanPropertySqlPa
 	}
 
 	private String patchParamName(String paramName) {
-		if (!StringUtils.hasLength(prefix)) {
+		if (!StringUtils.hasText(prefix)) {
 			return paramName;
 		}
 

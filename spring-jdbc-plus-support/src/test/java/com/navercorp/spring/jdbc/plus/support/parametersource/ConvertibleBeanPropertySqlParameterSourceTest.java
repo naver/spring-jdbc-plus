@@ -39,6 +39,7 @@ import com.navercorp.spring.jdbc.plus.support.parametersource.fallback.FallbackP
 
 /**
  * @author Myeonghyeon Lee
+ * @author IAM20
  */
 class ConvertibleBeanPropertySqlParameterSourceTest {
 	private final JdbcParameterSourceConverter converter = new DefaultJdbcParameterSourceConverter(
@@ -140,6 +141,22 @@ class ConvertibleBeanPropertySqlParameterSourceTest {
 		Criteria criteria = Criteria.of("sample", now);
 		ConvertibleBeanPropertySqlParameterSource sut = new ConvertibleBeanPropertySqlParameterSource(
 			"test.", criteria, this.converter);
+
+		// when
+		Object actual = sut.getValue(paramName);
+
+		// then
+		assertThat(actual).isEqualTo(Date.from(now));
+	}
+
+	@Test
+	void getWhitespaceIncludedPrefixValue() {
+		// given
+		Instant now = Instant.now();
+		String paramName = "t e s t .occurrenceTime";
+		Criteria criteria = Criteria.of("sample", now);
+		ConvertibleBeanPropertySqlParameterSource sut = new ConvertibleBeanPropertySqlParameterSource(
+			"    t e s t .    ", criteria, this.converter);
 
 		// when
 		Object actual = sut.getValue(paramName);
