@@ -35,6 +35,8 @@ interface OrderRepositoryCustom {
     fun search(criteria: OrderCriteria): List<Order>
 
     fun countByPurchaserNo(purchaserNo: String): Long
+
+    fun findByPurchaserNoAndStatusAndPrice(criteria: OrderCriteria, price: Long): List<Order>
 }
 
 class OrderRepositoryImpl(entityProvider: EntityJdbcProvider) : JdbcRepositorySupport<Order>(
@@ -69,6 +71,18 @@ class OrderRepositoryImpl(entityProvider: EntityJdbcProvider) : JdbcRepositorySu
             mapParameterSource()
                 .addValue("purchaserNo", purchaserNo),
             Long::class.java
+        )
+    }
+
+    override fun findByPurchaserNoAndStatusAndPrice(criteria: OrderCriteria, price: Long): List<Order> {
+        val sql = this.sqls.selectByPurchaserNoAndStatusAndPrice()
+        return find(
+            sql,
+            compositeSqlParameterSource(
+                beanParameterSource("criteria.", criteria),
+                mapParameterSource()
+                    .addValue("price", price)
+            )
         )
     }
 }

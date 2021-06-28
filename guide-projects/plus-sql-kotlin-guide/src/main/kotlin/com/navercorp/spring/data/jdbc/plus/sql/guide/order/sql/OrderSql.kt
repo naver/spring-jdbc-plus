@@ -52,4 +52,13 @@ class OrderSql : SqlGeneratorSupport() {
         FROM ${sql.tables(Order::class.java)}
         WHERE purchaser_no = :purchaserNo
         """
+
+    fun selectByPurchaserNoAndStatusAndPrice(): String =
+        """
+        SELECT ${sql.columns(Order::class.java)} 
+        FROM ${sql.tables(Order::class.java)}
+        WHERE purchaser_no = :criteria.purchaserNo
+        AND status = :criteria.status
+        AND price = :price
+        """
 }

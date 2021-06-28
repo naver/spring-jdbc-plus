@@ -73,6 +73,25 @@ class OrderRepositoryTest {
     }
 
     @Test
+    fun findByPurchaserNoAndStatusAndPrice() {
+        // given
+        sut.saveAll(orders)
+        val criteria = OrderCriteria(
+            purchaserNo = "navercorp",
+            status = OrderStatus.PLACE,
+            sortBy = OrderSort.PRICE
+        )
+
+        // when
+        val actual = sut.findByPurchaserNoAndStatusAndPrice(criteria, 5000)
+
+        // then
+        assertThat(actual).hasSize(1)
+        assertThat(actual[0].price).isEqualTo(5000L)
+        assertThat(actual[0].status).isEqualTo(OrderStatus.PLACE)
+    }
+
+    @Test
     fun search() {
         // given
         sut.saveAll(orders)
