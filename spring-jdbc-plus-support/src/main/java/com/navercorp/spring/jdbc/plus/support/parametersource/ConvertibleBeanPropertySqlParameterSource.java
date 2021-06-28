@@ -103,6 +103,17 @@ public class ConvertibleBeanPropertySqlParameterSource extends BeanPropertySqlPa
 		this.fallbackParameterSource = fallbackParameterSource;
 	}
 
+	@Override
+	public boolean hasValue(String paramName) {
+		String patchedParamName;
+		try {
+			patchedParamName = this.patchParamName(paramName);
+		} catch (IllegalArgumentException e) {
+			return false;
+		}
+		return super.hasValue(patchedParamName);
+	}
+
 	@Nullable
 	@Override
 	public Object getValue(String paramName) {

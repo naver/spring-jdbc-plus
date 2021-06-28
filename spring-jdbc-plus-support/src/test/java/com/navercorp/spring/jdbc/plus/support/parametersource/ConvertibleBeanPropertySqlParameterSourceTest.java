@@ -146,6 +146,7 @@ class ConvertibleBeanPropertySqlParameterSourceTest {
 		Object actual = sut.getValue(paramName);
 
 		// then
+		assertThat(sut.hasValue(paramName)).isTrue();
 		assertThat(actual).isEqualTo(Date.from(now));
 	}
 
@@ -162,6 +163,7 @@ class ConvertibleBeanPropertySqlParameterSourceTest {
 		Object actual = sut.getValue(paramName);
 
 		// then
+		assertThat(sut.hasValue(paramName)).isTrue();
 		assertThat(actual).isEqualTo(Date.from(now));
 	}
 
@@ -175,6 +177,7 @@ class ConvertibleBeanPropertySqlParameterSourceTest {
 		assertThatThrownBy(() -> sut.getValue(paramName))
 			.isExactlyInstanceOf(IllegalArgumentException.class)
 			.hasMessage("Param name does not starts with test.");
+		assertThat(sut.hasValue(paramName)).isFalse();
 	}
 
 	@DisplayName("Prefix 가 없지만 fallback parameter 라면 Exception 이 발생하지 않습니다.")
@@ -191,6 +194,7 @@ class ConvertibleBeanPropertySqlParameterSourceTest {
 
 		// then
 		assertThat(actual).isEqualTo("fallback");
+		assertThat(sut.hasValue(paramName)).isFalse();
 	}
 
 	@DisplayName("Object의 Field 가 존재하지 않지만, Prefix 가 있는 fallback parameter 라면 Exception 이 발생하지 않습니다.")
@@ -207,6 +211,7 @@ class ConvertibleBeanPropertySqlParameterSourceTest {
 
 		// then
 		assertThat(actual).isEqualTo("fallback");
+		assertThat(sut.hasValue(paramName)).isFalse();
 	}
 
 	@DisplayName("Iterable 한 값은, element 를 컨버팅한 후 expand padding 을 수행한다.")
