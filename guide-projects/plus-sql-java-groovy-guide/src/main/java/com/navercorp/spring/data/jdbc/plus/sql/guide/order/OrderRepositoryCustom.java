@@ -29,4 +29,6 @@ public interface OrderRepositoryCustom {
 	List<Order> search(OrderCriteria criteria);
 
 	long countByPurchaserNo(String purchaserNo);
+
+	List<Order> findByPurchaserNoAndStatusAndPrice(OrderCriteria criteria, Long price);
 }

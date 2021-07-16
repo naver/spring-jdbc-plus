@@ -54,6 +54,16 @@ class OrderSql extends SqlGeneratorSupport {
         """
     }
 
+    String selectByPurchaserNoAndStatusAndPrice() {
+    """
+    SELECT ${sql.columns(Order)} 
+    FROM ${sql.tables(Order)}
+    WHERE purchaser_no = :criteria.purchaserNo
+    AND status = :criteria.status
+    AND price = :price
+    """
+    }
+
     String countByPurchaserNo() {
         """
         SELECT count(*)

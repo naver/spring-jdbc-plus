@@ -100,6 +100,25 @@ class OrderRepositoryTest {
 	}
 
 	@Test
+	void findByPurchaesrNoAndStatusAndPrice() {
+		// given
+		sut.saveAll(orders);
+		OrderCriteria criteria = OrderCriteria.builder()
+			.purchaserNo("navercorp")
+			.status(OrderStatus.PLACE)
+			.sortBy(OrderCriteria.OrderSort.PRICE)
+			.build();
+
+		// when
+		List<Order> actual = sut.findByPurchaserNoAndStatusAndPrice(criteria, 1000L);
+
+		// then
+		Assertions.assertThat(actual).hasSize(1);
+		assertThat(actual.get(0).getPrice()).isEqualTo(1000L);
+		assertThat(actual.get(0).getStatus()).isEqualTo(OrderStatus.PLACE);
+	}
+
+	@Test
 	void countByPurchaserNo() {
 		// given
 		sut.saveAll(orders);

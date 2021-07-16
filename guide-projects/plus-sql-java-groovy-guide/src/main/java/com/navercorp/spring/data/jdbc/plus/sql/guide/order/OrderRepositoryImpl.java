@@ -60,4 +60,14 @@ public class OrderRepositoryImpl extends JdbcRepositorySupport<Order>
 				.addValue("purchaserNo", purchaserNo),
 			Long.class);
 	}
+
+	@Override
+	public List<Order> findByPurchaserNoAndStatusAndPrice(OrderCriteria criteria, Long price) {
+		String sql = this.sqls.selectByPurchaserNoAndStatusAndPrice();
+		return find(sql, compositeSqlParameterSource(
+			beanParameterSource("criteria.", criteria),
+			mapParameterSource()
+				.addValue("price", price)
+		));
+	}
 }
