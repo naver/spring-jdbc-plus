@@ -32,6 +32,7 @@ import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 
 import com.navercorp.spring.data.jdbc.plus.sql.convert.AggregateResultSetExtractor;
 import com.navercorp.spring.data.jdbc.plus.sql.convert.SqlProvider;
+import com.navercorp.spring.data.jdbc.plus.sql.parametersource.EntityConvertibleSqlParameterSourceFactory;
 import com.navercorp.spring.data.jdbc.plus.sql.parametersource.SqlParameterSourceFactory;
 import com.navercorp.spring.jdbc.plus.support.parametersource.CompositeSqlParameterSource;
 import com.navercorp.spring.jdbc.plus.support.parametersource.ConvertibleParameterSourceFactory;
@@ -207,8 +208,8 @@ public class EntityJdbcProvider {
 	 * @return the bean property sql parameter source
 	 */
 	public BeanPropertySqlParameterSource beanParameterSource(String prefix, Object bean) {
-		if (this.sqlParameterSourceFactory instanceof ConvertibleParameterSourceFactory) {
-			return ((ConvertibleParameterSourceFactory) this.sqlParameterSourceFactory).beanParameterSource(prefix, bean);
+		if (this.sqlParameterSourceFactory instanceof EntityConvertibleSqlParameterSourceFactory) {
+			return ((EntityConvertibleSqlParameterSourceFactory) this.sqlParameterSourceFactory).beanParameterSource(prefix, bean);
 		} else {
 			throw new UnsupportedOperationException("Prefix saving is not supported as default.");
 		}

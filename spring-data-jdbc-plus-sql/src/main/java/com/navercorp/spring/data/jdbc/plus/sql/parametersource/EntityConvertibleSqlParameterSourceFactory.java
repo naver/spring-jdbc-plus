@@ -66,6 +66,10 @@ public class EntityConvertibleSqlParameterSourceFactory implements SqlParameterS
 		return this.delegate.beanParameterSource(bean);
 	}
 
+	public BeanPropertySqlParameterSource beanParameterSource(String prefix, Object bean) {
+		return this.delegate.beanParameterSource(prefix, bean);
+	}
+
 	@Override
 	public MapSqlParameterSource mapParameterSource(Map<String, ?> map) {
 		return this.delegate.mapParameterSource(map);
