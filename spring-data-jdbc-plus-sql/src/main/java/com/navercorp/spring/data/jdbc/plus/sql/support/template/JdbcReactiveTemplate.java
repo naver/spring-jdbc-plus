@@ -285,6 +285,7 @@ public class JdbcReactiveTemplate {
 	}
 
 	private static class FluxItem<R> {
+		@SuppressWarnings("rawtypes")
 		private static final FluxItem END_ITEM = new EndOfFluxItem();
 
 		private final R item;
@@ -335,6 +336,7 @@ public class JdbcReactiveTemplate {
 			return null;
 		}
 
+		@SuppressWarnings("rawtypes")
 		private static FluxItem errorInstance(Exception e) {
 			return new ErrorFluxItem(e);
 		}
@@ -367,6 +369,11 @@ public class JdbcReactiveTemplate {
 		@Override
 		protected boolean isEnd() {
 			return true;
+		}
+
+		@Override
+		public Exception getError() {
+			return this.error;
 		}
 	}
 }
