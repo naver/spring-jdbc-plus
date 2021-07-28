@@ -59,7 +59,7 @@ If you need to use Spring Data JDBC's Persistence features and SQL execution fun
     <dependency>
         <groupId>com.navercorp.spring</groupId>
         <artifactId>spring-boot-starter-data-jdbc-plus-sql</artifactId>
-        <version>2.2.2</version>
+        <version>2.2.3</version>
     </dependency>
     ```
 
