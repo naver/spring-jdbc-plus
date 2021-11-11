@@ -159,6 +159,22 @@ class DefaultJdbcParameterSourceConverterTest {
 		});
 	}
 
+	@Test
+	void convertArrayOfPrimitiveTypeTest() {
+		// given
+		List<Converter<?, ?>> converters = new ArrayList<>();
+		DefaultJdbcParameterSourceConverter sut = new DefaultJdbcParameterSourceConverter(converters);
+		int[] array = {3, 14};
+
+		// when
+		Object actualResult = sut.convert("name", array);
+
+		// then
+		assertThat(actualResult.getClass().isArray()).isTrue();
+		assertThat(actualResult).isInstanceOf(int[].class);
+		assertThat((int[])actualResult).containsSequence(3, 14);
+	}
+
 	@DisplayName("Uuid 타입 컨버터를 변경한다.")
 	@ParameterizedTest
 	@AutoSource
