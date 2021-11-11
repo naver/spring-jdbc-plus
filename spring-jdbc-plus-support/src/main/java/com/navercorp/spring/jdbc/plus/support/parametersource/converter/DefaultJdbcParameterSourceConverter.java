@@ -206,6 +206,9 @@ public class DefaultJdbcParameterSourceConverter implements JdbcParameterSourceC
 			if (value instanceof Iterable) {
 				value = this.convertElements((Iterable)value);
 			} else if (value.getClass().isArray()) {
+				if (value.getClass().getComponentType().isPrimitive()) {
+					return value;
+				}
 				value = this.convertElements((Object[])value);
 			} else if (value instanceof Enum) {
 				value = enumConverter.convert((Enum)value);
