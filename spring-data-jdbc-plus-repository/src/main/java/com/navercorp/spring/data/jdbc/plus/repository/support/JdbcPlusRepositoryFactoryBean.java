@@ -69,7 +69,7 @@ public class JdbcPlusRepositoryFactoryBean<T extends Repository<S, ID>, S, ID ex
 	 *
 	 * @param repositoryInterface must not be {@literal null}.
 	 */
-	protected JdbcPlusRepositoryFactoryBean(Class<? extends T> repositoryInterface) {
+	public JdbcPlusRepositoryFactoryBean(Class<? extends T> repositoryInterface) {
 		super(repositoryInterface);
 	}
 
@@ -107,7 +107,7 @@ public class JdbcPlusRepositoryFactoryBean<T extends Repository<S, ID>, S, ID ex
 	 * @param mappingContext the mapping context
 	 */
 	@Autowired
-	protected void setMappingContext(RelationalMappingContext mappingContext) {
+	public void setMappingContext(RelationalMappingContext mappingContext) {
 
 		Assert.notNull(mappingContext, "MappingContext must not be null");
 
@@ -121,7 +121,7 @@ public class JdbcPlusRepositoryFactoryBean<T extends Repository<S, ID>, S, ID ex
 	 * @param dialect the dialect
 	 */
 	@Autowired
-	protected void setDialect(Dialect dialect) {
+	public void setDialect(Dialect dialect) {
 
 		Assert.notNull(dialect, "Dialect must not be null");
 
