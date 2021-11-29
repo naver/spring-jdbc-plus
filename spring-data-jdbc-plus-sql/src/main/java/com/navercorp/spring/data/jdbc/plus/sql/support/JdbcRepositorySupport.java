@@ -30,6 +30,8 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.data.mapping.callback.EntityCallbacks;
+import org.springframework.data.relational.core.mapping.event.AfterConvertCallback;
+import org.springframework.data.relational.core.mapping.event.AfterConvertEvent;
 import org.springframework.data.relational.core.mapping.event.AfterLoadCallback;
 import org.springframework.data.relational.core.mapping.event.AfterLoadEvent;
 import org.springframework.jdbc.core.ResultSetExtractor;
@@ -300,7 +302,7 @@ public abstract class JdbcRepositorySupport<T> {
 	 */
 	protected List<T> find(String sql, SqlParameterSource params) {
 		return this.find(sql, params, this.entityType).stream()
-			.map(this::triggerAfterLoad)
+			.map(this::triggerAfterConvert)
 			.collect(toList());
 	}
 
@@ -316,7 +318,7 @@ public abstract class JdbcRepositorySupport<T> {
 	protected <R> List<R> find(String sql, SqlParameterSource params, Class<R> returnType) {
 		AggregateResultSetExtractor<R> resultSetExtractor = this.getAggregateResultSetExtractor(returnType);
 		return this.find(sql, params, resultSetExtractor).stream()
-			.map(this::triggerAfterLoad)
+			.map(this::triggerAfterConvert)
 			.collect(toList());
 	}
 
@@ -331,7 +333,7 @@ public abstract class JdbcRepositorySupport<T> {
 	 */
 	protected <R> List<R> find(String sql, SqlParameterSource params, RowMapper<R> rowMapper) {
 		return this.getJdbcOperations().query(sql, params, rowMapper).stream()
-			.map(this::triggerAfterLoad)
+			.map(this::triggerAfterConvert)
 			.collect(toList());
 	}
 
@@ -350,7 +352,7 @@ public abstract class JdbcRepositorySupport<T> {
 		ResultSetExtractor<List<R>> resultSetExtractor) {
 
 		return this.getJdbcOperations().query(sql, params, resultSetExtractor).stream()
-			.map(this::triggerAfterLoad)
+			.map(this::triggerAfterConvert)
 			.collect(toList());
 	}
 
@@ -405,7 +407,7 @@ public abstract class JdbcRepositorySupport<T> {
 				.toString();
 			throw new IncorrectResultSizeDataAccessException(message, 1, list.size());
 		}
-		return Optional.ofNullable(this.triggerAfterLoad(list.get(0)));
+		return Optional.ofNullable(this.triggerAfterConvert(list.get(0)));
 	}
 
 	/**
@@ -430,7 +432,7 @@ public abstract class JdbcRepositorySupport<T> {
 		if (list.size() > 1) {
 			throw new IncorrectResultSizeDataAccessException(1, list.size());
 		}
-		return Optional.ofNullable(this.triggerAfterLoad(list.get(0)));
+		return Optional.ofNullable(this.triggerAfterConvert(list.get(0)));
 	}
 
 	/**
@@ -497,10 +499,15 @@ public abstract class JdbcRepositorySupport<T> {
 	 * @param aggregate the aggregate
 	 * @return the r
 	 */
-	protected <R> R triggerAfterLoad(R aggregate) {
+	protected <R> R triggerAfterConvert(R aggregate) {
 		this.getApplicationEventPublisher()
 			.publishEvent(new AfterLoadEvent<>(aggregate));
-		return this.getEntityCallbacks()
+		this.getApplicationEventPublisher()
+			.publishEvent(new AfterConvertEvent<>(aggregate));
+
+		aggregate = this.getEntityCallbacks()
 			.callback(AfterLoadCallback.class, aggregate);
+		return this.getEntityCallbacks()
+			.callback(AfterConvertCallback.class, aggregate);
 	}
 }
