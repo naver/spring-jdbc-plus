@@ -40,13 +40,15 @@ import org.springframework.lang.NonNull;
 public abstract class Jsr310TimestampBasedConverters {
 
 	/**
-	 * Gets converters to register.
+	 * Returns the converters to be registered.
+	 *
+	 * Note that the {@link LocalDateTimeToTimestampConverter} is not included, since many database don't need that conversion.
+	 * Databases that do need it, should include it in the conversions offered by their respective dialect.
 	 *
 	 * @return the converters to register
 	 */
 	public static List<Converter<?, ?>> getConvertersToRegister() {
 		return Arrays.asList(
-			LocalDateTimeToTimestampConverter.INSTANCE,
 			LocalDateToTimestampConverter.INSTANCE,
 			LocalTimeToTimestampConverter.INSTANCE,
 			InstantToTimestampConverter.INSTANCE,
