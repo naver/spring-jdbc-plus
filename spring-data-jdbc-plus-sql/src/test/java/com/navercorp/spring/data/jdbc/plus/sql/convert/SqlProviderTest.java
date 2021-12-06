@@ -25,7 +25,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.jdbc.core.convert.BasicJdbcConverter;
 import org.springframework.data.jdbc.core.convert.JdbcConverter;
-import org.springframework.data.relational.core.dialect.MySqlDialect;
+import org.springframework.data.jdbc.core.dialect.JdbcMySqlDialect;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Embedded;
 import org.springframework.data.relational.core.mapping.NamingStrategy;
@@ -235,7 +235,7 @@ class SqlProviderTest {
 		JdbcConverter converter = new BasicJdbcConverter(context, (identifier, path) -> {
 			throw new UnsupportedOperationException();
 		});
-		SqlProvider sut = new SqlProvider(context, converter, MySqlDialect.INSTANCE);
+		SqlProvider sut = new SqlProvider(context, converter, JdbcMySqlDialect.INSTANCE);
 
 		// when
 		String columns = sut.columns(TestOuterEntity.class);

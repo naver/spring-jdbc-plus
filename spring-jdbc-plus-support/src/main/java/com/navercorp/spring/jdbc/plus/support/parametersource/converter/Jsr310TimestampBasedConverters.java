@@ -37,6 +37,7 @@ import org.springframework.lang.NonNull;
  *
  * @author Myeonghyeon Lee
  */
+@Deprecated
 public abstract class Jsr310TimestampBasedConverters {
 
 	/**
