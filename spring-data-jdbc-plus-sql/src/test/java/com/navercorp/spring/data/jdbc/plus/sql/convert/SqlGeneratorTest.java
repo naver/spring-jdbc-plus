@@ -182,7 +182,7 @@ class SqlGeneratorTest {
 				+ "ON ref.dummy_entity = dummy_entity.id1", //
 			"LEFT OUTER JOIN second_level_referenced_entity ref_further "
 				+ "ON ref_further.referenced_entity = ref.x_l1id", //
-			"ORDER BY x_name ASC");
+			"ORDER BY dummy_entity.x_name ASC");
 	}
 
 	@Test // DATAJDBC-101
@@ -206,8 +206,8 @@ class SqlGeneratorTest {
 				+ "ON ref.dummy_entity = dummy_entity.id1", //
 			"LEFT OUTER JOIN second_level_referenced_entity ref_further "
 				+ "ON ref_further.referenced_entity = ref.x_l1id", //
-			"ORDER BY x_name DESC", //
-			"x_other ASC");
+			"ORDER BY dummy_entity.x_name DESC", //
+			"dummy_entity.x_other ASC");
 	}
 
 	@Test // DATAJDBC-101
@@ -258,7 +258,7 @@ class SqlGeneratorTest {
 				+ "ON ref.dummy_entity = dummy_entity.id1", //
 			"LEFT OUTER JOIN second_level_referenced_entity ref_further "
 				+ "ON ref_further.referenced_entity = ref.x_l1id", //
-			"ORDER BY x_name ASC", //
+			"ORDER BY dummy_entity.x_name ASC", //
 			"OFFSET 30", //
 			"LIMIT 10");
 	}

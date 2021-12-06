@@ -67,7 +67,7 @@ class DefaultJdbcParameterSourceConverterTest {
 		// then
 		assertThat(str).isEqualTo(":sample:");
 		assertThat(instant).isExactlyInstanceOf(Timestamp.class);
-		assertThat(localDateTime).isExactlyInstanceOf(Timestamp.class);
+		assertThat(localDateTime).isExactlyInstanceOf(LocalDateTime.class);
 		assertThat(localDate).isExactlyInstanceOf(Timestamp.class);
 		assertThat(zonedDateTime).isExactlyInstanceOf(Timestamp.class);
 		assertThat(enumName).isExactlyInstanceOf(String.class);

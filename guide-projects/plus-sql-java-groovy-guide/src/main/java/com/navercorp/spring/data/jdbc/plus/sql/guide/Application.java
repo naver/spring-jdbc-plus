@@ -22,8 +22,8 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
+import org.springframework.data.jdbc.core.dialect.JdbcMySqlDialect;
 import org.springframework.data.relational.core.dialect.Dialect;
-import org.springframework.data.relational.core.dialect.MySqlDialect;
 
 /**
  * @author Myeonghyeon Lee
@@ -37,6 +37,6 @@ public class Application {
 	@Bean
 	@Primary
 	public Dialect mysqlDialect() {
-		return MySqlDialect.INSTANCE;
+		return JdbcMySqlDialect.INSTANCE;
 	}
 }

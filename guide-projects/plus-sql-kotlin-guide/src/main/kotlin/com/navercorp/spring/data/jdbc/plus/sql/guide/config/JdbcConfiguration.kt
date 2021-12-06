@@ -7,19 +7,26 @@ import com.navercorp.spring.jdbc.plus.support.parametersource.converter.DefaultJ
 import com.navercorp.spring.jdbc.plus.support.parametersource.fallback.NoneFallbackParameterSource
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.core.convert.converter.Converter
 import org.springframework.data.jdbc.core.convert.JdbcConverter
+import org.springframework.data.relational.core.dialect.Dialect
 import org.springframework.data.relational.core.mapping.RelationalMappingContext
 import org.springframework.data.relational.core.sql.IdentifierProcessing
 
 @Configuration
 class JdbcConfiguration {
+    @Suppress("UNCHECKED_CAST")
     @Bean
-    fun sqlParameterSourceFacotry(
+    fun sqlParameterSourceFactory(
         mappingContext: RelationalMappingContext,
-        jdbcConverter: JdbcConverter
+        jdbcConverter: JdbcConverter,
+        dialect: Dialect
     ): SqlParameterSourceFactory {
         return EntityConvertibleSqlParameterSourceFactory(
-            ConvertibleParameterSourceFactory(DefaultJdbcParameterSourceConverter(), NoneFallbackParameterSource()),
+            ConvertibleParameterSourceFactory(
+                DefaultJdbcParameterSourceConverter(dialect.converters as List<Converter<Any?, Any?>>),
+                NoneFallbackParameterSource()
+            ),
             mappingContext,
             jdbcConverter,
             IdentifierProcessing.ANSI

@@ -31,13 +31,13 @@ If you need to use Spring Data JDBC's Persistence features and SQL execution fun
             }
         }
         dependencies {
-            classpath("org.springframework.boot:spring-boot-gradle-plugin:2.5.4")
+            classpath("org.springframework.boot:spring-boot-gradle-plugin:2.6.0")
         }
     }
 
     dependencies {
         implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
-        implementation("com.navercorp.spring:spring-boot-starter-data-jdbc-plus-sql:2.2.4")
+        implementation("com.navercorp.spring:spring-boot-starter-data-jdbc-plus-sql:2.3.0")
     }
     ```
 
@@ -47,7 +47,7 @@ If you need to use Spring Data JDBC's Persistence features and SQL execution fun
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.5.4</version>
+        <version>2.6.0</version>
         <relativePath/>
     </parent>
 
@@ -59,7 +59,7 @@ If you need to use Spring Data JDBC's Persistence features and SQL execution fun
     <dependency>
         <groupId>com.navercorp.spring</groupId>
         <artifactId>spring-boot-starter-data-jdbc-plus-sql</artifactId>
-        <version>2.2.4</version>
+        <version>2.3.0</version>
     </dependency>
     ```
 
