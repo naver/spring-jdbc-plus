@@ -8,7 +8,9 @@ import com.navercorp.spring.jdbc.plus.support.parametersource.fallback.NoneFallb
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.convert.converter.Converter
+import org.springframework.data.convert.ReadingConverter
 import org.springframework.data.jdbc.core.convert.JdbcConverter
+import org.springframework.data.jdbc.core.convert.JdbcCustomConversions
 import org.springframework.data.relational.core.dialect.Dialect
 import org.springframework.data.relational.core.mapping.RelationalMappingContext
 import org.springframework.data.relational.core.sql.IdentifierProcessing
@@ -22,14 +24,28 @@ class JdbcConfiguration {
         jdbcConverter: JdbcConverter,
         dialect: Dialect
     ): SqlParameterSourceFactory {
+        val converters = storeConverters()
+        converters.addAll(dialect.converters as List<Converter<*, *>>)
+
         return EntityConvertibleSqlParameterSourceFactory(
             ConvertibleParameterSourceFactory(
-                DefaultJdbcParameterSourceConverter(dialect.converters as List<Converter<Any?, Any?>>),
+                DefaultJdbcParameterSourceConverter(converters),
                 NoneFallbackParameterSource()
             ),
             mappingContext,
             jdbcConverter,
             IdentifierProcessing.ANSI
         )
+    }
+
+    private fun storeConverters(): MutableList<Converter<*, *>> {
+        val result = mutableListOf<Converter<*, *>>()
+
+        JdbcCustomConversions.storeConverters().forEach {
+            if (it is Converter<*, *> && it.javaClass.getAnnotation(ReadingConverter::class.java) == null) {
+                result.add(it)
+            }
+        }
+        return result
     }
 }

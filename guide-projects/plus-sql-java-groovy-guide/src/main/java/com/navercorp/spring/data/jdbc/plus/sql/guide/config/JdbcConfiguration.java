@@ -1,5 +1,7 @@
 package com.navercorp.spring.data.jdbc.plus.sql.guide.config;
 
+import static java.util.stream.Collectors.toList;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -7,6 +9,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.core.convert.converter.Converter;
+import org.springframework.data.convert.ReadingConverter;
 import org.springframework.data.jdbc.core.convert.JdbcConverter;
 import org.springframework.data.jdbc.core.convert.JdbcCustomConversions;
 import org.springframework.data.relational.core.dialect.Dialect;
@@ -30,14 +33,27 @@ public class JdbcConfiguration {
 		JdbcConverter jdbcConverter,
 		Dialect dialect) {
 		List<?> dialectConverters = (List<?>) dialect.getConverters();
+		List<Converter<?, ?>> converters = storeConverters();
+		converters.addAll((List<Converter<?, ?>>) dialectConverters);
+
 		return new EntityConvertibleSqlParameterSourceFactory(
 			new ConvertibleParameterSourceFactory(
-				new DefaultJdbcParameterSourceConverter((List<Converter<?, ?>>) dialectConverters),
+				new DefaultJdbcParameterSourceConverter(converters),
 				new NoneFallbackParameterSource()
 			),
 			mappingContext,
 			jdbcConverter,
 			IdentifierProcessing.ANSI
 		);
+	}
+
+	private static List<Converter<?, ?>> storeConverters() {
+		List<Converter<?, ?>> converters = new ArrayList<>();
+		for (Object obj : JdbcCustomConversions.storeConverters()) {
+			if (obj instanceof Converter<?, ?> && obj.getClass().getAnnotation(ReadingConverter.class) == null) {
+				converters.add((Converter<?, ?>) obj);
+			}
+		}
+		return converters;
 	}
 }
