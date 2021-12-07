@@ -29,10 +29,6 @@ import java.util.Map;
 
 import org.springframework.core.ResolvableType;
 import org.springframework.core.convert.converter.Converter;
-import org.springframework.data.convert.ReadingConverter;
-import org.springframework.data.convert.WritingConverter;
-import org.springframework.data.jdbc.core.convert.JdbcCustomConversions;
-import org.springframework.data.util.ReflectionUtils;
 import org.springframework.lang.Nullable;
 
 import com.navercorp.spring.jdbc.plus.support.parametersource.converter.EnumParameterTypeConverter.EnumToNameConverter;
@@ -137,13 +133,12 @@ public class DefaultJdbcParameterSourceConverter implements JdbcParameterSourceC
 		return conditionalUnwrappers;
 	}
 
-	@SuppressWarnings({"CollectionAddAllCanBeReplacedWithConstructor", "unchecked"})
+	@SuppressWarnings("CollectionAddAllCanBeReplacedWithConstructor")
 	private static Map<Class<?>, Converter<?, ?>> getDefaultConverters() {
 		List<Converter<?, ?>> converters = new ArrayList<>();
-		converters.addAll((List<Converter<?, ?>>) storeConverters());
+		converters.addAll(Jsr310TimestampBasedConverters.getConvertersToRegister());
 		converters.add(UuidParameterTypeConverter.UuidToStringTypeConverter.INSTANCE);
 		return converters.stream()
-			.filter(c -> c.getClass().getAnnotation(ReadingConverter.class) == null)
 			.collect(toMap(c -> resolveConverterGenerics(c.getClass()).get(0), c -> c));
 	}
 
@@ -170,16 +165,6 @@ public class DefaultJdbcParameterSourceConverter implements JdbcParameterSourceC
 		}
 
 		return Collections.unmodifiableMap(unwrapperMap);
-	}
-
-	private static List<Converter<?, ?>> storeConverters() {
-		List<Converter<?, ?>> converters = new ArrayList<>();
-		for (Object obj : JdbcCustomConversions.storeConverters()) {
-			if (obj instanceof Converter<?, ?>) {
-				converters.add((Converter<?, ?>) obj);
-			}
-		}
-		return converters;
 	}
 
 	private static List<Class<?>> resolveConverterGenerics(Class<?> type) {
