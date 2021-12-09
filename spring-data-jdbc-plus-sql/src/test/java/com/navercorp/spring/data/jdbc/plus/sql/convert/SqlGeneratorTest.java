@@ -32,6 +32,7 @@ import org.springframework.data.relational.core.mapping.RelationalPersistentProp
 import org.springframework.data.relational.core.sql.Aliased;
 import org.springframework.data.relational.core.sql.SqlIdentifier;
 import org.springframework.data.relational.core.sql.Table;
+import org.springframework.data.relational.core.sql.TableLike;
 
 /**
  * COPY org.springframework.data.relational.core.convert.SqlGeneratorUnitTests
@@ -649,7 +650,7 @@ class SqlGeneratorTest {
 	public void joinForOneToOneWithoutId() {
 
 		SqlGenerator.Join join = generateJoin("child", ParentOfNoIdChild.class);
-		Table joinTable = join.getJoinTable();
+		TableLike joinTable = join.getJoinTable();
 
 		SoftAssertions.assertSoftly(softly -> {
 
