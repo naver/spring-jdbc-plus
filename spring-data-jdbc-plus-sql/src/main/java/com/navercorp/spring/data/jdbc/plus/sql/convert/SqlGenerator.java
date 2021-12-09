@@ -73,6 +73,7 @@ import org.springframework.data.relational.core.sql.SimpleFunction;
 import org.springframework.data.relational.core.sql.SqlIdentifier;
 import org.springframework.data.relational.core.sql.StatementBuilder;
 import org.springframework.data.relational.core.sql.Table;
+import org.springframework.data.relational.core.sql.TableLike;
 import org.springframework.data.relational.core.sql.Update;
 import org.springframework.data.relational.core.sql.UpdateBuilder;
 import org.springframework.data.relational.core.sql.Visitor;
@@ -201,7 +202,7 @@ class SqlGenerator {
 			return rootCondition.apply(filterColumn);
 		}
 
-		Table subSelectTable = Table.create(parentPath.getTableName());
+		TableLike subSelectTable = Table.create(parentPath.getTableName());
 		Column idColumn = subSelectTable.column(parentPath.getIdColumnName());
 		Column selectFilterColumn = subSelectTable.column(parentPath.getEffectiveIdColumnName());
 
@@ -290,7 +291,7 @@ class SqlGenerator {
 		Assert.isTrue(keyColumn != null || !ordered,
 			"If the SQL statement should be ordered a keyColumn to order by must be provided.");
 
-		Table table = getTable();
+		TableLike table = getTable();
 
 		SelectBuilder.SelectWhere builder = selectBuilder(
 			keyColumn == null
@@ -308,7 +309,7 @@ class SqlGenerator {
 		return render(select);
 	}
 
-	private Condition buildConditionForBackReference(Identifier parentIdentifier, Table table) {
+	private Condition buildConditionForBackReference(Identifier parentIdentifier, TableLike table) {
 
 		Condition condition = null;
 		for (SqlIdentifier backReferenceColumn : parentIdentifier.toMap().keySet()) {
@@ -479,7 +480,7 @@ class SqlGenerator {
 
 	private String createAcquireLockById(LockMode lockMode) {
 
-		Table table = this.getTable();
+		TableLike table = this.getTable();
 
 		Select select = StatementBuilder //
 			.select(getIdColumn()) //
@@ -493,7 +494,7 @@ class SqlGenerator {
 
 	private String createAcquireLockAll(LockMode lockMode) {
 
-		Table table = this.getTable();
+		TableLike table = this.getTable();
 
 		Select select = StatementBuilder //
 			.select(getIdColumn()) //
@@ -514,7 +515,7 @@ class SqlGenerator {
 
 	private SelectBuilder.SelectWhere selectBuilder(Collection<SqlIdentifier> keyColumns) {
 
-		Table table = getTable();
+		TableLike table = getTable();
 
 		List<Expression> columnExpressions = new ArrayList<>();
 
@@ -611,7 +612,7 @@ class SqlGenerator {
 			return this.selectColumns();
 		}
 
-		Table table = getTable();
+		TableLike table = getTable();
 
 		List<Expression> columnExpressions = new ArrayList<>();
 
@@ -650,7 +651,7 @@ class SqlGenerator {
 	 * Additional custom method for {@link SqlProvider}.
 	 */
 	String selectAggregateFrom() {
-		Table table = getTable();
+		TableLike table = getTable();
 
 		List<Expression> columnExpressions = new ArrayList<>();
 
@@ -663,11 +664,11 @@ class SqlGenerator {
 
 			// add a join if necessary
 			if (extPath.isEntity() && !extPath.isEmbedded()) {
-				Table currentTable = sqlContext.getTable(extPath);
+				TableLike currentTable = sqlContext.getTable(extPath);
 
 				PersistentPropertyPathExtension idDefiningParentPath =
 					extPath.getIdDefiningParentPath();
-				Table parentTable = sqlContext.getTable(idDefiningParentPath);
+				TableLike parentTable = sqlContext.getTable(idDefiningParentPath);
 
 				joinTables.add(new Join( //
 					currentTable, //
@@ -752,10 +753,10 @@ class SqlGenerator {
 			return null;
 		}
 
-		Table currentTable = sqlContext.getTable(path);
+		TableLike currentTable = sqlContext.getTable(path);
 
 		PersistentPropertyPathExtension idDefiningParentPath = path.getIdDefiningParentPath();
-		Table parentTable = sqlContext.getTable(idDefiningParentPath);
+		TableLike parentTable = sqlContext.getTable(idDefiningParentPath);
 
 		return new Join( //
 			currentTable, //
@@ -774,7 +775,7 @@ class SqlGenerator {
 
 	private String createExistsSql() {
 
-		Table table = getTable();
+		TableLike table = getTable();
 
 		Select select = StatementBuilder //
 			.select(Functions.count(getIdColumn())) //
@@ -787,7 +788,7 @@ class SqlGenerator {
 
 	private String createCountSql() {
 
-		Table table = getTable();
+		TableLike table = getTable();
 
 		Select select = StatementBuilder //
 			.select(Functions.count(Expressions.asterisk())) //
@@ -1022,17 +1023,17 @@ class SqlGenerator {
 	 * DELOMBOK
 	 */
 	static class Join {
-		Table joinTable;
+		TableLike joinTable;
 		Column joinColumn;
 		Column parentId;
 
-		Join(Table joinTable, Column joinColumn, Column parentId) {
+		Join(TableLike joinTable, Column joinColumn, Column parentId) {
 			this.joinTable = joinTable;
 			this.joinColumn = joinColumn;
 			this.parentId = parentId;
 		}
 
-		Table getJoinTable() {
+		TableLike getJoinTable() {
 			return this.joinTable;
 		}
 
