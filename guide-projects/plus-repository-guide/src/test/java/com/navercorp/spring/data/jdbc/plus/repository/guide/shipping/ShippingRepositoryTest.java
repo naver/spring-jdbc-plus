@@ -23,7 +23,6 @@ import static org.assertj.core.api.Assertions.*;
 import java.util.Optional;
 import java.util.UUID;
 
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -69,6 +68,19 @@ public class ShippingRepositoryTest {
 	}
 
 	@Test
+	void findViaReferenceByOrderReference() {
+		// given
+		Shipping shipping = this.sut.insert(this.shipping);
+
+		// when
+		Optional<Shipping> actual = this.sut.findByOrderId(shipping.getOrderId());
+
+		// then
+		assertThat(actual).isNotEmpty();
+		assertThat(actual.get().getId()).isEqualTo(shipping.getId());
+	}
+
+	@Test
 	void findById() {
 		// given
 		Shipping shipping = this.sut.insert(this.shipping);
@@ -77,7 +89,7 @@ public class ShippingRepositoryTest {
 		Optional<Shipping> actual = this.sut.findById(shipping.getId());
 
 		// then
-		Assertions.assertThat(actual).isNotEmpty();
+		assertThat(actual).isNotEmpty();
 		assertThat(actual.get().getId()).isEqualTo(shipping.getId());
 	}
 }
