@@ -18,12 +18,17 @@
 
 package com.navercorp.spring.data.jdbc.plus.repository.guide.shipping;
 
+import java.util.Optional;
 import java.util.UUID;
 
+import org.springframework.data.jdbc.core.mapping.AggregateReference;
+
 import com.navercorp.spring.data.jdbc.plus.repository.JdbcRepository;
+import com.navercorp.spring.data.jdbc.plus.repository.guide.order.Order;
 
 /**
  * @author Myeonghyeon Lee
  */
 public interface ShippingRepository extends JdbcRepository<Shipping, UUID> {
+	Optional<Shipping> findByOrderId(AggregateReference<Order, Long> order);
 }
