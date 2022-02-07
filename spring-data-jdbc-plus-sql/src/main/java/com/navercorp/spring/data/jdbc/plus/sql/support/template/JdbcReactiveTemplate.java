@@ -65,7 +65,7 @@ public class JdbcReactiveTemplate {
 	 *
 	 * @param scheduler            the scheduler
 	 * @param defaultQueueSize     the default queue size
-	 * @param defaultBufferTimeout the default buffer timeout
+	 * @param defaultBufferTimeout the default buffer timeout in milliseconds
 	 */
 	public JdbcReactiveTemplate(
 		Scheduler scheduler,
