@@ -22,6 +22,7 @@ import org.springframework.data.relational.core.mapping.PersistentPropertyPathEx
 import org.springframework.data.relational.core.sql.IdentifierProcessing;
 import org.springframework.data.relational.core.sql.SqlIdentifier;
 import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
 
 /**
  * PropertyPathUtils to get ColumnAlias and TableAlias applied @SqlTableAlias
@@ -110,6 +111,7 @@ public class PropertyPathUtils {
 		return path.isEntity() && !path.isEmbedded() ? path : getTableOwningAncestor(path.getParentPath());
 	}
 
+	@Nullable
 	private static SqlIdentifier assembleTableAlias(PersistentPropertyPathExtension path) {
 
 		Assert.state(path != null, "Path is null");
@@ -117,13 +119,16 @@ public class PropertyPathUtils {
 		String prefix = TableAliasUtils.getTableAliasPropertyPathPrefix(path);
 		if (path.getLength() == 1) {
 			Assert.notNull(prefix, "Prefix must not be null.");
-			return SqlIdentifier.quoted(prefix);
+			return StringUtils.hasText(prefix) ? SqlIdentifier.quoted(prefix) : null;
 		}
 
 		PersistentPropertyPathExtension parentPath = path.getParentPath();
 		SqlIdentifier sqlIdentifier = assembleTableAlias(parentPath);
 
-		return parentPath.isEmbedded() ? sqlIdentifier.transform(name -> name.concat(prefix))
-			: sqlIdentifier.transform(name -> name + "_" + prefix);
+		if (sqlIdentifier != null) {
+			return parentPath.isEmbedded() ? sqlIdentifier.transform(name -> name.concat(prefix))
+				: sqlIdentifier.transform(name -> name + "_" + prefix);
+		}
+		return SqlIdentifier.quoted(prefix);
 	}
 }
