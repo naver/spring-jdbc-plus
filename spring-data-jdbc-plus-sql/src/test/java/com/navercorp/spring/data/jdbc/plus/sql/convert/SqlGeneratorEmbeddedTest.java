@@ -3,6 +3,8 @@ package com.navercorp.spring.data.jdbc.plus.sql.convert;
 import static java.util.Collections.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.springframework.data.relational.core.mapping.Embedded.*;
+import static org.springframework.data.relational.core.sql.SqlIdentifier.quoted;
+import static org.springframework.data.relational.core.sql.SqlIdentifier.unquoted;
 
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -12,11 +14,13 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.jdbc.core.convert.BasicJdbcConverter;
 import org.springframework.data.jdbc.core.convert.JdbcConverter;
 import org.springframework.data.jdbc.core.mapping.JdbcMappingContext;
+import org.springframework.data.mapping.PersistentPropertyPath;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Embedded;
 import org.springframework.data.relational.core.mapping.PersistentPropertyPathExtension;
 import org.springframework.data.relational.core.mapping.RelationalMappingContext;
 import org.springframework.data.relational.core.mapping.RelationalPersistentEntity;
+import org.springframework.data.relational.core.mapping.RelationalPersistentProperty;
 import org.springframework.data.relational.core.sql.Aliased;
 import org.springframework.data.relational.core.sql.SqlIdentifier;
 
@@ -195,10 +199,10 @@ class SqlGeneratorEmbeddedTest {
 				c -> getAlias(c.getTable()), //
 				this::getAlias) //
 			.containsExactly( //
-				SqlIdentifier.unquoted("test"), //
-				SqlIdentifier.unquoted("dummy_entity"), //
+				unquoted("test"), //
+				unquoted("dummy_entity"), //
 				null, //
-				SqlIdentifier.unquoted("test"));
+				unquoted("test"));
 	}
 
 	@Test // DATAJDBC-340
@@ -226,10 +230,10 @@ class SqlGeneratorEmbeddedTest {
 				c -> getAlias(c.getTable()), //
 				this::getAlias) //
 			.containsExactly( //
-				SqlIdentifier.unquoted("prefix_test"), //
-				SqlIdentifier.unquoted("dummy_entity"), //
+				unquoted("prefix_test"), //
+				unquoted("dummy_entity"), //
 				null, //
-				SqlIdentifier.unquoted("prefix_test"));
+				unquoted("prefix_test"));
 	}
 
 	@Test // DATAJDBC-340
@@ -249,8 +253,8 @@ class SqlGeneratorEmbeddedTest {
 				c -> c.getTable().getName(),
 				c -> getAlias(c.getTable()),
 				this::getAlias)
-			.containsExactly(SqlIdentifier.unquoted("attr1"), SqlIdentifier.unquoted("dummy_entity"), null,
-				SqlIdentifier.unquoted("attr1"));
+			.containsExactly(unquoted("attr1"), unquoted("dummy_entity"), null,
+				unquoted("attr1"));
 	}
 
 	@Test // DATAJDBC-340
@@ -261,14 +265,14 @@ class SqlGeneratorEmbeddedTest {
 		SoftAssertions.assertSoftly(softly -> {
 
 			softly.assertThat(join.getJoinTable().getName())
-				.isEqualTo(SqlIdentifier.unquoted("other_entity"));
+				.isEqualTo(unquoted("other_entity"));
 			softly.assertThat(join.getJoinColumn().getTable()).isEqualTo(join.getJoinTable());
 			softly.assertThat(join.getJoinColumn().getName())
-				.isEqualTo(SqlIdentifier.unquoted("dummy_entity2"));
+				.isEqualTo(unquoted("dummy_entity2"));
 			softly.assertThat(join.getParentId().getName())
-				.isEqualTo(SqlIdentifier.unquoted("id"));
+				.isEqualTo(unquoted("id"));
 			softly.assertThat(join.getParentId().getTable().getName())
-				.isEqualTo(SqlIdentifier.unquoted("dummy_entity2"));
+				.isEqualTo(unquoted("dummy_entity2"));
 		});
 	}
 
@@ -282,10 +286,20 @@ class SqlGeneratorEmbeddedTest {
 				c -> getAlias(c.getTable()), //
 				this::getAlias) //
 			.containsExactly( //
-				SqlIdentifier.unquoted("value"), //
-				SqlIdentifier.unquoted("other_entity"), //
-				SqlIdentifier.quoted("prefix_other"), //
-				SqlIdentifier.unquoted("prefix_other_value"));
+				unquoted("value"), //
+				unquoted("other_entity"), //
+				quoted("prefix_other"), //
+				unquoted("prefix_other_value"));
+	}
+
+	@Test
+	public void getTableAlias() {
+		SoftAssertions.assertSoftly(softly -> {
+			softly.assertThat(PropertyPathUtils.getTableAlias(extPath("prefixEmbeddable.other")))
+				.isEqualTo(quoted("prefix_other"));
+			softly.assertThat(PropertyPathUtils.getTableAlias(extPath("embeddable.other")))
+				.isEqualTo(quoted("other"));
+		});
 	}
 
 	private SqlGenerator.Join generateJoin(String path, Class<?> type) {
@@ -301,6 +315,17 @@ class SqlGeneratorEmbeddedTest {
 			return ((Aliased)maybeAliased).getAlias();
 		}
 		return null;
+	}
+
+	private PersistentPropertyPathExtension extPath(RelationalPersistentEntity<?> entity) {
+		return new PersistentPropertyPathExtension(context, entity);
+	}
+	private PersistentPropertyPathExtension extPath(String path) {
+		return new PersistentPropertyPathExtension(context, createSimplePath(path));
+	}
+
+	PersistentPropertyPath<RelationalPersistentProperty> createSimplePath(String path) {
+		return PropertyPathTestingUtils.toPath(path, DummyEntity3.class, context);
 	}
 
 	private org.springframework.data.relational.core.sql.Column generatedColumn(
@@ -348,6 +373,17 @@ class SqlGeneratorEmbeddedTest {
 
 		@Embedded(onEmpty = OnEmpty.USE_NULL, prefix = "prefix_")
 		EmbeddedWithReference embedded;
+	}
+
+	static class DummyEntity3 {
+		@Id
+		Long id;
+
+		@Embedded(onEmpty = OnEmpty.USE_NULL, prefix = "prefix_")
+		EmbeddedWithReference prefixEmbeddable;
+
+		@Embedded(onEmpty = OnEmpty.USE_NULL)
+		EmbeddedWithReference embeddable;
 	}
 
 	static class EmbeddedWithReference {
