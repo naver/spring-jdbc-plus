@@ -26,10 +26,9 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.dao.DataAccessResourceFailureException;
-import org.springframework.jdbc.UncategorizedSQLException;
 import org.springframework.jdbc.core.RowCountCallbackHandler;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
@@ -47,7 +46,7 @@ import reactor.core.scheduler.Schedulers;
  * @author IAM20
  */
 public class JdbcReactiveTemplate {
-	private final Logger logger = LoggerFactory.getLogger(this.getClass());
+	private final Log logger = LogFactory.getLog(this.getClass());
 
 	private final Scheduler scheduler;
 	private final int defaultQueueSize;
