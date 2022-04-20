@@ -36,6 +36,7 @@ import org.springframework.data.jdbc.core.convert.Identifier;
 import org.springframework.data.jdbc.core.convert.JdbcTypeFactory;
 import org.springframework.data.jdbc.core.convert.RelationResolver;
 import org.springframework.data.mapping.MappingException;
+import org.springframework.data.mapping.Parameter;
 import org.springframework.data.mapping.PersistentProperty;
 import org.springframework.data.mapping.PersistentPropertyAccessor;
 import org.springframework.data.mapping.PersistentPropertyPath;
@@ -535,7 +536,7 @@ public class AggregateResultJdbcConverter extends BasicJdbcConverter {
 		 * @return the parameter value
 		 */
 		@Nullable
-		Object getParameterValue(PreferredConstructor.Parameter<?, P> parameter);
+		Object getParameterValue(Parameter<?, P> parameter);
 	}
 
 	private static class ResultSetHolder {
@@ -1289,11 +1290,11 @@ public class AggregateResultJdbcConverter extends BasicJdbcConverter {
 
 			/*
 			 * (non-Javadoc)
-			 * @see org.springframework.data.mapping.model.ParameterValueProvider#getParameterValue(org.springframework.data.mapping.PreferredConstructor.Parameter)
+			 * @see org.springframework.data.mapping.model.ParameterValueProvider#getParameterValue(org.springframework.data.mapping.Parameter)
 			 */
 			@Override
 			@Nullable
-			public <T> T getParameterValue(PreferredConstructor.Parameter<T, RelationalPersistentProperty> parameter) {
+			public <T> T getParameterValue(Parameter<T, RelationalPersistentProperty> parameter) {
 
 				String parameterName = parameter.getName();
 
@@ -1310,7 +1311,7 @@ public class AggregateResultJdbcConverter extends BasicJdbcConverter {
 		INSTANCE;
 
 		@Override
-		public <T> T getParameterValue(PreferredConstructor.Parameter<T, RelationalPersistentProperty> parameter) {
+		public <T> T getParameterValue(Parameter<T, RelationalPersistentProperty> parameter) {
 			return null;
 		}
 	}
