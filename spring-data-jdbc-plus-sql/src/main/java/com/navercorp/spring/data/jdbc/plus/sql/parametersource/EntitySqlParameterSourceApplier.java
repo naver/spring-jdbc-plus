@@ -18,6 +18,8 @@
 
 package com.navercorp.spring.data.jdbc.plus.sql.parametersource;
 
+import java.sql.SQLType;
+
 import org.springframework.data.jdbc.core.convert.JdbcConverter;
 import org.springframework.data.jdbc.core.mapping.JdbcValue;
 import org.springframework.data.jdbc.support.JdbcUtil;
@@ -99,9 +101,9 @@ class EntitySqlParameterSourceApplier {
 		SqlIdentifier name) {
 
 		Class<?> javaType = this.jdbcConverter.getColumnType(property);
-		int sqlType = this.jdbcConverter.getSqlType(property);
+		SQLType sqlType = this.jdbcConverter.getTargetSqlType(property);
 		JdbcValue jdbcValue = this.jdbcConverter.writeJdbcValue(value, javaType, sqlType);
-		parameterSource.addValue(name, jdbcValue.getValue(), JdbcUtil.sqlTypeFor(jdbcValue.getJdbcType()));
+		parameterSource.addValue(name, jdbcValue.getValue(), jdbcValue.getJdbcType().getVendorTypeNumber());
 	}
 
 	/**
