@@ -307,7 +307,7 @@ public abstract class JdbcDaoSupport {
 				+ ", sql: "
 				+ sql
 				+ ", params:"
-				+ params.toString();
+				+ params;
 			throw new IncorrectResultSizeDataAccessException(message, 1, list.size());
 		}
 		return Optional.ofNullable(list.get(0));
