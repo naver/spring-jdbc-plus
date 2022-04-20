@@ -393,6 +393,26 @@ class SqlGeneratorTest {
 		assertThat(insertSqlStatement).endsWith(" DEFAULT VALUES");
 	}
 
+	@Test // GH-821
+	public void findAllSortedWithNullHandling_resolvesNullHandlingWhenDialectSupportsIt() {
+
+		SqlGenerator sqlGenerator = createSqlGenerator(DummyEntity.class, PostgresDialect.INSTANCE);
+
+		String sql = sqlGenerator.getFindAll(Sort.by(new Sort.Order(Sort.Direction.ASC, "name", Sort.NullHandling.NULLS_LAST)));
+
+		assertThat(sql).contains("ORDER BY \"dummy_entity\".\"x_name\" ASC NULLS LAST");
+	}
+
+	@Test // GH-821
+	public void findAllSortedWithNullHandling_ignoresNullHandlingWhenDialectDoesNotSupportIt() {
+
+		SqlGenerator sqlGenerator = createSqlGenerator(DummyEntity.class, SqlServerDialect.INSTANCE);
+
+		String sql = sqlGenerator.getFindAll(Sort.by(new Sort.Order(Sort.Direction.ASC, "name", Sort.NullHandling.NULLS_LAST)));
+
+		assertThat(sql).endsWith("ORDER BY dummy_entity.x_name ASC");
+	}
+
 	@Test // DATAJDBC-334
 	public void getInsertForQuotedColumnName() {
 
