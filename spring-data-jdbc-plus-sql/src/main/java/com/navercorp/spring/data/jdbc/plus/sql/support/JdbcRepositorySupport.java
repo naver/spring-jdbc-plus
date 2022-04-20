@@ -402,7 +402,7 @@ public abstract class JdbcRepositorySupport<T> {
 				+ ", sql: "
 				+ sql
 				+ ", params:"
-				+ params.toString();
+				+ params;
 			throw new IncorrectResultSizeDataAccessException(message, 1, list.size());
 		}
 		return Optional.ofNullable(this.triggerAfterConvert(list.get(0)));

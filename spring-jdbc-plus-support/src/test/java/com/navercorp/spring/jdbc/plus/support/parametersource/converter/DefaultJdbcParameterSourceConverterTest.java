@@ -455,7 +455,7 @@ class DefaultJdbcParameterSourceConverterTest {
 
 		@Override
 		public String convert(JsonNode source) {
-			return "conditional converted " + source.toString();
+			return "conditional converted " + source;
 		}
 
 	}
