@@ -813,6 +813,10 @@ class SqlGenerator {
 			insert = insert.column(table.column(cn));
 		}
 
+		if (columnNamesForInsert.isEmpty()) {
+			return render(insert.build());
+		}
+
 		InsertBuilder.InsertValuesWithBuild insertWithValues = null;
 		for (SqlIdentifier cn : columnNamesForInsert) {
 			insertWithValues = (insertWithValues == null
@@ -820,7 +824,7 @@ class SqlGenerator {
 				: insertWithValues).values(getBindMarker(cn));
 		}
 
-		return render(insertWithValues == null ? insert.build() : insertWithValues.build());
+		return render(insertWithValues.build());
 	}
 
 	private String createUpdateSql() {

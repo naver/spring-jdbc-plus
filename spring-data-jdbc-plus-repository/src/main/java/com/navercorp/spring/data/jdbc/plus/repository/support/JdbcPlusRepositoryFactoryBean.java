@@ -24,10 +24,13 @@ import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationEventPublisherAware;
+import org.springframework.data.jdbc.core.convert.BatchJdbcOperations;
 import org.springframework.data.jdbc.core.convert.DataAccessStrategy;
 import org.springframework.data.jdbc.core.convert.DefaultDataAccessStrategy;
+import org.springframework.data.jdbc.core.convert.InsertStrategyFactory;
 import org.springframework.data.jdbc.core.convert.JdbcConverter;
 import org.springframework.data.jdbc.core.convert.SqlGeneratorSource;
+import org.springframework.data.jdbc.core.convert.SqlParametersFactory;
 import org.springframework.data.jdbc.repository.QueryMappingConfiguration;
 import org.springframework.data.jdbc.repository.support.JdbcRepositoryFactory;
 import org.springframework.data.mapping.callback.EntityCallbacks;
@@ -218,11 +221,17 @@ public class JdbcPlusRepositoryFactoryBean<T extends Repository<S, ID>, S, ID ex
 
 					SqlGeneratorSource sqlGeneratorSource = new SqlGeneratorSource(
 						this.mappingContext, this.converter, this.dialect);
+					SqlParametersFactory sqlParametersFactory = new SqlParametersFactory(this.mappingContext, this.converter,
+						this.dialect);
+					InsertStrategyFactory insertStrategyFactory = new InsertStrategyFactory(this.operations,
+						new BatchJdbcOperations(this.operations.getJdbcOperations()), this.dialect);
 					return new DefaultDataAccessStrategy(
 						sqlGeneratorSource,
 						this.mappingContext,
 						this.converter,
-						this.operations);
+						this.operations,
+						sqlParametersFactory,
+						insertStrategyFactory);
 				});
 		}
 
