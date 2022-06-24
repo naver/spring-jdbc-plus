@@ -29,6 +29,7 @@ import org.springframework.beans.factory.FactoryBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.jdbc.repository.support.JdbcRepositoryFactoryBean;
+import org.springframework.data.repository.query.QueryLookupStrategy;
 
 import com.navercorp.spring.data.jdbc.plus.repository.support.JdbcPlusRepository;
 import com.navercorp.spring.data.jdbc.plus.repository.support.JdbcPlusRepositoryFactoryBean;
@@ -162,4 +163,11 @@ public @interface EnableJdbcPlusReactiveSupportRepositories {
 	 * @return transactionManager
 	 */
 	String transactionManagerRef() default "transactionManager";
+
+
+	/**
+	 * Returns the key of the {@link QueryLookupStrategy} to be used for lookup queries for query methods. Defaults to
+	 * {@link QueryLookupStrategy.Key#CREATE_IF_NOT_FOUND}.
+	 */
+	QueryLookupStrategy.Key queryLookupStrategy() default QueryLookupStrategy.Key.CREATE_IF_NOT_FOUND;
 }
