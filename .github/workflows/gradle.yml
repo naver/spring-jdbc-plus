@@ -24,3 +24,22 @@ jobs:
       uses: gradle/gradle-build-action@v2.2.1
       with:
         arguments: check
+
+    - name: Publish Checkstyle report
+      uses: jwgmeligmeyling/checkstyle-github-action@v1.2
+      if: always()
+      with:
+        name: Checkstyle Report
+        path: '**/build/reports/checkstyle/*.xml'
+
+    - name: Publish test report
+      uses: mikepenz/action-junit-report@v3.0.3
+      if: always() # always run even if the previous step fails
+      with:
+        report_paths: '**/build/test-results/test/TEST-*.xml'
+
+    - name: Test Summary
+      uses: test-summary/action@v1
+      if: always()
+      with:
+        paths: '**/build/test-results/test/TEST-*.xml'
