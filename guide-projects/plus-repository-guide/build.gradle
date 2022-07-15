@@ -5,9 +5,9 @@ dependencies {
     implementation("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
 
-    implementation("org.springframework.data:spring-data-jdbc:2.3.5")
-    implementation("org.springframework.data:spring-data-relational:2.3.5")
-    implementation("org.springframework.data:spring-data-commons:2.6.5")
+    implementation("org.springframework.data:spring-data-jdbc:2.3.6")
+    implementation("org.springframework.data:spring-data-relational:2.3.6")
+    implementation("org.springframework.data:spring-data-commons:2.6.6")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.projectlombok:lombok")
