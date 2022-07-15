@@ -27,9 +27,9 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("com.h2database:h2")
 
-    implementation("org.springframework.data:spring-data-jdbc:2.4.1")
-    implementation("org.springframework.data:spring-data-relational:2.4.1")
-    implementation("org.springframework.data:spring-data-commons:2.7.1")
+    implementation("org.springframework.data:spring-data-jdbc:2.4.2")
+    implementation("org.springframework.data:spring-data-relational:2.4.2")
+    implementation("org.springframework.data:spring-data-commons:2.7.2")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
 }
