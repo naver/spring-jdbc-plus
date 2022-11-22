@@ -1,6 +1,6 @@
 dependencies {
-    compile("org.springframework.data:spring-data-relational:2.4.5")
-    compile("org.springframework.data:spring-data-commons:2.7.5")
+    compile("org.springframework.data:spring-data-relational:2.4.6")
+    compile("org.springframework.data:spring-data-commons:2.7.6")
     compile project(":spring-data-jdbc-plus-sql")
     compile("com.squareup:javapoet:1.12.1")
 
