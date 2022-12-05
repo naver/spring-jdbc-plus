@@ -5,14 +5,14 @@ buildscript {
         maven(url = "https://plugins.gradle.org/m2/")
     }
     dependencies {
-        classpath("org.jlleitschuh.gradle:ktlint-gradle:9.4.1")
+        classpath("org.jlleitschuh.gradle:ktlint-gradle:10.2.0")
     }
 }
 
 plugins {
-    id("org.jlleitschuh.gradle.ktlint") version "9.4.1"
-    kotlin("jvm") version "1.6.0"
-    kotlin("plugin.spring") version "1.6.0"
+    id("org.jlleitschuh.gradle.ktlint") version "10.2.0"
+    kotlin("jvm") version "1.6.21"
+    kotlin("plugin.spring") version "1.6.21"
 }
 
 repositories {
@@ -35,9 +35,5 @@ dependencies {
 }
 
 tasks.withType<KotlinCompile> {
-    kotlinOptions.jvmTarget = "1.8"
-}
-
-tasks.named("uploadArchives") {
-    enabled = false
+    kotlinOptions.jvmTarget = "17"
 }

@@ -3,7 +3,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.6.0")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.6.21")
     }
 }
 
@@ -17,13 +17,13 @@ repositories {
 compileKotlin {
     kotlinOptions {
         freeCompilerArgs = ["-Xjsr305=strict"]
-        jvmTarget = "1.8"
+        jvmTarget = "17"
     }
 }
 compileTestKotlin {
     kotlinOptions {
         freeCompilerArgs = ["-Xjsr305=strict"]
-        jvmTarget = "1.8"
+        jvmTarget = "17"
     }
 }
 
@@ -45,5 +45,3 @@ dependencies {
     testImplementation("org.projectlombok:lombok")
     testAnnotationProcessor("org.projectlombok:lombok")
 }
-
-uploadArchives.enabled = false

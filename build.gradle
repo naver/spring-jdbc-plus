@@ -20,14 +20,15 @@ allprojects {
 
 subprojects {
     apply plugin: "java"
+    apply plugin: "java-library"
     apply plugin: "idea"
     apply plugin: "checkstyle"
     apply plugin: "io.spring.dependency-management"
-    apply plugin: "maven"
+    apply plugin: "maven-publish"
     apply plugin: "signing"
 
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
 
     repositories {
         mavenCentral()
@@ -49,75 +50,85 @@ subprojects {
 
     checkstyle {
         configFile = file("${project.rootDir}/rule/naver-checkstyle-rules.xml")
-        configProperties = [config_loc: ".."]
-        toolVersion = "8.24"
+        configProperties = ["suppressionFile": "${project.rootDir}/tool/naver-checkstyle-suppressions.xml"]
+        toolVersion = "9.1"
+        ignoreFailures = true // TODO: return to false
+        maxErrors = 0
+        maxWarnings = 0
     }
 
     test {
         useJUnitPlatform()
     }
 
-    task javadocJar(type: Jar) {
-        archiveClassifier = 'javadoc'
-        from javadoc
+    tasks.withType(Javadoc).all { enabled = false }
+
+    java {
+        withJavadocJar()
+        withSourcesJar()
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
-    task sourcesJar(type: Jar) {
-        archiveClassifier = 'sources'
-        from sourceSets.main.allSource
-    }
+    publishing {
+        publications {
+            mavenJava(MavenPublication) {
+                from components.java
 
-    artifacts {
-        archives javadocJar, sourcesJar
-    }
+                repositories {
+                    maven {
+                        def ossrhUsername = project.hasProperty("ossrhUsername") ? ossrhUsername : ""
+                        def ossrhPassword = project.hasProperty("ossrhPassword") ? ossrhPassword : ""
 
-    signing {
-        sign configurations.archives
-    }
+                        credentials {
+                            username ossrhUsername
+                            password ossrhPassword
+                        }
 
-    signArchives.enabled = false
-
-    uploadArchives {
-        repositories {
-            mavenDeployer {
-                beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
-
-                repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
-                    authentication(userName: hasProperty('ossrhUsername')?ossrhUsername:'', password: hasProperty('ossrhPassword')?ossrhPassword:'')
-                }
-
-                snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
-                    authentication(userName: hasProperty('ossrhUsername')?ossrhUsername:'', password: hasProperty('ossrhPassword')?ossrhPassword:'')
-                }
-
-                pom.project {
-                    name project.name
-                    packaging "jar"
-                    description "Spring JDBC Plus"
-                    url "https://github.com/naver/spring-jdbc-plus"
-
-                    scm {
-                        connection "scm:git:git://github.com/naver/spring-jdbc-plus.git"
-                        developerConnection "scm:git:git://github.com/naver/spring-jdbc-plus.git"
-                        url "git://github.com/naver/spring-jdbc-plus.git"
+                        def releasesRepoUrl = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
+                        def snapshotsRepoUrl = "https://oss.sonatype.org/content/repositories/snapshots/"
+                        url = version.endsWith("SNAPSHOT") ? snapshotsRepoUrl : releasesRepoUrl
                     }
+                }
 
+                pom {
+                    name = "Spring JDBC Plus"
+                    description = "Spring JDBC Plus"
+                    url = "http://github.com/naver/spring-jdbc-plus"
                     licenses {
                         license {
-                            name "The Apache License, Version 2.0"
-                            url "http://www.apache.org/licenses/LICENSE-2.0.txt"
+                            name = "The Apache License, Version 2.0"
+                            url = "http://www.apache.org/licenses/LICENSE-2.0.txt"
                         }
                     }
-
                     developers {
                         developer {
-                            id "mhyeon.lee"
-                            name "Myeonghyeon Lee"
-                            email "mhyeon.lee@navercorp.com"
+                            id = "mhyeon-lee"
+                            name = "Myeonghyeon Lee"
+                            email = "mheyon.lee@gmail.com"
                         }
+                        developer {
+                            id = "yd-2"
+                            name = "Youngdae Lee"
+                            email = "yd.2@navercorp.com"
+                        }
+                    }
+                    scm {
+                        connection = "scm:git:git://github.com/naver/spring-jdbc-plus.git"
+                        developerConnection = "scm:git:git://github.com/naver/spring-jdbc-plus.git"
+                        url = "https://github.com/naver/spring-jdbc-plus"
                     }
                 }
             }
         }
+    }
+
+
+    signing {
+        sign publishing.publications.mavenJava
+    }
+
+    tasks.withType(Sign) {
+        onlyIf { !version.endsWith("SNAPSHOT") }
     }
 }

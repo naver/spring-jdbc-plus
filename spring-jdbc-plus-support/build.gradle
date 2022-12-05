@@ -1,5 +1,5 @@
 dependencies {
-    compile("org.springframework:spring-jdbc")
+    api("org.springframework:spring-jdbc")
 
     testImplementation("org.junit.jupiter:junit-jupiter")
     testImplementation("org.junit.jupiter:junit-jupiter-api")
@@ -9,6 +9,6 @@ dependencies {
     testImplementation("org.mockito:mockito-junit-jupiter")
     testImplementation("io.github.javaunit:autoparams:0.1.1")
 
-    testRuntime("org.junit.platform:junit-platform-launcher")
-    testRuntime("org.junit.platform:junit-platform-commons")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    testRuntimeOnly("org.junit.platform:junit-platform-commons")
 }

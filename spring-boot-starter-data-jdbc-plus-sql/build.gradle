@@ -1,7 +1,7 @@
 dependencies {
-    compile(project(":spring-boot-autoconfigure-data-jdbc-plus"))
-    compile(project(":spring-data-jdbc-plus-sql"))
-    compile("org.springframework.boot:spring-boot-starter-jdbc")
+    api(project(":spring-boot-autoconfigure-data-jdbc-plus"))
+    api(project(":spring-data-jdbc-plus-sql"))
+    api("org.springframework.boot:spring-boot-starter-jdbc")
 
     implementation("org.springframework.data:spring-data-jdbc:2.4.6")
     implementation("org.springframework.data:spring-data-relational:2.4.6")
