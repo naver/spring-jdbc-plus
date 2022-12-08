@@ -398,7 +398,9 @@ class SqlGeneratorTest {
 
 		SqlGenerator sqlGenerator = createSqlGenerator(DummyEntity.class, PostgresDialect.INSTANCE);
 
-		String sql = sqlGenerator.getFindAll(Sort.by(new Sort.Order(Sort.Direction.ASC, "name", Sort.NullHandling.NULLS_LAST)));
+		String sql = sqlGenerator.getFindAll(
+			Sort.by(new Sort.Order(Sort.Direction.ASC, "name", Sort.NullHandling.NULLS_LAST))
+		);
 
 		assertThat(sql).contains("ORDER BY \"dummy_entity\".\"x_name\" ASC NULLS LAST");
 	}
@@ -408,7 +410,9 @@ class SqlGeneratorTest {
 
 		SqlGenerator sqlGenerator = createSqlGenerator(DummyEntity.class, SqlServerDialect.INSTANCE);
 
-		String sql = sqlGenerator.getFindAll(Sort.by(new Sort.Order(Sort.Direction.ASC, "name", Sort.NullHandling.NULLS_LAST)));
+		String sql = sqlGenerator.getFindAll(
+			Sort.by(new Sort.Order(Sort.Direction.ASC, "name", Sort.NullHandling.NULLS_LAST))
+		);
 
 		assertThat(sql).endsWith("ORDER BY dummy_entity.x_name ASC");
 	}
@@ -468,8 +472,9 @@ class SqlGeneratorTest {
 		String upsert = sqlGenerator.getUpsert();
 
 		assertThat(upsert).isEqualTo(
-			"INSERT INTO \"ENTITY_WITH_QUOTED_COLUMN_NAME\" SET \"test\"\"_@id\" = :test_id, \"test\"\"_@123\" = :test_123"
-		+ " ON DUPLICATE KEY UPDATE \"test\"\"_@123\" = :test_123");
+			"INSERT INTO \"ENTITY_WITH_QUOTED_COLUMN_NAME\" "
+				+ "SET \"test\"\"_@id\" = :test_id, \"test\"\"_@123\" = :test_123"
+				+ " ON DUPLICATE KEY UPDATE \"test\"\"_@123\" = :test_123");
 	}
 
 	@Test // DATAJDBC-324
@@ -576,18 +581,18 @@ class SqlGeneratorTest {
 		assertThat(
 			createSqlGenerator(Chain4.class).createDeleteByPath(
 				getPath("chain3.chain2.chain1.chain0", Chain4.class))) //
-			.isEqualTo("DELETE FROM chain0 " + //
-				"WHERE chain0.chain1 IN (" + //
-				"SELECT chain1.x_one " + //
-				"FROM chain1 " + //
-				"WHERE chain1.chain2 IN (" + //
-				"SELECT chain2.x_two " + //
-				"FROM chain2 " + //
-				"WHERE chain2.chain3 IN (" + //
-				"SELECT chain3.x_three " + //
-				"FROM chain3 " + //
-				"WHERE chain3.chain4 = :rootId" + //
-				")))");
+			.isEqualTo("DELETE FROM chain0 " //
+				+ "WHERE chain0.chain1 IN ("
+				+ "SELECT chain1.x_one " //
+				+ "FROM chain1 " //
+				+ "WHERE chain1.chain2 IN (" //
+				+ "SELECT chain2.x_two " //
+				+ "FROM chain2 " //
+				+ "WHERE chain2.chain3 IN (" //
+				+ "SELECT chain3.x_three " //
+				+ "FROM chain3 " //
+				+ "WHERE chain3.chain4 = :rootId" //
+				+ ")))");
 	}
 
 	@Test // DATAJDBC-359

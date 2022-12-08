@@ -44,7 +44,7 @@ The following rules in the Naver coding convention cannot be checked by this con
     <!-- [line-length-120] -->
     <module name="LineLength">
         <property name="max" value="120"/>
-        <property name="ignorePattern" value="^package.*|^import.*|a href|href|http://|https://|ftp://"/>
+        <property name="ignorePattern" value="^ *\* *[^ ]+$|^package.*|^import.*|a href|href|http://|https://|ftp://"/>
         <message key="maxLineLen"
                  value="[line-length-120] Line is longer than {0,number,integer} characters (found {1,number,integer})"/>
     </module>
@@ -163,8 +163,10 @@ The following rules in the Naver coding convention cannot be checked by this con
         <!-- [special-escape] -->
         <module name="IllegalTokenText">
             <property name="tokens" value="STRING_LITERAL, CHAR_LITERAL"/>
-            <property name="format" value="\\u00(08|09|0(a|A)|0(c|C)|0(d|D)|22|27|5(C|c))|\\(0(10|11|12|14|15|42|47)|134)"/>
-            <property name="message" value="[array-square-after-type]  Avoid using corresponding octal or Unicode escape."/>
+            <property name="format"
+                      value="\\u00(08|09|0(a|A)|0(c|C)|0(d|D)|22|27|5(C|c))|\\(0(10|11|12|14|15|42|47)|134)"/>
+            <property name="message"
+                      value="[array-square-after-type]  Avoid using corresponding octal or Unicode escape."/>
         </module>
 
         <!-- End of Declarations chapter -->
@@ -196,7 +198,8 @@ The following rules in the Naver coding convention cannot be checked by this con
         </module>
         <module name="RightCurly">
             <property name="option" value="alone"/>
-            <property name="tokens" value="CLASS_DEF, METHOD_DEF, CTOR_DEF, LITERAL_FOR, LITERAL_WHILE, STATIC_INIT, INSTANCE_INIT"/>
+            <property name="tokens"
+                      value="CLASS_DEF, METHOD_DEF, CTOR_DEF, LITERAL_FOR, LITERAL_WHILE, STATIC_INIT, INSTANCE_INIT"/>
             <message key="line.alone"
                      value="[braces-knr-style] ''{0}'' at column {1} should be alone on a line."/>
             <message key="line.break.before"
@@ -208,7 +211,8 @@ The following rules in the Naver coding convention cannot be checked by this con
         <!-- [sub-flow-after-brace] -->
         <module name="RightCurly">
             <property name="option" value="same"/>
-            <property name="tokens" value="LITERAL_TRY, LITERAL_CATCH, LITERAL_FINALLY, LITERAL_IF, LITERAL_ELSE, LITERAL_DO"/>
+            <property name="tokens"
+                      value="LITERAL_TRY, LITERAL_CATCH, LITERAL_FINALLY, LITERAL_IF, LITERAL_ELSE, LITERAL_DO"/>
             <message key="line.same"
                      value="[sub-flow-after-brace] ''{0}'' at column {1} should be on the same line as the next part of a multi-block statement (one that directly contains multiple blocks: if/else-if/else or try/catch/finally)."/>
             <message key="line.break.before"
@@ -258,7 +262,8 @@ The following rules in the Naver coding convention cannot be checked by this con
         </module>
         <module name="OperatorWrap">
             <property name="option" value="NL"/>
-            <property name="tokens" value="BAND, BOR, BSR, BXOR, DIV, EQUAL, GE, GT, LAND, LE, LITERAL_INSTANCEOF, LOR, LT, MINUS, MOD, NOT_EQUAL, PLUS, QUESTION, SL, SR, STAR "/>
+            <property name="tokens"
+                      value="BAND, BOR, BSR, BXOR, DIV, EQUAL, GE, GT, LAND, LE, LITERAL_INSTANCEOF, LOR, LT, MINUS, MOD, NOT_EQUAL, PLUS, QUESTION, SL, SR, STAR "/>
             <message key="line.new"
                      value="[line-wrapping-position] ''{0}'' should be on a new line."/>
         </module>
@@ -280,20 +285,19 @@ The following rules in the Naver coding convention cannot be checked by this con
         -->
 
         <!-- [import-grouping] -->
-        <module name="CustomImportOrder">
-            <property name="specialImportsRegExp" value="^(com\.nhncorp|com\.navercorp|com\.naver)\."/>
-            <property name="thirdPartyPackageRegExp" value=".*"/>
-            <property name="customImportOrderRules" value="STATIC###STANDARD_JAVA_PACKAGE###THIRD_PARTY_PACKAGE###SPECIAL_IMPORTS"/>
-            <message key="custom.import.order"
-                     value="[import-grouping] Import statement for ''{2}'' is in the wrong order. Should be in the ''{0}'' group, expecting group ''{1}'' on this line."/>
-            <message key="custom.import.order.line.separator"
-                     value="[import-grouping] ''{0}'' should be separated from previous import group."/>
-            <message key="custom.import.order.lex"
-                     value="[import-grouping] Wrong lexicographical order for ''{0}'' import. Should be before ''{1}''."/>
-            <message key="custom.import.order.nonGroup.import"
-                     value="[import-grouping] Imports without groups should be placed at the end of the import list: ''{0}''."/>
-            <message key="custom.import.order.nonGroup.expected"
-                     value="[import-grouping] Import statement for ''{1}'' is in the wrong order. Should be in the ''{0}'' group, expecting not assigned imports on this line."/>
+        <module name="ImportOrder">
+            <property name="groups"
+                      value="java., javax., org., net., /com\.(?!navercorp|naver)/, /(?!java\.|javax\.|com\.|org\.|net\.)/, com.navercorp., com.naver."/>
+            <property name="ordered" value="true"/>
+            <property name="separated" value="true"/>
+            <property name="option" value="top"/>
+            <property name="sortStaticImportsAlphabetically" value="true"/>
+            <message key="import.groups.separated.internally"
+                     value="[import-grouping] Extra separation in import group before ''{0}''"/>
+            <message key="import.ordering"
+                     value="[import-grouping] Wrong order for ''{0}'' import."/>
+            <message key="import.separation"
+                     value="[import-grouping] ''{0}'' should be separated from previous imports."/>
         </module>
 
         <!-- [blankline-between-methods] -->
