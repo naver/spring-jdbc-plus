@@ -1,7 +1,7 @@
 compileJava.dependsOn(processResources)
 
 dependencies {
-    compile("org.springframework.boot:spring-boot-autoconfigure")
+    api("org.springframework.boot:spring-boot-autoconfigure")
     implementation project(":spring-data-jdbc-plus-sql")
     implementation project(":spring-data-jdbc-plus-repository")
 
@@ -17,6 +17,6 @@ dependencies {
     testImplementation("org.assertj:assertj-core")
     testImplementation("org.mockito:mockito-junit-jupiter")
 
-    testRuntime("org.junit.platform:junit-platform-launcher")
-    testRuntime("org.junit.platform:junit-platform-commons")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    testRuntimeOnly("org.junit.platform:junit-platform-commons")
 }

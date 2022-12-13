@@ -1,7 +1,5 @@
 package com.navercorp.spring.data.jdbc.plus.sql.guide.config;
 
-import static java.util.stream.Collectors.toList;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,7 +48,9 @@ public class JdbcConfiguration {
 	private static List<Converter<?, ?>> storeConverters() {
 		List<Converter<?, ?>> converters = new ArrayList<>();
 		for (Object obj : JdbcCustomConversions.storeConverters()) {
-			if (obj instanceof Converter<?, ?> && obj.getClass().getAnnotation(ReadingConverter.class) == null) {
+			if (obj instanceof Converter<?, ?>
+				&& obj.getClass().getAnnotation(ReadingConverter.class) == null
+			) {
 				converters.add((Converter<?, ?>) obj);
 			}
 		}

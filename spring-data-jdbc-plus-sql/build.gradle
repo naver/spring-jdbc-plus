@@ -1,10 +1,11 @@
 compileJava.dependsOn(processResources)
 
 dependencies {
-    compile project(":spring-jdbc-plus-support")
-    compile("org.springframework.data:spring-data-jdbc:2.4.6")
-    compile("org.springframework.data:spring-data-relational:2.4.6")
-    compile("org.springframework.data:spring-data-commons:2.7.6")
+    api(project(":spring-jdbc-plus-support"))
+    api("org.springframework.data:spring-data-jdbc:2.4.6")
+    api("org.springframework.data:spring-data-relational:2.4.6")
+    api("org.springframework.data:spring-data-commons:2.7.6")
+
     compileOnly("org.jetbrains.kotlin:kotlin-stdlib:1.4.21")
     compileOnly("org.jetbrains.kotlin:kotlin-reflect:1.4.21")
     compileOnly("io.projectreactor:reactor-core")
@@ -13,9 +14,9 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-api")
     testImplementation("org.junit.jupiter:junit-jupiter-params")
     testImplementation("org.junit.jupiter:junit-jupiter-engine")
-    testImplementation("org.assertj:assertj-core:3.6.2")
+    testImplementation("org.assertj:assertj-core:3.23.1")
     testImplementation("org.mockito:mockito-junit-jupiter")
 
-    testRuntime("org.junit.platform:junit-platform-launcher")
-    testRuntime("org.junit.platform:junit-platform-commons")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    testRuntimeOnly("org.junit.platform:junit-platform-commons")
 }

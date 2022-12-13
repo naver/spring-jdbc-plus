@@ -1,8 +1,9 @@
 dependencies {
-    compile("org.springframework.data:spring-data-relational:2.4.6")
-    compile("org.springframework.data:spring-data-commons:2.7.6")
-    compile project(":spring-data-jdbc-plus-sql")
-    compile("com.squareup:javapoet:1.12.1")
+    api(project(":spring-data-jdbc-plus-sql"))
+
+    api("org.springframework.data:spring-data-relational:2.4.6")
+    api("org.springframework.data:spring-data-commons:2.7.6")
+    api("com.squareup:javapoet:1.12.1")
 
     testImplementation("org.junit.jupiter:junit-jupiter")
     testImplementation("org.junit.jupiter:junit-jupiter-api")
@@ -11,6 +12,6 @@ dependencies {
     testImplementation("org.assertj:assertj-core:3.6.2")
     testImplementation("org.mockito:mockito-junit-jupiter")
 
-    testRuntime("org.junit.platform:junit-platform-launcher")
-    testRuntime("org.junit.platform:junit-platform-commons")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    testRuntimeOnly("org.junit.platform:junit-platform-commons")
 }
