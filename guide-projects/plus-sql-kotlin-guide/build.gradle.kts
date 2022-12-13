@@ -10,7 +10,7 @@ buildscript {
 }
 
 plugins {
-    val kotlinVersion = "1.6.21"
+    val kotlinVersion = "1.7.21"
 
     id("org.jlleitschuh.gradle.ktlint") version "10.2.0"
     kotlin("jvm") version kotlinVersion
