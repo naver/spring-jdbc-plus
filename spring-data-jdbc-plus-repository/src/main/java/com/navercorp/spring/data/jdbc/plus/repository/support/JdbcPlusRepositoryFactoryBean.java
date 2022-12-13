@@ -198,13 +198,13 @@ public class JdbcPlusRepositoryFactoryBean<T extends Repository<S, ID>, S, ID ex
 	@Override
 	public void afterPropertiesSet() {
 
-		Assert.state(this.mappingContext != null, "MappingContext is required and must not be null!");
-		Assert.state(this.converter != null, "RelationalConverter is required and must not be null!");
+		Assert.state(this.mappingContext != null, "MappingContext is required and must not be null");
+		Assert.state(this.converter != null, "RelationalConverter is required and must not be null");
 
 		if (this.operations == null) {
 
 			Assert.state(beanFactory != null,
-				"If no JdbcOperations are set a BeanFactory must be available.");
+				"If no JdbcOperations are set a BeanFactory must be available");
 
 			this.operations = beanFactory.getBean(NamedParameterJdbcOperations.class);
 		}
@@ -212,17 +212,17 @@ public class JdbcPlusRepositoryFactoryBean<T extends Repository<S, ID>, S, ID ex
 		if (this.dataAccessStrategy == null) {
 
 			Assert.state(beanFactory != null,
-				"If no DataAccessStrategy is set a BeanFactory must be available.");
+				"If no DataAccessStrategy is set a BeanFactory must be available");
 
 			this.dataAccessStrategy = this.beanFactory.getBeanProvider(DataAccessStrategy.class) //
 				.getIfAvailable(() -> {
 
-					Assert.state(this.dialect != null, "Dialect is required and must not be null!");
+					Assert.state(this.dialect != null, "Dialect is required and must not be null");
 
 					SqlGeneratorSource sqlGeneratorSource = new SqlGeneratorSource(
 						this.mappingContext, this.converter, this.dialect);
-					SqlParametersFactory sqlParametersFactory = new SqlParametersFactory(this.mappingContext, this.converter,
-						this.dialect);
+					SqlParametersFactory sqlParametersFactory = new SqlParametersFactory(
+						this.mappingContext, this.converter, this.dialect);
 					InsertStrategyFactory insertStrategyFactory = new InsertStrategyFactory(this.operations,
 						new BatchJdbcOperations(this.operations.getJdbcOperations()), this.dialect);
 					return new DefaultDataAccessStrategy(

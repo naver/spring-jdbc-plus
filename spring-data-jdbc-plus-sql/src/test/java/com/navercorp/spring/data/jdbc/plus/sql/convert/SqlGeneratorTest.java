@@ -33,7 +33,6 @@ import org.springframework.data.relational.core.mapping.RelationalPersistentEnti
 import org.springframework.data.relational.core.mapping.RelationalPersistentProperty;
 import org.springframework.data.relational.core.sql.Aliased;
 import org.springframework.data.relational.core.sql.SqlIdentifier;
-import org.springframework.data.relational.core.sql.Table;
 import org.springframework.data.relational.core.sql.TableLike;
 
 /**
@@ -414,7 +413,7 @@ class SqlGeneratorTest {
 			Sort.by(new Sort.Order(Sort.Direction.ASC, "name", Sort.NullHandling.NULLS_LAST))
 		);
 
-		assertThat(sql).endsWith("ORDER BY dummy_entity.x_name ASC");
+		assertThat(sql).endsWith("ORDER BY \"dummy_entity\".\"x_name\" ASC");
 	}
 
 	@Test // DATAJDBC-334
