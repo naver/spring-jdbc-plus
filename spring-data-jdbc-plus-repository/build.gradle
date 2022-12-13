@@ -1,9 +1,9 @@
 compileJava.dependsOn(processResources)
 
 dependencies {
-    api("org.springframework.data:spring-data-jdbc:2.4.6")
-    api("org.springframework.data:spring-data-relational:2.4.6")
-    api("org.springframework.data:spring-data-commons:2.7.6")
+    api("org.springframework.data:spring-data-jdbc:${springDataVersion}")
+    api("org.springframework.data:spring-data-relational:${springDataVersion}")
+    api("org.springframework.data:spring-data-commons:${springDataCommonsVersion}")
 
     testImplementation("org.junit.jupiter:junit-jupiter")
     testImplementation("org.junit.jupiter:junit-jupiter-api")

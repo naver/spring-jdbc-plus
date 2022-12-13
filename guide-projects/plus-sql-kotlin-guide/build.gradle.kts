@@ -10,9 +10,11 @@ buildscript {
 }
 
 plugins {
+    val kotlinVersion = "1.6.21"
+
     id("org.jlleitschuh.gradle.ktlint") version "10.2.0"
-    kotlin("jvm") version "1.6.21"
-    kotlin("plugin.spring") version "1.6.21"
+    kotlin("jvm") version kotlinVersion
+    kotlin("plugin.spring") version kotlinVersion
 }
 
 repositories {
@@ -20,6 +22,9 @@ repositories {
 }
 
 dependencies {
+    val springDataVersion: String by rootProject.extra
+    val springDataCommonsVersion: String by rootProject.extra
+
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation(project(":spring-boot-starter-data-jdbc-plus-sql"))
     implementation("org.springframework.boot:spring-boot-starter-actuator")
@@ -27,9 +32,9 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("com.h2database:h2")
 
-    implementation("org.springframework.data:spring-data-jdbc:2.4.6")
-    implementation("org.springframework.data:spring-data-relational:2.4.6")
-    implementation("org.springframework.data:spring-data-commons:2.7.6")
+    implementation("org.springframework.data:spring-data-jdbc:$springDataVersion")
+    implementation("org.springframework.data:spring-data-relational:$springDataVersion")
+    implementation("org.springframework.data:spring-data-commons:$springDataCommonsVersion")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
 }
