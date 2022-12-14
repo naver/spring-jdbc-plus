@@ -23,17 +23,25 @@ class JdbcPlusRuntimeHints implements RuntimeHintsRegistrar {
 	public void registerHints(RuntimeHints hints, @Nullable ClassLoader classLoader) {
 
 		hints.reflection().registerTypes(
-			Arrays.asList(TypeReference.of(JdbcPlusRepository.class), TypeReference.of(AfterConvertCallback.class),
-				TypeReference.of(AfterDeleteCallback.class), TypeReference.of(AfterSaveCallback.class),
-				TypeReference.of(BeforeConvertCallback.class), TypeReference.of(BeforeDeleteCallback.class),
-				TypeReference.of(BeforeSaveCallback.class), TypeReference.of(RelationalAuditingCallback.class)),
+			Arrays.asList(
+				TypeReference.of(JdbcPlusRepository.class),
+				TypeReference.of(AfterConvertCallback.class),
+				TypeReference.of(AfterDeleteCallback.class),
+				TypeReference.of(AfterSaveCallback.class),
+				TypeReference.of(BeforeConvertCallback.class),
+				TypeReference.of(BeforeDeleteCallback.class),
+				TypeReference.of(BeforeSaveCallback.class),
+				TypeReference.of(RelationalAuditingCallback.class)
+			),
 			builder -> builder.withMembers(MemberCategory.INVOKE_DECLARED_CONSTRUCTORS,
 				MemberCategory.INVOKE_PUBLIC_METHODS));
 
 		hints.proxies()
-			.registerJdkProxy(TypeReference.of("org.springframework.data.jdbc.core.convert.RelationResolver"),
+			.registerJdkProxy(
+				TypeReference.of("org.springframework.data.jdbc.core.convert.RelationResolver"),
 				TypeReference.of("org.springframework.aop.SpringProxy"),
 				TypeReference.of("org.springframework.aop.framework.Advised"),
-				TypeReference.of("org.springframework.core.DecoratingProxy"));
+				TypeReference.of("org.springframework.core.DecoratingProxy")
+			);
 	}
 }
