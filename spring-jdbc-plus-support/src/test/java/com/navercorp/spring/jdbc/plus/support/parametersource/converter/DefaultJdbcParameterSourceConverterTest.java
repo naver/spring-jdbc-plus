@@ -38,7 +38,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.springframework.core.convert.converter.Converter;
 
-import com.navercorp.spring.jdbc.plus.support.parametersource.converter.Java8TimeParameterTypeConverter.InstantParameterTypeConverter;
+import com.navercorp.spring.jdbc.plus.support.parametersource.converter.Jsr310TimestampBasedConverters.InstantToTimestampConverter;
 
 /**
  * @author Myeonghyeon Lee
@@ -310,19 +310,19 @@ class DefaultJdbcParameterSourceConverterTest {
 	@Test
 	void constructorDuplicatedConverter() {
 		List<Converter<?, ?>> converters = new ArrayList<>();
-		converters.add(InstantParameterTypeConverter.INSTANCE);
+		converters.add(InstantToTimestampConverter.INSTANCE);
 		converters.add(new InstantToStringTypeConverter());
 		assertThatThrownBy(() -> new DefaultJdbcParameterSourceConverter(converters))
 			.isExactlyInstanceOf(ParameterTypeConverterResolveException.class)
 			.hasMessageContaining("duplicated")
-			.hasMessageContaining(InstantParameterTypeConverter.class.getName())
+			.hasMessageContaining(InstantToTimestampConverter.class.getName())
 			.hasMessageContaining(InstantToStringTypeConverter.class.getName());
 	}
 
 	@Test
 	void constructorObjectConverter() {
 		List<Converter<?, ?>> converters = new ArrayList<>();
-		converters.add(InstantParameterTypeConverter.INSTANCE);
+		converters.add(InstantToTimestampConverter.INSTANCE);
 		converters.add(new ObjectTypeConverter());
 		assertThatThrownBy(() -> new DefaultJdbcParameterSourceConverter(converters))
 			.isExactlyInstanceOf(ParameterTypeConverterResolveException.class)
@@ -333,7 +333,7 @@ class DefaultJdbcParameterSourceConverterTest {
 	@Test
 	void constructorIterableConverter() {
 		List<Converter<?, ?>> converters = new ArrayList<>();
-		converters.add(InstantParameterTypeConverter.INSTANCE);
+		converters.add(InstantToTimestampConverter.INSTANCE);
 		converters.add(new IterableTypeConverter());
 		assertThatThrownBy(() -> new DefaultJdbcParameterSourceConverter(converters))
 			.isExactlyInstanceOf(ParameterTypeConverterResolveException.class)
@@ -344,7 +344,7 @@ class DefaultJdbcParameterSourceConverterTest {
 	@Test
 	void constructorArrayConverter() {
 		List<Converter<?, ?>> converters = new ArrayList<>();
-		converters.add(InstantParameterTypeConverter.INSTANCE);
+		converters.add(InstantToTimestampConverter.INSTANCE);
 		converters.add(new ArrayTypeConverter());
 		assertThatThrownBy(() -> new DefaultJdbcParameterSourceConverter(converters))
 			.isExactlyInstanceOf(ParameterTypeConverterResolveException.class)

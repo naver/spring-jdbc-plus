@@ -48,14 +48,6 @@ public class DefaultJdbcParameterSourceConverter implements JdbcParameterSourceC
 
 	/**
 	 * Instantiates a new Default jdbc parameter source converter.
-	 */
-	@Deprecated
-	public DefaultJdbcParameterSourceConverter() {
-		this(Collections.emptyList());
-	}
-
-	/**
-	 * Instantiates a new Default jdbc parameter source converter.
 	 *
 	 * @param converters the converters
 	 */

@@ -18,7 +18,6 @@
 
 package com.navercorp.spring.jdbc.plus.support.parametersource;
 
-import static com.navercorp.spring.jdbc.plus.support.parametersource.converter.Java8TimeParameterTypeConverter.*;
 import static org.assertj.core.api.Assertions.*;
 
 import java.sql.Timestamp;
@@ -36,6 +35,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 
 import com.navercorp.spring.jdbc.plus.support.parametersource.converter.DefaultJdbcParameterSourceConverter;
 import com.navercorp.spring.jdbc.plus.support.parametersource.converter.JdbcParameterSourceConverter;
+import com.navercorp.spring.jdbc.plus.support.parametersource.converter.Jsr310TimestampBasedConverters.InstantToTimestampConverter;
 import com.navercorp.spring.jdbc.plus.support.parametersource.fallback.FallbackParameterSource;
 
 /**
@@ -43,7 +43,7 @@ import com.navercorp.spring.jdbc.plus.support.parametersource.fallback.FallbackP
  */
 class ConvertibleMapSqlParameterSourceTest {
 	private final JdbcParameterSourceConverter converter = new DefaultJdbcParameterSourceConverter(
-		Collections.singletonList(InstantParameterTypeConverter.INSTANCE));
+		Collections.singletonList(InstantToTimestampConverter.INSTANCE));
 
 	@Test
 	@DisplayName("생성자에 Converter 로 null 을 넘기면 NullPointerException 이 발생합니다.")
@@ -67,9 +67,9 @@ class ConvertibleMapSqlParameterSourceTest {
 
 		// then
 		assertThat(actual).isNotNull();
-		assertThat(actual).isExactlyInstanceOf(Date.class);
+		assertThat(actual).isExactlyInstanceOf(Timestamp.class);
 		assertThat(actual).isEqualTo(
-			InstantParameterTypeConverter.INSTANCE.convert(value));
+			InstantToTimestampConverter.INSTANCE.convert(value));
 	}
 
 	@DisplayName("value 타입의 Converter 가 등록되지 않았다면, 그대로 반환합니다.")
@@ -153,11 +153,11 @@ class ConvertibleMapSqlParameterSourceTest {
 		List<Timestamp> list = (List<Timestamp>)actual;
 		assertThat(list).hasSize(8);
 		assertThat(list.get(0)).isEqualTo(
-			InstantParameterTypeConverter.INSTANCE.convert(value.get(0)));
+			InstantToTimestampConverter.INSTANCE.convert(value.get(0)));
 		assertThat(list.get(4)).isEqualTo(
-			InstantParameterTypeConverter.INSTANCE.convert(value.get(4)));
+			InstantToTimestampConverter.INSTANCE.convert(value.get(4)));
 		assertThat(list.get(7)).isEqualTo(
-			InstantParameterTypeConverter.INSTANCE.convert(value.get(4)));
+			InstantToTimestampConverter.INSTANCE.convert(value.get(4)));
 	}
 
 	@DisplayName("iterablePaddingBoundaries 를 주입하더라도 paddingIterableParam 이 false 면 padding 하지 않는다.")
