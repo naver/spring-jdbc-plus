@@ -36,6 +36,7 @@ import org.springframework.lang.NonNull;
  * The type JSR 310 Timestamp based converters.
  *
  * @author Myeonghyeon Lee
+ * @deprecated use {@link org.springframework.data.jdbc.core.convert.Jsr310TimestampBasedConverters} instead
  */
 @Deprecated
 public abstract class Jsr310TimestampBasedConverters {
