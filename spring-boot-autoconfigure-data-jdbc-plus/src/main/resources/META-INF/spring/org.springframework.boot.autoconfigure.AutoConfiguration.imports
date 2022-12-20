@@ -1,0 +1,2 @@
+com.navercorp.spring.boot.autoconfigure.data.jdbc.plus.sql.JdbcPlusSqlAutoConfiguration
+com.navercorp.spring.boot.autoconfigure.data.jdbc.plus.repository.JdbcPlusRepositoriesAutoConfiguration

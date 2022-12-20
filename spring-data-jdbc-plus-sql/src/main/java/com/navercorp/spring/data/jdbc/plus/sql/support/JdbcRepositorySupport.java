@@ -32,8 +32,6 @@ import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.data.mapping.callback.EntityCallbacks;
 import org.springframework.data.relational.core.mapping.event.AfterConvertCallback;
 import org.springframework.data.relational.core.mapping.event.AfterConvertEvent;
-import org.springframework.data.relational.core.mapping.event.AfterLoadCallback;
-import org.springframework.data.relational.core.mapping.event.AfterLoadEvent;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
@@ -179,7 +177,6 @@ public abstract class JdbcRepositorySupport<T> {
 	protected BeanPropertySqlParameterSource beanParameterSource(Object bean) {
 		return this.entityJdbcProvider.beanParameterSource(bean);
 	}
-
 
 	/**
 	 * Bean parameter source bean property sql parameter source.
@@ -499,12 +496,8 @@ public abstract class JdbcRepositorySupport<T> {
 	 */
 	protected <R> R triggerAfterConvert(R aggregate) {
 		this.getApplicationEventPublisher()
-			.publishEvent(new AfterLoadEvent<>(aggregate));
-		this.getApplicationEventPublisher()
 			.publishEvent(new AfterConvertEvent<>(aggregate));
 
-		aggregate = this.getEntityCallbacks()
-			.callback(AfterLoadCallback.class, aggregate);
 		return this.getEntityCallbacks()
 			.callback(AfterConvertCallback.class, aggregate);
 	}

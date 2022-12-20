@@ -44,7 +44,7 @@ class SqlContext implements SqlContexts {
 	}
 
 	private static Table getEntityTable(RelationalPersistentEntity<?> entity) {
-		Table table = Table.create(entity.getTableName());
+		Table table = Table.create(entity.getQualifiedTableName());
 		SqlIdentifier tableAlias = TableAliasUtils.getTableAlias(entity);
 		if (tableAlias != null) {
 			table = table.as(tableAlias);
@@ -70,7 +70,7 @@ class SqlContext implements SqlContexts {
 	@Override
 	public Table getTable(PersistentPropertyPathExtension path) {
 		SqlIdentifier tableAlias = PropertyPathUtils.getTableAlias(path);
-		Table table = Table.create(path.getTableName());
+		Table table = Table.create(path.getQualifiedTableName());
 		return tableAlias == null ? table : table.as(tableAlias);
 	}
 

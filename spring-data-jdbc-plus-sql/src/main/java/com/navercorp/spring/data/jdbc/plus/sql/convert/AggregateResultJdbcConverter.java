@@ -35,12 +35,12 @@ import org.springframework.data.jdbc.core.convert.BasicJdbcConverter;
 import org.springframework.data.jdbc.core.convert.Identifier;
 import org.springframework.data.jdbc.core.convert.JdbcTypeFactory;
 import org.springframework.data.jdbc.core.convert.RelationResolver;
+import org.springframework.data.mapping.InstanceCreatorMetadata;
 import org.springframework.data.mapping.MappingException;
 import org.springframework.data.mapping.Parameter;
 import org.springframework.data.mapping.PersistentProperty;
 import org.springframework.data.mapping.PersistentPropertyAccessor;
 import org.springframework.data.mapping.PersistentPropertyPath;
-import org.springframework.data.mapping.PreferredConstructor;
 import org.springframework.data.mapping.context.MappingContext;
 import org.springframework.data.mapping.model.DefaultSpELExpressionEvaluator;
 import org.springframework.data.mapping.model.ParameterValueProvider;
@@ -964,9 +964,7 @@ public class AggregateResultJdbcConverter extends BasicJdbcConverter {
 
 		private boolean hasInstanceValues(@Nullable Object idValue) {
 
-			RelationalPersistentEntity<?> persistentEntity = path.getLeafEntity();
-
-			Assert.state(persistentEntity != null, "Entity must not be null");
+			RelationalPersistentEntity<?> persistentEntity = path.getRequiredLeafEntity();
 
 			for (RelationalPersistentProperty embeddedProperty : persistentEntity) {
 
@@ -1074,13 +1072,13 @@ public class AggregateResultJdbcConverter extends BasicJdbcConverter {
 
 			PersistentPropertyAccessor<T> propertyAccessor = getPropertyAccessor(entity, instance);
 
-			PreferredConstructor<T, RelationalPersistentProperty> persistenceConstructor =
-				entity.getPersistenceConstructor();
+			InstanceCreatorMetadata<RelationalPersistentProperty> creatorMetadata =
+				entity.getInstanceCreatorMetadata();
 
 			entity.doWithAll(property -> {
 
-				if (persistenceConstructor != null
-					&& persistenceConstructor.isConstructorParameter(property)) {
+				if (creatorMetadata != null
+					&& creatorMetadata.isCreatorParameter(property)) {
 					return;
 				}
 
@@ -1148,8 +1146,6 @@ public class AggregateResultJdbcConverter extends BasicJdbcConverter {
 		private boolean hasInstanceValues(@Nullable Object idValue) {
 
 			RelationalPersistentEntity<?> persistentEntity = path.getLeafEntity();
-
-			Assert.state(persistentEntity != null, "Entity must not be null");
 
 			for (RelationalPersistentProperty embeddedProperty : persistentEntity) {
 
@@ -1254,10 +1250,11 @@ public class AggregateResultJdbcConverter extends BasicJdbcConverter {
 
 		private T createInstanceInternal(@Nullable Object idValue) {
 
-			PreferredConstructor<?, RelationalPersistentProperty> persistenceConstructor = entity.getPersistenceConstructor();
+			InstanceCreatorMetadata<RelationalPersistentProperty> creatorMetadata =
+				entity.getInstanceCreatorMetadata();
 			ParameterValueProvider<RelationalPersistentProperty> provider;
 
-			if (persistenceConstructor != null && persistenceConstructor.hasParameters()) {
+			if (creatorMetadata != null && creatorMetadata.hasParameters()) {
 				SpELExpressionEvaluator expressionEvaluator = new DefaultSpELExpressionEvaluator(this.entityMap, spElContext);
 				provider = new SpELExpressionParameterValueProvider<>(expressionEvaluator, getConversionService(),
 					new ResultSetParameterValueProvider(idValue, entity));

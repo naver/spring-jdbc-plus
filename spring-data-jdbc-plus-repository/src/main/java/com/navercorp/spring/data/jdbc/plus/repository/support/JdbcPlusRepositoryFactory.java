@@ -80,9 +80,11 @@ public class JdbcPlusRepositoryFactory extends JdbcRepositoryFactory {
 			template.setEntityCallbacks(entityCallbacks);
 		}
 
-		RelationalPersistentEntity<?> persistentEntity = context.getRequiredPersistentEntity(repositoryInformation.getDomainType());
+		RelationalPersistentEntity<?> persistentEntity = context.getRequiredPersistentEntity(
+			repositoryInformation.getDomainType());
 
-		return getTargetRepositoryViaReflection(repositoryInformation.getRepositoryBaseClass(), template, persistentEntity);
+		return getTargetRepositoryViaReflection(repositoryInformation, template, persistentEntity,
+			converter);
 	}
 
 	@Override

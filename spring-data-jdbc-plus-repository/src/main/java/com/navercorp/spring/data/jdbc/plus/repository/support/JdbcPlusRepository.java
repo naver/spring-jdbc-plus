@@ -21,6 +21,7 @@ package com.navercorp.spring.data.jdbc.plus.repository.support;
 import java.util.stream.Collectors;
 
 import org.springframework.data.jdbc.core.JdbcAggregateOperations;
+import org.springframework.data.jdbc.core.convert.JdbcConverter;
 import org.springframework.data.jdbc.repository.support.SimpleJdbcRepository;
 import org.springframework.data.mapping.PersistentEntity;
 import org.springframework.data.util.Streamable;
@@ -49,9 +50,9 @@ public class JdbcPlusRepository<T, ID> extends SimpleJdbcRepository<T, ID> imple
 	 * @param entity           the entity
 	 */
 	public JdbcPlusRepository(
-		JdbcAggregateOperations entityOperations, PersistentEntity<T, ?> entity) {
+		JdbcAggregateOperations entityOperations, PersistentEntity<T, ?> entity, JdbcConverter converter) {
 
-		super(entityOperations, entity);
+		super(entityOperations, entity, converter);
 		this.entityOperations = entityOperations;
 	}
 
