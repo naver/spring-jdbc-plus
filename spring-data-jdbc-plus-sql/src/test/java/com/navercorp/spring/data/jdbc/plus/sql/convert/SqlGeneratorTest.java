@@ -33,7 +33,6 @@ import org.springframework.data.relational.core.mapping.RelationalPersistentEnti
 import org.springframework.data.relational.core.mapping.RelationalPersistentProperty;
 import org.springframework.data.relational.core.sql.Aliased;
 import org.springframework.data.relational.core.sql.SqlIdentifier;
-import org.springframework.data.relational.core.sql.Table;
 import org.springframework.data.relational.core.sql.TableLike;
 
 /**
@@ -398,7 +397,8 @@ class SqlGeneratorTest {
 
 		SqlGenerator sqlGenerator = createSqlGenerator(DummyEntity.class, PostgresDialect.INSTANCE);
 
-		String sql = sqlGenerator.getFindAll(Sort.by(new Sort.Order(Sort.Direction.ASC, "name", Sort.NullHandling.NULLS_LAST)));
+		String sql = sqlGenerator.getFindAll(
+			Sort.by(new Sort.Order(Sort.Direction.ASC, "name", Sort.NullHandling.NULLS_LAST)));
 
 		assertThat(sql).contains("ORDER BY \"dummy_entity\".\"x_name\" ASC NULLS LAST");
 	}
@@ -408,9 +408,10 @@ class SqlGeneratorTest {
 
 		SqlGenerator sqlGenerator = createSqlGenerator(DummyEntity.class, SqlServerDialect.INSTANCE);
 
-		String sql = sqlGenerator.getFindAll(Sort.by(new Sort.Order(Sort.Direction.ASC, "name", Sort.NullHandling.NULLS_LAST)));
+		String sql = sqlGenerator.getFindAll(
+			Sort.by(new Sort.Order(Sort.Direction.ASC, "name", Sort.NullHandling.NULLS_LAST)));
 
-		assertThat(sql).endsWith("ORDER BY dummy_entity.x_name ASC");
+		assertThat(sql).endsWith("ORDER BY \"dummy_entity\".\"x_name\" ASC");
 	}
 
 	@Test // DATAJDBC-334
@@ -469,7 +470,7 @@ class SqlGeneratorTest {
 
 		assertThat(upsert).isEqualTo(
 			"INSERT INTO \"ENTITY_WITH_QUOTED_COLUMN_NAME\" SET \"test\"\"_@id\" = :test_id, \"test\"\"_@123\" = :test_123"
-		+ " ON DUPLICATE KEY UPDATE \"test\"\"_@123\" = :test_123");
+				+ " ON DUPLICATE KEY UPDATE \"test\"\"_@123\" = :test_123");
 	}
 
 	@Test // DATAJDBC-324
