@@ -21,6 +21,9 @@ package com.navercorp.spring.jdbc.plus.support.parametersource;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
+
+import javax.annotation.Nullable;
 
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 
@@ -73,6 +76,36 @@ public class CompositeSqlParameterSource implements SqlParameterSource {
 		}
 		throw new IllegalArgumentException(
 			"Can not find '" + paramName + "' parameter in CompositeSqlParameterSource.");
+	}
+
+	@Override
+	public int getSqlType(String paramName) {
+		for (SqlParameterSource each : this.sqlParameterSources) {
+			if (each.hasValue(paramName)) {
+				return each.getSqlType(paramName);
+			}
+		}
+		return TYPE_UNKNOWN;
+	}
+
+	@Nullable
+	@Override
+	public String getTypeName(String paramName) {
+		for (SqlParameterSource each : this.sqlParameterSources) {
+			if (each.hasValue(paramName)) {
+				return each.getTypeName(paramName);
+			}
+		}
+		return null;
+	}
+
+	@Override
+	public String[] getParameterNames() {
+		return this.sqlParameterSources.stream()
+			.map(SqlParameterSource::getParameterNames)
+			.filter(Objects::nonNull)
+			.flatMap(Arrays::stream)
+			.toArray(String[]::new);
 	}
 
 	@Override
