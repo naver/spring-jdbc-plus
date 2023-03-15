@@ -29,7 +29,6 @@ import java.util.OptionalLong;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.function.Function;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -88,6 +87,7 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 import com.navercorp.spring.data.jdbc.plus.sql.annotation.SqlFunction;
+import com.navercorp.spring.data.jdbc.plus.sql.parametersource.BindParameterNameSanitizer;
 
 /**
  * Generates SQL statements to be used by {@link org.springframework.data.jdbc.repository.support.SimpleJdbcRepository}
@@ -112,8 +112,6 @@ class SqlGenerator {
 	static final SqlIdentifier ID_SQL_PARAMETER = SqlIdentifier.unquoted("id");
 	static final SqlIdentifier IDS_SQL_PARAMETER = SqlIdentifier.unquoted("ids");
 	static final SqlIdentifier ROOT_ID_PARAMETER = SqlIdentifier.unquoted("rootId");
-
-	private static final Pattern parameterPattern = Pattern.compile("\\W");
 
 	private final RelationalPersistentEntity<?> entity;
 	private final MappingContext<RelationalPersistentEntity<?>, RelationalPersistentProperty> mappingContext;
@@ -236,7 +234,7 @@ class SqlGenerator {
 	}
 
 	private BindMarker getBindMarker(SqlIdentifier columnName) {
-		return SQL.bindMarker(":" + parameterPattern.matcher(renderReference(columnName)).replaceAll(""));
+		return SQL.bindMarker(":" + BindParameterNameSanitizer.sanitize(renderReference(columnName)));
 	}
 
 	/**
@@ -887,7 +885,7 @@ class SqlGenerator {
 
 		Update update = createBaseUpdate() //
 			.and(getVersionColumn().isEqualTo(
-				SQL.bindMarker(":" + renderReference(VERSION_SQL_PARAMETER)))) //
+				getBindMarker(VERSION_SQL_PARAMETER))) //
 			.build();
 
 		return render(update);
@@ -950,7 +948,7 @@ class SqlGenerator {
 
 		Delete delete = createBaseDeleteById(getDmlTable()) //
 			.and(getVersionColumn().isEqualTo(
-				SQL.bindMarker(":" + renderReference(VERSION_SQL_PARAMETER)))) //
+				getBindMarker(VERSION_SQL_PARAMETER))) //
 			.build();
 
 		return render(delete);
@@ -959,13 +957,13 @@ class SqlGenerator {
 	private DeleteBuilder.DeleteWhereAndOr createBaseDeleteById(Table table) {
 		return Delete.builder().from(table)
 			.where(getIdColumn().isEqualTo(
-				SQL.bindMarker(":" + renderReference(ID_SQL_PARAMETER))));
+				getBindMarker(ID_SQL_PARAMETER)));
 	}
 
 	private DeleteBuilder.DeleteWhereAndOr createBaseDeleteByIdIn(Table table) {
 
 		return Delete.builder().from(table)
-			.where(getIdColumn().in(SQL.bindMarker(":" + renderReference(IDS_SQL_PARAMETER))));
+			.where(getIdColumn().in(getBindMarker(IDS_SQL_PARAMETER)));
 	}
 
 	private String createDeleteByPathAndCriteria(PersistentPropertyPathExtension path,
