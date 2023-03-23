@@ -884,8 +884,7 @@ class SqlGenerator {
 	private String createUpdateWithVersionSql() {
 
 		Update update = createBaseUpdate() //
-			.and(getVersionColumn().isEqualTo(
-				getBindMarker(VERSION_SQL_PARAMETER))) //
+			.and(getDmlVersionColumn().isEqualTo(getBindMarker(VERSION_SQL_PARAMETER))) //
 			.build();
 
 		return render(update);
@@ -900,12 +899,12 @@ class SqlGenerator {
 			.map(columnName -> Assignments.value( //
 				table.column(columnName), //
 				getBindMarker(columnName))) //
-			.collect(Collectors.toList());
+			.toList();
 
 		return Update.builder() //
 			.table(table) //
 			.set(assignments) //
-			.where(getIdColumn().isEqualTo(getBindMarker(entity.getIdColumn())));
+			.where(getDmlIdColumn().isEqualTo(getBindMarker(entity.getIdColumn())));
 	}
 
 	private String createUpsertSql() {
@@ -947,7 +946,7 @@ class SqlGenerator {
 	private String createDeleteByIdAndVersionSql() {
 
 		Delete delete = createBaseDeleteById(getDmlTable()) //
-			.and(getVersionColumn().isEqualTo(
+			.and(getDmlVersionColumn().isEqualTo(
 				getBindMarker(VERSION_SQL_PARAMETER))) //
 			.build();
 
@@ -956,14 +955,14 @@ class SqlGenerator {
 
 	private DeleteBuilder.DeleteWhereAndOr createBaseDeleteById(Table table) {
 		return Delete.builder().from(table)
-			.where(getIdColumn().isEqualTo(
+			.where(getDmlIdColumn().isEqualTo(
 				getBindMarker(ID_SQL_PARAMETER)));
 	}
 
 	private DeleteBuilder.DeleteWhereAndOr createBaseDeleteByIdIn(Table table) {
 
 		return Delete.builder().from(table)
-			.where(getIdColumn().in(getBindMarker(IDS_SQL_PARAMETER)));
+			.where(getDmlIdColumn().in(getBindMarker(IDS_SQL_PARAMETER)));
 	}
 
 	private String createDeleteByPathAndCriteria(PersistentPropertyPathExtension path,
@@ -997,7 +996,7 @@ class SqlGenerator {
 
 		Delete delete = Delete.builder() //
 			.from(table) //
-			.where(getIdColumn().in(getBindMarker(IDS_SQL_PARAMETER))) //
+			.where(getDmlIdColumn().in(getBindMarker(IDS_SQL_PARAMETER))) //
 			.build();
 
 		return render(delete);
@@ -1036,8 +1035,16 @@ class SqlGenerator {
 		return sqlContext.getIdColumn();
 	}
 
+	private Column getDmlIdColumn() {
+		return sqlContext.getDmlIdColumn();
+	}
+
 	private Column getVersionColumn() {
 		return sqlContext.getVersionColumn();
+	}
+
+	private Column getDmlVersionColumn() {
+		return sqlContext.getDmlVersionColumn();
 	}
 
 	private String renderReference(SqlIdentifier identifier) {

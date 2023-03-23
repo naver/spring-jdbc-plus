@@ -17,6 +17,7 @@ package com.navercorp.spring.data.jdbc.plus.sql.convert;
 
 import org.springframework.data.relational.core.mapping.PersistentPropertyPathExtension;
 import org.springframework.data.relational.core.mapping.RelationalPersistentEntity;
+import org.springframework.data.relational.core.sql.Aliased;
 import org.springframework.data.relational.core.sql.Column;
 import org.springframework.data.relational.core.sql.SqlIdentifier;
 import org.springframework.data.relational.core.sql.Table;
@@ -58,8 +59,26 @@ class SqlContext implements SqlContexts {
 	}
 
 	@Override
+	public Column getDmlIdColumn() {
+		Table dmlTable = table;
+		if (table instanceof Aliased) {
+			dmlTable = Table.create(table.getName());
+		}
+		return dmlTable.column(entity.getIdColumn());
+	}
+
+	@Override
 	public Column getVersionColumn() {
 		return table.column(entity.getRequiredVersionProperty().getColumnName());
+	}
+
+	@Override
+	public Column getDmlVersionColumn() {
+		Table dmlTable = table;
+		if (table instanceof Aliased) {
+			dmlTable = Table.create(table.getName());
+		}
+		return dmlTable.column(entity.getRequiredVersionProperty().getColumnName());
 	}
 
 	@Override

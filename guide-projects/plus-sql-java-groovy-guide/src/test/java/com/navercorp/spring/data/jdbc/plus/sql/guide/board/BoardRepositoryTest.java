@@ -91,18 +91,18 @@ public class BoardRepositoryTest {
 							.build()
 					))
 					.configMap(Stream.of(
-						Config.builder()
-							.configKey("board1 post1 config-key")
-							.configValue("board1 post1 config-value")
-							.build(),
-						Config.builder()
-							.configKey("board1 post1 config-key2")
-							.configValue("board1 post1 config-value2")
-							.build(),
-						Config.builder()
-							.configKey("board1 post1 config-key3")
-							.configValue("board1 post1 config-value3")
-							.build())
+							Config.builder()
+								.configKey("board1 post1 config-key")
+								.configValue("board1 post1 config-value")
+								.build(),
+							Config.builder()
+								.configKey("board1 post1 config-key2")
+								.configValue("board1 post1 config-value2")
+								.build(),
+							Config.builder()
+								.configKey("board1 post1 config-key3")
+								.configValue("board1 post1 config-value3")
+								.build())
 						.collect(toMap(Config::getConfigKey, config -> config)))
 					.audit(Audit.builder()
 						.name("naver1")
@@ -156,14 +156,14 @@ public class BoardRepositoryTest {
 					.build()
 			))
 			.configMap(Stream.of(
-				Config.builder()
-					.configKey("board1 config-key")
-					.configValue("board1 config-value")
-					.build(),
-				Config.builder()
-					.configKey("board1 config-key2")
-					.configValue("board1 config-value2")
-					.build())
+					Config.builder()
+						.configKey("board1 config-key")
+						.configValue("board1 config-value")
+						.build(),
+					Config.builder()
+						.configKey("board1 config-key2")
+						.configValue("board1 config-value2")
+						.build())
 				.collect(toMap(Config::getConfigKey, config -> config)))
 			.audit(Audit.builder()
 				.name("naver")
