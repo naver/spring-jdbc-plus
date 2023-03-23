@@ -31,9 +31,12 @@ import org.springframework.data.relational.core.mapping.PersistentPropertyPathEx
 import org.springframework.data.relational.core.mapping.RelationalMappingContext;
 import org.springframework.data.relational.core.mapping.RelationalPersistentEntity;
 import org.springframework.data.relational.core.mapping.RelationalPersistentProperty;
+import org.springframework.data.relational.core.mapping.Table;
 import org.springframework.data.relational.core.sql.Aliased;
 import org.springframework.data.relational.core.sql.SqlIdentifier;
 import org.springframework.data.relational.core.sql.TableLike;
+
+import com.navercorp.spring.data.jdbc.plus.sql.annotation.SqlTableAlias;
 
 /**
  * COPY org.springframework.data.relational.core.convert.SqlGeneratorUnitTests
@@ -753,6 +756,31 @@ class SqlGeneratorTest {
 				quoted("child"), quoted("CHILD_PARENT_OF_NO_ID_CHILD"));
 	}
 
+	@Test
+	void updateWithAlias() {
+
+		assertThat(createSqlGenerator(DummyAliasEntity.class, NonQuotingDialect.INSTANCE).getUpdate())
+			.contains("WHERE dummy_entity.id1 = :id1");
+	}
+
+	@Test
+	void deleteWithAlias() {
+		assertThat(createSqlGenerator(DummyAliasEntity.class, NonQuotingDialect.INSTANCE).getDeleteById())
+			.contains("WHERE dummy_entity.id1 = :id");
+	}
+
+	@Test
+	void updateVersionWithAlias() {
+		assertThat(createSqlGenerator(VersionedAliasEntity.class, NonQuotingDialect.INSTANCE).getUpdateWithVersion())
+			.contains("WHERE versioned_entity.id1 = :id1 AND versioned_entity.x_version = :___old");
+	}
+
+	@Test
+	void deleteVersionWithAlias() {
+		assertThat(createSqlGenerator(VersionedAliasEntity.class, NonQuotingDialect.INSTANCE).getDeleteByIdAndVersion())
+			.contains("versioned_entity.id1 = :id AND versioned_entity.x_version = :___old");
+	}
+
 	private SqlIdentifier getAlias(Object maybeAliased) {
 
 		if (maybeAliased instanceof Aliased) {
@@ -785,6 +813,30 @@ class SqlGeneratorTest {
 		Set<Element> elements;
 		Map<Integer, Element> mappedElements;
 		AggregateReference<OtherAggregate, Long> other;
+	}
+
+	@SuppressWarnings("unused")
+	@Table("dummy_entity")
+	@SqlTableAlias("n_dummy")
+	static class DummyAliasEntity {
+
+		@Column("id1")
+		@Id
+		Long id;
+		String name;
+		ReferencedEntity ref;
+		Set<Element> elements;
+		Map<Integer, Element> mappedElements;
+		AggregateReference<OtherAggregate, Long> other;
+	}
+
+	@SuppressWarnings("unused")
+	@Table("versioned_entity")
+	@SqlTableAlias("n_dummy")
+	static class VersionedAliasEntity extends DummyAliasEntity {
+
+		@Version
+		Integer version;
 	}
 
 	static class VersionedEntity extends DummyEntity {

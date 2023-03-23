@@ -36,6 +36,13 @@ public interface SqlContexts {
 	Column getIdColumn();
 
 	/**
+	 * Gets dml id column for dml.
+	 *
+	 * @return the id column
+	 */
+	Column getDmlIdColumn();
+
+	/**
 	 * Gets table.
 	 *
 	 * @return the table
@@ -64,6 +71,13 @@ public interface SqlContexts {
 	 * @return the version column
 	 */
 	Column getVersionColumn();
+
+	/**
+	 * Gets version column for dml.
+	 *
+	 * @return the version column
+	 */
+	Column getDmlVersionColumn();
 
 	/**
 	 * Gets reverse column.
