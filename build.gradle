@@ -15,7 +15,7 @@ buildscript {
 
 allprojects {
     group = "com.navercorp.spring"
-    version = "3.0.4"
+    version = "3.0.5-SNAPSHOT"
 }
 
 subprojects {
