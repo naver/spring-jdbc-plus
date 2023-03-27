@@ -34,13 +34,13 @@ may be an appropriate choice.
             }
         }
         dependencies {
-            classpath("org.springframework.boot:spring-boot-gradle-plugin:3.0.3")
+            classpath("org.springframework.boot:spring-boot-gradle-plugin:3.0.4")
         }
     }
 
     dependencies {
         implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
-        implementation("com.navercorp.spring:spring-boot-starter-data-jdbc-plus-sql:3.0.4-SNAPSHOT")
+        implementation("com.navercorp.spring:spring-boot-starter-data-jdbc-plus-sql:3.0.4")
     }
     ```
 
@@ -62,7 +62,7 @@ may be an appropriate choice.
     <dependency>
         <groupId>com.navercorp.spring</groupId>
         <artifactId>spring-boot-starter-data-jdbc-plus-sql</artifactId>
-        <version>3.0.4-SNAPSHOT</version>
+        <version>3.0.4</version>
     </dependency>
     ```
 
