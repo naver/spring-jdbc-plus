@@ -36,6 +36,7 @@ public class ConvertibleParameterSourceFactory {
 	private final JdbcParameterSourceConverter converter;
 	private final FallbackParameterSource fallbackParameterSource;
 
+	private boolean padArray = true;
 	private boolean paddingIterableParams = false;
 	private int[] paddingIterableBoundaries = null;
 
@@ -101,6 +102,7 @@ public class ConvertibleParameterSourceFactory {
 			new ConvertibleMapSqlParameterSource(map, this.converter, this.fallbackParameterSource);
 		paramSource.setPaddingIterableParam(this.paddingIterableParams);
 		paramSource.setPaddingIterableBoundaries(this.paddingIterableBoundaries);
+		paramSource.setPadArray(this.padArray);
 		return paramSource;
 	}
 

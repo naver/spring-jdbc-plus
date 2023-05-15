@@ -430,7 +430,7 @@ class DefaultJdbcParameterSourceConverterTest {
 			if (value instanceof JsonArray) {
 				return new JsonArray("conditional unwrapped " + value.value);
 			} else if (value instanceof JsonValue) {
-					return new JsonValue("conditional unwrapped " + value.value);
+				return new JsonValue("conditional unwrapped " + value.value);
 			} else {
 				return new JsonNode("conditional unwrapped " + value.value);
 			}
