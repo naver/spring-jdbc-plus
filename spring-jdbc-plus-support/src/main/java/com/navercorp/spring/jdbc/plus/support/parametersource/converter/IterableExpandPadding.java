@@ -30,6 +30,7 @@ import org.springframework.lang.Nullable;
  * The type Iterable expand padding.
  *
  * @author Myeonghyeon Lee
+ * @author IAM20
  */
 public class IterableExpandPadding {
 	private static final int[] REGULAR_SIZES = {0, 1, 2, 3, 4, 8, 16, 32, 50, 100, 200, 300, 500, 1000, 1500, 2000};
@@ -39,9 +40,22 @@ public class IterableExpandPadding {
 	 *
 	 * @param source the source
 	 * @return the object
+	 * @deprecated use {@link #expandIfIterable(Object, boolean)} instead
 	 */
+	@Deprecated(forRemoval = true)
 	public static Object expandIfIterable(Object source) {
-		return expandIfIterable(source, REGULAR_SIZES);
+		return expandIfIterable(source, true, REGULAR_SIZES);
+	}
+
+	/**
+	 * Expand if iterable object.
+	 *
+	 * @param source 	the source
+	 * @param padArray 	the pad array y/n
+	 * @return the object
+	 */
+	public static Object expandIfIterable(Object source, boolean padArray) {
+		return expandIfIterable(source, padArray, REGULAR_SIZES);
 	}
 
 	/**
@@ -50,8 +64,22 @@ public class IterableExpandPadding {
 	 * @param source            the source
 	 * @param paddingBoundaries the padding boundaries
 	 * @return the object
+	 * @deprecated Use {@link #expandIfIterable(Object, boolean, int[])} instead
 	 */
+	@Deprecated(forRemoval = true)
 	public static Object expandIfIterable(Object source, @Nullable int[] paddingBoundaries) {
+		return expandIfIterable(source, true, paddingBoundaries);
+	}
+
+	/**
+	 * Expand if iterable object.
+	 *
+	 * @param source            the source
+	 * @param padArray          the pad array y/n
+	 * @param paddingBoundaries the padding boundaries
+	 * @return the object
+	 */
+	public static Object expandIfIterable(Object source, boolean padArray, @Nullable int[] paddingBoundaries) {
 		if (source == null) {
 			return null;
 		}
@@ -62,7 +90,7 @@ public class IterableExpandPadding {
 
 		if (source instanceof Collection) {
 			return CollectionExpandPadding.INSTANCE.expand((Collection<?>)source, paddingBoundaries);
-		} else if (source.getClass().isArray()) {
+		} else if (source.getClass().isArray() && padArray) {
 			return ArrayExpandPadding.INSTANCE.expand((Object[])source, paddingBoundaries);
 		}
 

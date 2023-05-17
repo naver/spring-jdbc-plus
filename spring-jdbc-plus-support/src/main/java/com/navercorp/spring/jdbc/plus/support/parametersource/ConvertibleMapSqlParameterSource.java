@@ -32,11 +32,13 @@ import com.navercorp.spring.jdbc.plus.support.parametersource.fallback.FallbackP
  * The type Convertible map sql parameter source.
  *
  * @author Myeonghyeon Lee
+ * @author IAM20
  */
 public class ConvertibleMapSqlParameterSource extends MapSqlParameterSource {
 	private final JdbcParameterSourceConverter converter;
 	private final FallbackParameterSource fallbackParameterSource;
 
+	private boolean padArray = true;
 	private boolean paddingIterableParams = false;
 	private int[] paddingIterableBoundaries = null;
 
@@ -85,7 +87,11 @@ public class ConvertibleMapSqlParameterSource extends MapSqlParameterSource {
 
 		value = this.converter.convert(paramName, value);
 		if (this.paddingIterableParams) {
-			value = IterableExpandPadding.expandIfIterable(value, this.paddingIterableBoundaries);
+			value = IterableExpandPadding.expandIfIterable(
+				value,
+				this.padArray,
+				this.paddingIterableBoundaries
+			);
 		}
 
 		return value;
@@ -98,6 +104,15 @@ public class ConvertibleMapSqlParameterSource extends MapSqlParameterSource {
 	 */
 	public void setPaddingIterableBoundaries(int[] setPaddingIterableBoundaries) {
 		this.paddingIterableBoundaries = setPaddingIterableBoundaries;
+	}
+
+	/**
+	 * Sets pad array.
+	 *
+	 * @param padArray the pad array y/n
+	 */
+	public void setPadArray(boolean padArray) {
+		this.padArray = padArray;
 	}
 
 	/**

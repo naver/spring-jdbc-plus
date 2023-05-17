@@ -24,7 +24,6 @@ import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -144,6 +143,7 @@ class ConvertibleMapSqlParameterSourceTest {
 		Map<String, Object> map = Collections.singletonMap(paramName, value);
 		ConvertibleMapSqlParameterSource sut = new ConvertibleMapSqlParameterSource(map, this.converter);
 		sut.setPaddingIterableParam(true);
+		sut.setPadArray(true);
 
 		// when
 		Object actual = sut.getValue(paramName);
@@ -160,6 +160,33 @@ class ConvertibleMapSqlParameterSourceTest {
 			InstantToTimestampConverter.INSTANCE.convert(value.get(4)));
 	}
 
+	@DisplayName("Array 는 expand padding flag 가 false 면 padding 을 수행하지 않는다.")
+	@ParameterizedTest
+	@AutoSource
+	@SuppressWarnings("unchecked")
+	void getValueIterablePaddingForArray(String paramName) {
+		// given
+		Instant now = Instant.now();
+		Instant[] value = {now.minusSeconds(300), now.minusSeconds(240),
+			now.minusSeconds(180), now.minusSeconds(120), now.minusSeconds(60)};
+		Map<String, Object> map = Collections.singletonMap(paramName, value);
+		ConvertibleMapSqlParameterSource sut = new ConvertibleMapSqlParameterSource(map, this.converter);
+		sut.setPaddingIterableParam(true);
+		sut.setPadArray(false);
+
+		// when
+		Object actual = sut.getValue(paramName);
+
+		// then
+		assertThat(actual).isInstanceOf(Object[].class);
+		Object[] array = (Object[])actual;
+		assertThat(array).hasSize(5);
+		assertThat(array[0]).isEqualTo(
+			InstantToTimestampConverter.INSTANCE.convert(value[0]));
+		assertThat(array[4]).isEqualTo(
+			InstantToTimestampConverter.INSTANCE.convert(value[4]));
+	}
+
 	@DisplayName("iterablePaddingBoundaries 를 주입하더라도 paddingIterableParam 이 false 면 padding 하지 않는다.")
 	@ParameterizedTest
 	@AutoSource
@@ -173,6 +200,7 @@ class ConvertibleMapSqlParameterSourceTest {
 		ConvertibleMapSqlParameterSource sut = new ConvertibleMapSqlParameterSource(map, this.converter);
 		sut.setPaddingIterableBoundaries(new int[] {1, 10});
 		sut.setPaddingIterableParam(false);
+		sut.setPadArray(true);
 
 		// when
 		Object actual = sut.getValue(paramName);

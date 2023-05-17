@@ -35,6 +35,7 @@ class ConvertibleSqlIdentifierParameterSource extends SqlIdentifierParameterSour
 	private final JdbcParameterSourceConverter converter;
 	private final FallbackParameterSource fallbackParameterSource;
 
+	private boolean padArray = true;
 	private boolean paddingIterableParams = false;
 	private int[] paddingIterableBoundaries = null;
 
@@ -72,7 +73,11 @@ class ConvertibleSqlIdentifierParameterSource extends SqlIdentifierParameterSour
 
 		value = this.converter.convert(paramName, value);
 		if (this.paddingIterableParams) {
-			value = IterableExpandPadding.expandIfIterable(value, this.paddingIterableBoundaries);
+			value = IterableExpandPadding.expandIfIterable(
+				value,
+				this.padArray,
+				this.paddingIterableBoundaries
+			);
 		}
 
 		return value;
@@ -94,6 +99,15 @@ class ConvertibleSqlIdentifierParameterSource extends SqlIdentifierParameterSour
 	 */
 	public void setPaddingIterableParam(boolean padding) {
 		this.paddingIterableParams = padding;
+	}
+
+	/**
+	 * Sets pad array.
+	 *
+	 * @param padArray the pad array y/n
+	 */
+	public void setPadArray(boolean padArray) {
+		this.padArray = padArray;
 	}
 
 	private boolean isFallback(String paramName) {
