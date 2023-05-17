@@ -24,7 +24,6 @@ import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 
 import org.javaunit.autoparams.AutoSource;
@@ -227,6 +226,7 @@ class ConvertibleBeanPropertySqlParameterSourceTest {
 		ConvertibleBeanPropertySqlParameterSource sut =
 			new ConvertibleBeanPropertySqlParameterSource(criteria, this.converter);
 		sut.setPaddingIterableParam(true);
+		sut.setPadArray(true);
 
 		// when
 		Object actual = sut.getValue("list");
@@ -254,6 +254,7 @@ class ConvertibleBeanPropertySqlParameterSourceTest {
 			new ConvertibleBeanPropertySqlParameterSource(criteria, this.converter);
 		sut.setPaddingIterableBoundaries(new int[] {1, 10});
 		sut.setPaddingIterableParam(false);
+		sut.setPadArray(true);
 
 		// when
 		Object actual = sut.getValue("list");

@@ -87,7 +87,11 @@ public class ConvertibleMapSqlParameterSource extends MapSqlParameterSource {
 
 		value = this.converter.convert(paramName, value);
 		if (this.paddingIterableParams) {
-			value = IterableExpandPadding.expandIfIterable(value, this.padArray, this.paddingIterableBoundaries);
+			value = IterableExpandPadding.expandIfIterable(
+				value,
+				this.padArray,
+				this.paddingIterableBoundaries
+			);
 		}
 
 		return value;

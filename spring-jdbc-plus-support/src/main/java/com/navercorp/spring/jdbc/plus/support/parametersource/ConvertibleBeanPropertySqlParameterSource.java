@@ -39,6 +39,8 @@ public class ConvertibleBeanPropertySqlParameterSource extends BeanPropertySqlPa
 	private final FallbackParameterSource fallbackParameterSource;
 	private final String prefix;
 
+	private boolean padArray = true;
+
 	private boolean paddingIterableParams = false;
 	private int[] paddingIterableBoundaries = null;
 
@@ -135,7 +137,11 @@ public class ConvertibleBeanPropertySqlParameterSource extends BeanPropertySqlPa
 
 		value = this.converter.convert(patchedParamName, value);
 		if (this.paddingIterableParams) {
-			value = IterableExpandPadding.expandIfIterable(value, this.paddingIterableBoundaries);
+			value = IterableExpandPadding.expandIfIterable(
+				value,
+				padArray,
+				this.paddingIterableBoundaries
+			);
 		}
 
 		return value;
@@ -157,6 +163,16 @@ public class ConvertibleBeanPropertySqlParameterSource extends BeanPropertySqlPa
 	 */
 	public void setPaddingIterableParam(boolean padding) {
 		this.paddingIterableParams = padding;
+	}
+
+
+	/**
+	 * Sets pad array.
+	 *
+	 * @param padArray the pad array y/n
+	 */
+	public void setPadArray(boolean padArray) {
+		this.padArray = padArray;
 	}
 
 	private boolean isFallback(String paramName) {

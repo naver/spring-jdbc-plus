@@ -72,6 +72,7 @@ public class ConvertibleParameterSourceFactory {
 				bean, this.converter, this.fallbackParameterSource);
 		paramSource.setPaddingIterableParam(this.paddingIterableParams);
 		paramSource.setPaddingIterableBoundaries(this.paddingIterableBoundaries);
+		paramSource.setPadArray(this.padArray);
 		return paramSource;
 	}
 
@@ -88,6 +89,7 @@ public class ConvertibleParameterSourceFactory {
 				prefix, bean, this.converter, this.fallbackParameterSource);
 		paramSource.setPaddingIterableParam(this.paddingIterableParams);
 		paramSource.setPaddingIterableBoundaries(this.paddingIterableBoundaries);
+		paramSource.setPadArray(this.padArray);
 		return paramSource;
 	}
 
@@ -140,6 +142,15 @@ public class ConvertibleParameterSourceFactory {
 	 */
 	public boolean isPaddingIterableParams() {
 		return this.paddingIterableParams;
+	}
+
+	/**
+	 * Sets pad array.
+	 *
+	 * @param padArray the pad array y/n
+	 */
+	public void setPadArray(boolean padArray) {
+		this.padArray = padArray;
 	}
 
 	/**

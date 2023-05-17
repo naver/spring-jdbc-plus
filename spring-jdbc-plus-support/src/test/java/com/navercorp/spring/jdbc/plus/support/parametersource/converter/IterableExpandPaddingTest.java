@@ -52,19 +52,23 @@ class IterableExpandPaddingTest {
 
 	@Test
 	void expandIfIterable() {
-		assertThat(IterableExpandPadding.expandIfIterable(null)).isNull();
+		assertThat(IterableExpandPadding.expandIfIterable(null, true)).isNull();
 
 		Map<String, Object> map = Collections.singletonMap("key", "value");
-		assertThat(IterableExpandPadding.expandIfIterable(map)).isSameAs(map);
+		assertThat(IterableExpandPadding.expandIfIterable(map, true)).isSameAs(map);
 
 		String text = "sample";
-		assertThat(IterableExpandPadding.expandIfIterable(text)).isSameAs(text);
+		assertThat(IterableExpandPadding.expandIfIterable(text, true)).isSameAs(text);
 
 		List<String> list = Arrays.asList("1", "2", "3", "4", "5");
-		assertThat((Collection)IterableExpandPadding.expandIfIterable(list)).hasSize(8);
+		assertThat(
+			(Collection<?>)IterableExpandPadding.expandIfIterable(list, true)
+		).hasSize(8);
 
 		String[] array = new String[] {"1", "2", "3", "4", "5"};
-		assertThat((String[])IterableExpandPadding.expandIfIterable(array)).hasSize(8);
+		assertThat(
+			(String[])IterableExpandPadding.expandIfIterable(array, true)
+		).hasSize(8);
 	}
 
 	@Test
@@ -72,33 +76,41 @@ class IterableExpandPaddingTest {
 	void expandIfIterableWithBoundaries() {
 		int[] paddingBoundaries = {5, 10};
 		Map<String, Object> map = Collections.singletonMap("key", "value");
-		assertThat(IterableExpandPadding.expandIfIterable(map, paddingBoundaries)).isSameAs(map);
+		assertThat(IterableExpandPadding.expandIfIterable(map, true, paddingBoundaries)).isSameAs(map);
 
 		String text = "sample";
-		assertThat(IterableExpandPadding.expandIfIterable(text, paddingBoundaries)).isSameAs(text);
+		assertThat(IterableExpandPadding.expandIfIterable(text, true, paddingBoundaries)).isSameAs(text);
 
 		List<String> list = Arrays.asList("1", "2", "3", "4", "5", "6");
-		assertThat((Collection)IterableExpandPadding.expandIfIterable(list, paddingBoundaries)).hasSize(10);
+		assertThat(
+			(Collection<?>)IterableExpandPadding.expandIfIterable(list, true, paddingBoundaries)
+		).hasSize(10);
 
 		String[] array = new String[] {"1", "2", "3", "4"};
-		assertThat((String[])IterableExpandPadding.expandIfIterable(array, paddingBoundaries)).hasSize(5);
+		assertThat(
+			(String[])IterableExpandPadding.expandIfIterable(array, true, paddingBoundaries)
+		).hasSize(5);
 	}
 
 	@Test
 	@DisplayName("list 가 1 이면, paddingBoundaries 와 무관하게 그대로 반환합니다. ")
-	void reuturnSourceIfSourceSizeOne() {
+	void returnSourceIfSourceSizeOne() {
 		int[] paddingBoundaries = {5, 10};
 		Map<String, Object> map = Collections.singletonMap("key", "value");
-		assertThat(IterableExpandPadding.expandIfIterable(map, paddingBoundaries)).isSameAs(map);
+		assertThat(IterableExpandPadding.expandIfIterable(map, true, paddingBoundaries)).isSameAs(map);
 
 		String text = "sample";
-		assertThat(IterableExpandPadding.expandIfIterable(text, paddingBoundaries)).isSameAs(text);
+		assertThat(IterableExpandPadding.expandIfIterable(text, true, paddingBoundaries)).isSameAs(text);
 
 		List<String> list = Collections.singletonList("1");
-		assertThat((Collection)IterableExpandPadding.expandIfIterable(list, paddingBoundaries)).hasSize(1);
+		assertThat(
+			(Collection<?>)IterableExpandPadding.expandIfIterable(list, true, paddingBoundaries)
+		).hasSize(1);
 
 		String[] array = new String[] {"1"};
-		assertThat((String[])IterableExpandPadding.expandIfIterable(array, paddingBoundaries)).hasSize(1);
+		assertThat(
+			(String[])IterableExpandPadding.expandIfIterable(array, true, paddingBoundaries)
+		).hasSize(1);
 	}
 
 	@Test
