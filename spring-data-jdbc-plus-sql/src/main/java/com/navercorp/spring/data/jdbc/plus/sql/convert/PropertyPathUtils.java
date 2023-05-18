@@ -55,7 +55,7 @@ public class PropertyPathUtils {
 		} else {
 			SqlIdentifier tableAlias = getTableAliasFromTableOwner(tableOwner);
 			return tableAlias == null ? columnName
-				: columnName.transform(name -> tableAlias.getReference(IdentifierProcessing.NONE) + "_" + name);
+				: columnName.transform(name -> tableAlias.getReference() + "_" + name);
 		}
 	}
 
@@ -81,7 +81,7 @@ public class PropertyPathUtils {
 	) {
 		SqlIdentifier tableAlias = getTableAlias(path);
 		return tableAlias == null ? reverseColumnName
-			: reverseColumnName.transform(name -> tableAlias.getReference(IdentifierProcessing.NONE) + "_" + name);
+			: reverseColumnName.transform(name -> tableAlias.getReference() + "_" + name);
 	}
 
 	/**

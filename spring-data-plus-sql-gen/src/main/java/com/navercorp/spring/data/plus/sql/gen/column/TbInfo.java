@@ -45,10 +45,10 @@ public final class TbInfo {
 		this.identifierProcessing = identifierProcessing;
 
 		this.path = pathExtension.getRequiredPersistentPropertyPath().toDotPath();
-		this.table = pathExtension.getQualifiedTableName().getReference(identifierProcessing);
+		this.table = pathExtension.getQualifiedTableName().getReference();
 		String aliasValue = this.table;
 		if (pathExtension.getTableAlias() != null) {
-			aliasValue = pathExtension.getTableAlias().getReference(identifierProcessing);
+			aliasValue = pathExtension.getTableAlias().getReference();
 		}
 		this.alias = aliasValue;
 	}
