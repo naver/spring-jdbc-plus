@@ -956,14 +956,13 @@ class SqlGenerator {
 	}
 
 	private DeleteBuilder.DeleteWhereAndOr createBaseDeleteById(Table table) {
-		return Delete.builder().from(table)
-			.where(getDmlIdColumn().isEqualTo(
-				getBindMarker(ID_SQL_PARAMETER)));
+		return Delete.builder().from(table) //
+			.where(getDmlIdColumn().isEqualTo(getBindMarker(ID_SQL_PARAMETER)));
 	}
 
 	private DeleteBuilder.DeleteWhereAndOr createBaseDeleteByIdIn(Table table) {
 
-		return Delete.builder().from(table)
+		return Delete.builder().from(table) //
 			.where(getDmlIdColumn().in(getBindMarker(IDS_SQL_PARAMETER)));
 	}
 
@@ -1061,9 +1060,45 @@ class SqlGenerator {
 
 	private OrderByField orderToOrderByField(Sort.Order order) {
 
-		SqlIdentifier columnName = this.entity.getRequiredPersistentProperty(order.getProperty()).getColumnName();
+		SqlIdentifier columnName = getColumnNameToSortBy(order);
 		Column column = Column.create(columnName, this.getTable());
 		return OrderByField.from(column, order.getDirection()).withNullHandling(order.getNullHandling());
+	}
+
+	private SqlIdentifier getColumnNameToSortBy(Sort.Order order) {
+
+		RelationalPersistentProperty propertyToSortBy = entity.getPersistentProperty(order.getProperty());
+		if (propertyToSortBy != null) {
+			return propertyToSortBy.getColumnName();
+		}
+
+		PersistentPropertyPath<RelationalPersistentProperty> persistentPropertyPath = mappingContext
+			.getPersistentPropertyPath(order.getProperty(), entity.getType());
+
+
+		propertyToSortBy = persistentPropertyPath.getBaseProperty();
+
+		Assert.state(propertyToSortBy != null && propertyToSortBy.isEmbedded(), () -> String.format( //
+			"Specified sorting property '%s' is expected to " + //
+				"be the property, named '%s', of embedded entity '%s', but field '%s' is " + //
+				"not marked with @Embedded", //
+			order.getProperty(), //
+			extractFieldNameFromEmbeddedProperty(order), //
+			extractEmbeddedPropertyName(order), //
+			extractEmbeddedPropertyName(order) //
+		));
+
+		RelationalPersistentEntity<?> embeddedEntity = mappingContext
+			.getRequiredPersistentEntity(propertyToSortBy.getType());
+		return embeddedEntity.getRequiredPersistentProperty(extractFieldNameFromEmbeddedProperty(order)).getColumnName(); // @checkstyle:ignoreLength
+	}
+
+	public String extractEmbeddedPropertyName(Sort.Order order) {
+		return order.getProperty().substring(0, order.getProperty().indexOf("."));
+	}
+
+	public String extractFieldNameFromEmbeddedProperty(Sort.Order order) {
+		return order.getProperty().substring(order.getProperty().indexOf(".") + 1);
 	}
 
 	/**
