@@ -43,7 +43,7 @@ class TableAliasUtils {
 	static String getTableAliasPropertyPathPrefix(PersistentPropertyPathExtension path) {
 		PersistentPropertyPath<? extends RelationalPersistentProperty> propertyPath =
 			path.getRequiredPersistentPropertyPath();
-		RelationalPersistentProperty leafProperty = propertyPath.getRequiredLeafProperty();
+		RelationalPersistentProperty leafProperty = propertyPath.getLeafProperty();
 
 		String prefix;
 		if (path.isEmbedded()) {
