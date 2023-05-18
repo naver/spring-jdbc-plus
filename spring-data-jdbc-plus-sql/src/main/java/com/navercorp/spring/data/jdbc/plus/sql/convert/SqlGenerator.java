@@ -341,6 +341,8 @@ class SqlGenerator {
 
 		Condition condition = null;
 		for (SqlIdentifier backReferenceColumn : parentIdentifier.toMap().keySet()) {
+			Assert.isTrue(!SqlIdentifier.EMPTY.equals(backReferenceColumn),
+				"An empty SqlIdentifier can't be used in condition. Make sure that all composite primary keys are defined in the query"); // @checkstyle:ignoreLength
 
 			Condition newCondition = table.column(backReferenceColumn)
 				.isEqualTo(getBindMarker(backReferenceColumn));
