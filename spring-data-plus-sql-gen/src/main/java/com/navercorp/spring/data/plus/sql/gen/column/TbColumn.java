@@ -45,10 +45,10 @@ public final class TbColumn {
 		this.identifierProcessing = identifierProcessing;
 
 		this.path = pathExtension.getRequiredPersistentPropertyPath().toDotPath();
-		this.column = pathExtension.getColumnName().getReference(identifierProcessing);
+		this.column = pathExtension.getColumnName().getReference();
 		String aliasValue = this.column;
 		if (pathExtension.getColumnAlias() != null) {
-			aliasValue = pathExtension.getColumnAlias().getReference(identifierProcessing);
+			aliasValue = pathExtension.getColumnAlias().getReference();
 		}
 		this.alias = aliasValue;
 	}

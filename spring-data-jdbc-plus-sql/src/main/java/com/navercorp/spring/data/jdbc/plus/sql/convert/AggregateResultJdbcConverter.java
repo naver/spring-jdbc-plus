@@ -459,8 +459,7 @@ public class AggregateResultJdbcConverter extends BasicJdbcConverter {
 		ResultSetHolder resultSet,
 		RelationalPersistentEntity<?> entity) throws SQLException {
 
-		return resultSet.getResultSet().getObject(entity.getIdColumn()
-			.getReference(identifierProcessing));
+		return resultSet.getResultSet().getObject(entity.getIdColumn().getReference());
 	}
 
 	private Identifier getRelationEntityIdentifier(
@@ -475,12 +474,12 @@ public class AggregateResultJdbcConverter extends BasicJdbcConverter {
 	protected String getIdColumnAlias(PersistentPropertyPathExtension relationPath) {
 		return PropertyPathUtils.getColumnAlias(
 			relationPath.extendBy(relationPath.getLeafEntity().getRequiredIdProperty())
-		).getReference(identifierProcessing);
+		).getReference();
 	}
 
 	protected String getQualifierColumnAlias(PersistentPropertyPathExtension relationPath) {
-		return PropertyPathUtils.getTableAlias(relationPath).getReference(identifierProcessing)
-			+ "_" + relationPath.getQualifierColumn().getReference(identifierProcessing);
+		return PropertyPathUtils.getTableAlias(relationPath).getReference()
+			+ "_" + relationPath.getQualifierColumn().getReference();
 	}
 
 	private Object determineRelationValue(
