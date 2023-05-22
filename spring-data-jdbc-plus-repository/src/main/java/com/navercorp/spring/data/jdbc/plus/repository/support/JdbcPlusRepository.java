@@ -18,13 +18,10 @@
 
 package com.navercorp.spring.data.jdbc.plus.repository.support;
 
-import java.util.stream.Collectors;
-
 import org.springframework.data.jdbc.core.JdbcAggregateOperations;
 import org.springframework.data.jdbc.core.convert.JdbcConverter;
 import org.springframework.data.jdbc.repository.support.SimpleJdbcRepository;
 import org.springframework.data.mapping.PersistentEntity;
-import org.springframework.data.util.Streamable;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.navercorp.spring.data.jdbc.plus.repository.JdbcRepository;
@@ -65,9 +62,7 @@ public class JdbcPlusRepository<T, ID> extends SimpleJdbcRepository<T, ID> imple
 	@Transactional
 	@Override
 	public <S extends T> Iterable<S> insertAll(Iterable<S> entities) {
-		return Streamable.of(entities).stream()
-			.map(this::insert)
-			.collect(Collectors.toList());
+		return entityOperations.insertAll(entities);
 	}
 
 	@Transactional
@@ -79,8 +74,6 @@ public class JdbcPlusRepository<T, ID> extends SimpleJdbcRepository<T, ID> imple
 	@Transactional
 	@Override
 	public <S extends T> Iterable<S> updateAll(Iterable<S> entities) {
-		return Streamable.of(entities).stream()
-			.map(this::update)
-			.collect(Collectors.toList());
+		return entityOperations.updateAll(entities);
 	}
 }
