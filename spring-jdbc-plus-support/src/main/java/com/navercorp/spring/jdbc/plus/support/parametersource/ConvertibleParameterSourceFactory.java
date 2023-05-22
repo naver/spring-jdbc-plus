@@ -154,6 +154,15 @@ public class ConvertibleParameterSourceFactory {
 	}
 
 	/**
+	 * Is pad array boolean.
+	 *
+	 * @return the boolean
+	 */
+	public boolean isPadArray() {
+		return padArray;
+	}
+
+	/**
 	 * Gets converter.
 	 *
 	 * @return the converter
