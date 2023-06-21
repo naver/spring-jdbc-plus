@@ -33,7 +33,7 @@ import org.springframework.lang.Nullable;
  * @author IAM20
  */
 public class IterableExpandPadding {
-	private static final int[] REGULAR_SIZES = {0, 1, 2, 3, 4, 8, 16, 32, 50, 100, 200, 300, 500, 1000, 1500, 2000};
+	public static final int[] REGULAR_SIZES = {0, 1, 2, 3, 4, 8, 16, 32, 50, 100, 200, 300, 500, 1000, 1500, 2000};
 
 	/**
 	 * Expand if iterable object.
@@ -50,8 +50,8 @@ public class IterableExpandPadding {
 	/**
 	 * Expand if iterable object.
 	 *
-	 * @param source 	the source
-	 * @param padArray 	the pad array y/n
+	 * @param source    the source
+	 * @param padArray    the pad array y/n
 	 * @return the object
 	 */
 	public static Object expandIfIterable(Object source, boolean padArray) {
