@@ -11,6 +11,7 @@ import org.springframework.core.convert.converter.Converter
 import org.springframework.data.convert.ReadingConverter
 import org.springframework.data.jdbc.core.convert.JdbcConverter
 import org.springframework.data.jdbc.core.convert.JdbcCustomConversions
+import org.springframework.data.jdbc.core.dialect.JdbcMySqlDialect
 import org.springframework.data.relational.core.dialect.Dialect
 import org.springframework.data.relational.core.mapping.RelationalMappingContext
 import org.springframework.data.relational.core.sql.IdentifierProcessing
@@ -37,6 +38,9 @@ class JdbcConfiguration {
             IdentifierProcessing.ANSI
         )
     }
+
+    @Bean
+    fun jdbcDialect(): Dialect = JdbcMySqlDialect.INSTANCE
 
     private fun storeConverters(): MutableList<Converter<*, *>> {
         val result = mutableListOf<Converter<*, *>>()

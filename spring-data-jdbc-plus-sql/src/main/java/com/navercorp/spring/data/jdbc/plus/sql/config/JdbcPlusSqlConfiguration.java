@@ -19,7 +19,6 @@
 package com.navercorp.spring.data.jdbc.plus.sql.config;
 
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
