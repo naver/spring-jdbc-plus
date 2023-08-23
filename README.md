@@ -34,7 +34,7 @@ may be an appropriate choice.
             }
         }
         dependencies {
-            classpath("org.springframework.boot:spring-boot-gradle-plugin:3.1.2")
+            classpath("org.springframework.boot:spring-boot-gradle-plugin:3.1.3")
         }
     }
 
