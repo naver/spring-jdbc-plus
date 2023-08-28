@@ -40,7 +40,7 @@ may be an appropriate choice.
 
     dependencies {
         implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
-        implementation("com.navercorp.spring:spring-boot-starter-data-jdbc-plus-sql:3.1.3-SNAPSHOT")
+        implementation("com.navercorp.spring:spring-boot-starter-data-jdbc-plus-sql:3.1.3")
     }
     ```
 
@@ -50,7 +50,7 @@ may be an appropriate choice.
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.1.1</version>
+        <version>3.1.3</version>
         <relativePath/>
     </parent>
 
@@ -62,7 +62,7 @@ may be an appropriate choice.
     <dependency>
         <groupId>com.navercorp.spring</groupId>
         <artifactId>spring-boot-starter-data-jdbc-plus-sql</artifactId>
-        <version>3.1.3-SNAPSHOT</version>
+        <version>3.1.3</version>
     </dependency>
     ```
 
