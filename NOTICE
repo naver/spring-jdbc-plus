@@ -25,7 +25,7 @@ spring-projects/spring-data-commons
 https://github.com/spring-projects/spring-data-commons
 
 
-Spring Data Commons 3.1.4
+Spring Data Commons 3.1.5
 Copyright (c) [2010-2019] Pivotal Software, Inc.
 
 This product is licensed to you under the Apache License, Version 2.0 (the "License").
@@ -71,7 +71,7 @@ spring-projects/spring-data-jdbc
 https://github.com/spring-projects/spring-data-jdbc
 
 
-Spring Data Relational 3.1.4
+Spring Data Relational 3.1.5
 Copyright (c) [2017-2019] Pivotal Software, Inc.
 
 This product is licensed to you under the Apache License, Version 2.0 (the "License").
