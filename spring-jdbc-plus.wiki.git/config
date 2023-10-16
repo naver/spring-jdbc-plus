@@ -1,0 +1,9 @@
+[core]
+	repositoryformatversion = 0
+	filemode = false
+	bare = true
+	ignorecase = true
+[remote "origin"]
+	url = https://github.com/naver/spring-jdbc-plus.wiki.git
+	fetch = +refs/*:refs/*
+	mirror = true
