@@ -111,7 +111,7 @@ may be an appropriate choice.
 
     ```groovy
     class OrderSql extends SqlGeneratorSupport {
-
+    
         String selectByPurchaserNo() {
             """
             SELECT ${sql.columns(Order)}
@@ -134,7 +134,7 @@ Be careful when use string interpolation in Groovy and Kotlin.
 * Bad  :-1:
     ```groovy
     class OrderSql extends SqlGeneratorSupport {
-
+    
         String selectByPurchaserNo(String purchaserNo) {
         """
         SELECT ${sql.columns(Order)}
@@ -148,7 +148,7 @@ Be careful when use string interpolation in Groovy and Kotlin.
 * Good :+1:
     ```groovy
     class OrderSql extends SqlGeneratorSupport {
-
+    
         String selectByPurchaserNo() {
         """
         SELECT ${sql.columns(Order)}
@@ -158,6 +158,18 @@ Be careful when use string interpolation in Groovy and Kotlin.
         }
     }
     ```
+
+
+
+## How to use this
+
+``` JAVA
+
+```
+
+
+
+
 
 ## Examples
 
