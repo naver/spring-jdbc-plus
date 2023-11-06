@@ -34,7 +34,7 @@ may be an appropriate choice.
             }
         }
         dependencies {
-            classpath("org.springframework.boot:spring-boot-gradle-plugin:3.0.10")
+            classpath("org.springframework.boot:spring-boot-gradle-plugin:3.0.11")
         }
     }
 
@@ -50,7 +50,7 @@ may be an appropriate choice.
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.0.10</version>
+        <version>3.0.11</version>
         <relativePath/>
     </parent>
 
