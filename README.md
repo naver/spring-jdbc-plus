@@ -161,13 +161,45 @@ Be careful when use string interpolation in Groovy and Kotlin.
 
 
 
-## How to use this
+##  Annotation Guide
+
+### @SqlTableAlias
 
 ``` JAVA
+@Value
+@Builder
+@Table("post")
+public class PostDto {
+	@Id
+	Long id;
 
+	@Column
+	Post post;
+
+	@SqlTableAlias("p_labels")
+	@MappedCollection(idColumn = "board_id")
+	Set<Label> labels;
+}
 ```
 
+`@SqlTableAlias` is used to attach a separate identifier to the table.
 
+### @SqlFunction
+
+```java
+@SqlTableAlias("ts")
+static class TestEntityWithNonNullValue {
+    @Column
+    private Long testerId;
+
+    @Column("tester_nm")
+    private String testerName;
+
+    @SqlFunction(expressions = {SqlFunction.COLUMN_NAME, "0"})
+    @Column
+    private int age;
+}
+```
 
 
 
