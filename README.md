@@ -182,7 +182,11 @@ public class PostDto {
 }
 ```
 
-`@SqlTableAlias` is used to attach a separate identifier to the table.
+`@SqlTableAlias` is used to attach a separate identifier to the table. `@SqlTableAlias` can be applied to class, field and method.
+
+`@SqlTableAlias` is used in the form of `@SqlTableAlias("value")` .
+
+
 
 ### @SqlFunction
 
