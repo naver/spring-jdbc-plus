@@ -27,7 +27,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationEventPublisherAware;
 import org.springframework.data.jdbc.core.convert.BatchJdbcOperations;
 import org.springframework.data.jdbc.core.convert.DataAccessStrategy;
-import org.springframework.data.jdbc.core.convert.DefaultDataAccessStrategy;
+import org.springframework.data.jdbc.core.convert.DataAccessStrategyFactory;
 import org.springframework.data.jdbc.core.convert.InsertStrategyFactory;
 import org.springframework.data.jdbc.core.convert.JdbcConverter;
 import org.springframework.data.jdbc.core.convert.SqlGeneratorSource;
@@ -223,13 +223,14 @@ public class JdbcPlusRepositoryFactoryBean<T extends Repository<S, ID>, S, ID ex
 						this.mappingContext, this.converter, this.dialect);
 					InsertStrategyFactory insertStrategyFactory = new InsertStrategyFactory(this.operations,
 						new BatchJdbcOperations(this.operations.getJdbcOperations()), this.dialect);
-					return new DefaultDataAccessStrategy(
+					DataAccessStrategyFactory factory = new DataAccessStrategyFactory(
 						sqlGeneratorSource,
-						this.mappingContext,
 						this.converter,
 						this.operations,
 						sqlParametersFactory,
-						insertStrategyFactory);
+						insertStrategyFactory
+					);
+					return factory.create();
 				});
 		}
 
