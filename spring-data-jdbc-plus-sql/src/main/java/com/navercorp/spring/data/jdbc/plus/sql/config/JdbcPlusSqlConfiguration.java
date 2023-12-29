@@ -79,8 +79,7 @@ public class JdbcPlusSqlConfiguration {
 		JdbcCustomConversions conversions,
 		Dialect dialect) {
 
-		DefaultJdbcTypeFactory jdbcTypeFactory = new DefaultJdbcTypeFactory(
-			operations.getJdbcOperations());
+		DefaultJdbcTypeFactory jdbcTypeFactory = new DefaultJdbcTypeFactory(operations.getJdbcOperations());
 		JdbcConverter jdbcConverter = new AggregateResultJdbcConverter(
 			jdbcMappingContext,
 			relationResolver,

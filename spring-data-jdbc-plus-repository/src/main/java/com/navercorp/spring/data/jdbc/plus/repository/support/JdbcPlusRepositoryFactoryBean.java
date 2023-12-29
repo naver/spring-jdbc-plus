@@ -219,7 +219,7 @@ public class JdbcPlusRepositoryFactoryBean<T extends Repository<S, ID>, S, ID ex
 					SqlGeneratorSource sqlGeneratorSource = new SqlGeneratorSource(
 						this.mappingContext, this.converter, this.dialect);
 					SqlParametersFactory sqlParametersFactory = new SqlParametersFactory(
-						this.mappingContext, this.converter, this.dialect);
+						this.mappingContext, this.converter);
 					InsertStrategyFactory insertStrategyFactory = new InsertStrategyFactory(this.operations,
 						this.dialect);
 					DataAccessStrategyFactory factory = new DataAccessStrategyFactory(
