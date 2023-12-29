@@ -18,7 +18,11 @@
 
 package com.navercorp.spring.data.jdbc.plus.repository.config;
 
+import org.springframework.beans.factory.config.RuntimeBeanReference;
+import org.springframework.beans.factory.support.BeanDefinitionBuilder;
+import org.springframework.data.jdbc.repository.QueryMappingConfiguration;
 import org.springframework.data.jdbc.repository.config.JdbcRepositoryConfigExtension;
+import org.springframework.data.repository.config.RepositoryConfigurationSource;
 
 import com.navercorp.spring.data.jdbc.plus.repository.support.JdbcPlusRepositoryFactoryBean;
 
@@ -32,6 +36,16 @@ import com.navercorp.spring.data.jdbc.plus.repository.support.JdbcPlusRepository
  * {@link org.springframework.data.jdbc.repository.config.JdbcRepositoryConfigExtension}
  */
 public class JdbcPlusRepositoryConfigExtension extends JdbcRepositoryConfigExtension {
+
+	@Override
+	public void postProcess(BeanDefinitionBuilder builder, RepositoryConfigurationSource source) {
+		super.postProcess(builder, source);
+		builder.addPropertyValue(
+			"queryMappingConfiguration",
+			new RuntimeBeanReference(QueryMappingConfiguration.class)
+		);
+	}
+
 	@Override
 	public String getModuleName() {
 		return "JDBC-PLUS-REPOSITORY";
