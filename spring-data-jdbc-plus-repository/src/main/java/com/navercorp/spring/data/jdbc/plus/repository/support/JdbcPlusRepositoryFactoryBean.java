@@ -25,7 +25,6 @@ import javax.annotation.Nullable;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationEventPublisherAware;
-import org.springframework.data.jdbc.core.convert.BatchJdbcOperations;
 import org.springframework.data.jdbc.core.convert.DataAccessStrategy;
 import org.springframework.data.jdbc.core.convert.DataAccessStrategyFactory;
 import org.springframework.data.jdbc.core.convert.InsertStrategyFactory;
@@ -222,7 +221,7 @@ public class JdbcPlusRepositoryFactoryBean<T extends Repository<S, ID>, S, ID ex
 					SqlParametersFactory sqlParametersFactory = new SqlParametersFactory(
 						this.mappingContext, this.converter, this.dialect);
 					InsertStrategyFactory insertStrategyFactory = new InsertStrategyFactory(this.operations,
-						new BatchJdbcOperations(this.operations.getJdbcOperations()), this.dialect);
+						this.dialect);
 					DataAccessStrategyFactory factory = new DataAccessStrategyFactory(
 						sqlGeneratorSource,
 						this.converter,
