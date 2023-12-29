@@ -3,8 +3,7 @@ package com.navercorp.spring.data.jdbc.plus.sql.convert;
 import static java.util.Collections.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.springframework.data.relational.core.mapping.Embedded.*;
-import static org.springframework.data.relational.core.sql.SqlIdentifier.quoted;
-import static org.springframework.data.relational.core.sql.SqlIdentifier.unquoted;
+import static org.springframework.data.relational.core.sql.SqlIdentifier.*;
 
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,9 +14,9 @@ import org.springframework.data.jdbc.core.convert.BasicJdbcConverter;
 import org.springframework.data.jdbc.core.convert.JdbcConverter;
 import org.springframework.data.jdbc.core.mapping.JdbcMappingContext;
 import org.springframework.data.mapping.PersistentPropertyPath;
+import org.springframework.data.relational.core.mapping.AggregatePath;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Embedded;
-import org.springframework.data.relational.core.mapping.PersistentPropertyPathExtension;
 import org.springframework.data.relational.core.mapping.RelationalMappingContext;
 import org.springframework.data.relational.core.mapping.RelationalPersistentEntity;
 import org.springframework.data.relational.core.mapping.RelationalPersistentProperty;
@@ -304,8 +303,7 @@ class SqlGeneratorEmbeddedTest {
 
 	private SqlGenerator.Join generateJoin(String path, Class<?> type) {
 		return createSqlGenerator(type)
-			.getJoin(new PersistentPropertyPathExtension(
-				context, PropertyPathTestingUtils.toPath(path, type, context)));
+			.getJoin(context.getAggregatePath(PropertyPathTestingUtils.toPath(path, type, context)));
 	}
 
 	@Nullable
@@ -317,11 +315,12 @@ class SqlGeneratorEmbeddedTest {
 		return null;
 	}
 
-	private PersistentPropertyPathExtension extPath(RelationalPersistentEntity<?> entity) {
-		return new PersistentPropertyPathExtension(context, entity);
+	private AggregatePath extPath(RelationalPersistentEntity<?> entity) {
+		return context.getAggregatePath(entity);
 	}
-	private PersistentPropertyPathExtension extPath(String path) {
-		return new PersistentPropertyPathExtension(context, createSimplePath(path));
+
+	private AggregatePath extPath(String path) {
+		return context.getAggregatePath(createSimplePath(path));
 	}
 
 	PersistentPropertyPath<RelationalPersistentProperty> createSimplePath(String path) {
@@ -332,8 +331,7 @@ class SqlGeneratorEmbeddedTest {
 		String path, Class<?> type) {
 
 		return createSqlGenerator(type)
-			.getColumn(new PersistentPropertyPathExtension(
-				context, PropertyPathTestingUtils.toPath(path, type, context)));
+			.getColumn(context.getAggregatePath(PropertyPathTestingUtils.toPath(path, type, context)));
 	}
 
 	@SuppressWarnings("unused")

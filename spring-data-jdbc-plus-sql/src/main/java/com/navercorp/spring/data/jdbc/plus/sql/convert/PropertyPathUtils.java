@@ -18,8 +18,7 @@ package com.navercorp.spring.data.jdbc.plus.sql.convert;
 
 import javax.annotation.Nullable;
 
-import org.springframework.data.relational.core.mapping.PersistentPropertyPathExtension;
-import org.springframework.data.relational.core.sql.IdentifierProcessing;
+import org.springframework.data.relational.core.mapping.AggregatePath;
 import org.springframework.data.relational.core.sql.SqlIdentifier;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
@@ -37,8 +36,8 @@ public class PropertyPathUtils {
 	 * @param path
 	 * @return
 	 */
-	static SqlIdentifier getColumnAlias(PersistentPropertyPathExtension path) {
-		return getColumnAlias(path, path.getColumnName());
+	static SqlIdentifier getColumnAlias(AggregatePath path) {
+		return getColumnAlias(path, path.getColumnInfo().name());
 	}
 
 	/**
@@ -48,9 +47,9 @@ public class PropertyPathUtils {
 	 * @param columnName
 	 * @return
 	 */
-	static SqlIdentifier getColumnAlias(PersistentPropertyPathExtension path, SqlIdentifier columnName) {
-		PersistentPropertyPathExtension tableOwner = getTableOwningAncestor(path);
-		if (tableOwner.getLength() == 0) {
+	static SqlIdentifier getColumnAlias(AggregatePath path, SqlIdentifier columnName) {
+		AggregatePath tableOwner = getTableOwningAncestor(path);
+		if (tableOwner.isRoot()) {
 			return columnName;
 		} else {
 			SqlIdentifier tableAlias = getTableAliasFromTableOwner(tableOwner);
@@ -65,8 +64,8 @@ public class PropertyPathUtils {
 	 * @param path
 	 * @return
 	 */
-	static SqlIdentifier getReverseColumnAlias(PersistentPropertyPathExtension path) {
-		return getReverseColumnAlias(path, path.getReverseColumnName());
+	static SqlIdentifier getReverseColumnAlias(AggregatePath path) {
+		return getReverseColumnAlias(path, path.getTableInfo().reverseColumnInfo().name());
 	}
 
 	/**
@@ -77,7 +76,7 @@ public class PropertyPathUtils {
 	 * @return
 	 */
 	static SqlIdentifier getReverseColumnAlias(
-		PersistentPropertyPathExtension path, SqlIdentifier reverseColumnName
+		AggregatePath path, SqlIdentifier reverseColumnName
 	) {
 		SqlIdentifier tableAlias = getTableAlias(path);
 		return tableAlias == null ? reverseColumnName
@@ -86,20 +85,20 @@ public class PropertyPathUtils {
 
 	/**
 	 * getTableAlias applied @SqlTableAlias
-	 * Refer from PersistentPropertyPathExtension#getTableAlias
+	 * Refer from AggregatePath#getTableInfo#tableAlias
 	 *
 	 * @param path
 	 * @return
 	 */
 	@Nullable
-	static SqlIdentifier getTableAlias(PersistentPropertyPathExtension path) {
-		PersistentPropertyPathExtension tableOwner = getTableOwningAncestor(path);
+	static SqlIdentifier getTableAlias(AggregatePath path) {
+		AggregatePath tableOwner = getTableOwningAncestor(path);
 		return getTableAliasFromTableOwner(tableOwner);
 	}
 
 	@Nullable
-	private static SqlIdentifier getTableAliasFromTableOwner(PersistentPropertyPathExtension tableOwner) {
-		if (tableOwner.getLength() > 0) {	// path != null
+	private static SqlIdentifier getTableAliasFromTableOwner(AggregatePath tableOwner) {
+		if (!tableOwner.isRoot()) {    // path != null
 			return assembleTableAlias(tableOwner);
 		}
 
@@ -107,22 +106,26 @@ public class PropertyPathUtils {
 		return TableAliasUtils.getTableAlias(tableOwner.getLeafEntity());
 	}
 
-	private static PersistentPropertyPathExtension getTableOwningAncestor(PersistentPropertyPathExtension path) {
+	private static AggregatePath getTableOwningAncestor(AggregatePath path) {
 		return path.isEntity() && !path.isEmbedded() ? path : getTableOwningAncestor(path.getParentPath());
 	}
 
 	@Nullable
-	private static SqlIdentifier assembleTableAlias(PersistentPropertyPathExtension path) {
+	private static SqlIdentifier assembleTableAlias(AggregatePath path) {
 
 		Assert.state(path != null, "Path is null");
 
+		if (path.isRoot()) {
+			return null;
+		}
+
 		String prefix = TableAliasUtils.getTableAliasPropertyPathPrefix(path);
-		if (path.getLength() == 1) {
+		if (path.getParentPath().isRoot()) {
 			Assert.notNull(prefix, "Prefix must not be null.");
 			return StringUtils.hasText(prefix) ? SqlIdentifier.quoted(prefix) : null;
 		}
 
-		PersistentPropertyPathExtension parentPath = path.getParentPath();
+		AggregatePath parentPath = path.getParentPath();
 		SqlIdentifier sqlIdentifier = assembleTableAlias(parentPath);
 
 		if (sqlIdentifier != null) {

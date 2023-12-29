@@ -25,9 +25,9 @@ import org.springframework.data.mapping.PersistentPropertyPath;
 import org.springframework.data.relational.core.dialect.Dialect;
 import org.springframework.data.relational.core.dialect.PostgresDialect;
 import org.springframework.data.relational.core.dialect.SqlServerDialect;
+import org.springframework.data.relational.core.mapping.AggregatePath;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.NamingStrategy;
-import org.springframework.data.relational.core.mapping.PersistentPropertyPathExtension;
 import org.springframework.data.relational.core.mapping.RelationalMappingContext;
 import org.springframework.data.relational.core.mapping.RelationalPersistentEntity;
 import org.springframework.data.relational.core.mapping.RelationalPersistentProperty;
@@ -319,7 +319,7 @@ class SqlGeneratorTest {
 
 		// this would get called when ListParent is th element type of a Map
 		String sql = sqlGenerator.getFindAllByProperty(
-			BACKREF, unquoted("key-column"), false);
+			BACKREF, new AggregatePath.ColumnInfo(unquoted("key-column"), unquoted("key-column")), false);
 
 		assertThat(sql).isEqualTo(
 			"SELECT dummy_entity.id1 AS id1, dummy_entity.x_name AS x_name, " //
@@ -346,7 +346,8 @@ class SqlGeneratorTest {
 	public void findAllByPropertyWithKeyOrdered() {
 
 		// this would get called when ListParent is th element type of a Map
-		String sql = sqlGenerator.getFindAllByProperty(BACKREF, unquoted("key-column"), true);
+		String sql = sqlGenerator.getFindAllByProperty(BACKREF,
+			new AggregatePath.ColumnInfo(unquoted("key-column"), unquoted("key-column")), true);
 
 		assertThat(sql).isEqualTo("SELECT dummy_entity.id1 AS id1, dummy_entity.x_name AS x_name, " //
 			+ "dummy_entity.x_other AS x_other, " //
@@ -535,7 +536,8 @@ class SqlGeneratorTest {
 		final SqlGenerator sqlGenerator = createSqlGenerator(EntityWithReadOnlyProperty.class);
 
 		assertThat(sqlGenerator.getFindAllByProperty(
-			BACKREF, unquoted("key-column"), true)).isEqualToIgnoringCase( //
+			BACKREF, new AggregatePath.ColumnInfo(unquoted("key-column"), unquoted("key-column")),
+			true)).isEqualToIgnoringCase( //
 			"SELECT " //
 				+ "entity_with_read_only_property.x_id AS x_id, " //
 				+ "entity_with_read_only_property.x_name AS x_name, " //
@@ -707,8 +709,7 @@ class SqlGeneratorTest {
 
 	private SqlGenerator.Join generateJoin(String path, Class<?> type) {
 		return createSqlGenerator(type, AnsiDialect.INSTANCE)
-			.getJoin(new PersistentPropertyPathExtension(
-				context, PropertyPathTestingUtils.toPath(path, type, context)));
+			.getJoin(context.getAggregatePath(PropertyPathTestingUtils.toPath(path, type, context)));
 	}
 
 	@Test // DATAJDBC-340
@@ -793,8 +794,7 @@ class SqlGeneratorTest {
 		String path, Class<?> type) {
 
 		return createSqlGenerator(type, AnsiDialect.INSTANCE)
-			.getColumn(new PersistentPropertyPathExtension(
-				context, PropertyPathTestingUtils.toPath(path, type, context)));
+			.getColumn(context.getAggregatePath(PropertyPathTestingUtils.toPath(path, type, context)));
 	}
 
 	private PersistentPropertyPath<RelationalPersistentProperty> getPath(

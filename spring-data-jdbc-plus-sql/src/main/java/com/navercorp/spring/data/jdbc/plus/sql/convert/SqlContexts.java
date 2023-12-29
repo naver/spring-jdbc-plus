@@ -18,7 +18,7 @@
 
 package com.navercorp.spring.data.jdbc.plus.sql.convert;
 
-import org.springframework.data.relational.core.mapping.PersistentPropertyPathExtension;
+import org.springframework.data.relational.core.mapping.AggregatePath;
 import org.springframework.data.relational.core.sql.Column;
 import org.springframework.data.relational.core.sql.Table;
 
@@ -55,7 +55,7 @@ public interface SqlContexts {
 	 * @param path the path
 	 * @return the table
 	 */
-	Table getTable(PersistentPropertyPathExtension path);
+	Table getTable(AggregatePath path);
 
 	/**
 	 * Gets column.
@@ -63,7 +63,7 @@ public interface SqlContexts {
 	 * @param path the path
 	 * @return the column
 	 */
-	Column getColumn(PersistentPropertyPathExtension path);
+	Column getColumn(AggregatePath path);
 
 	/**
 	 * Gets version column.
@@ -85,5 +85,5 @@ public interface SqlContexts {
 	 * @param path the path
 	 * @return the reverse column
 	 */
-	Column getReverseColumn(PersistentPropertyPathExtension path);
+	Column getReverseColumn(AggregatePath path);
 }

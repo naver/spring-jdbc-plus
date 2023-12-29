@@ -17,7 +17,7 @@
 package com.navercorp.spring.data.jdbc.plus.sql.convert;
 
 import org.springframework.data.mapping.model.PropertyValueProvider;
-import org.springframework.data.relational.core.mapping.PersistentPropertyPathExtension;
+import org.springframework.data.relational.core.mapping.AggregatePath;
 import org.springframework.data.relational.core.mapping.RelationalPersistentProperty;
 import org.springframework.data.relational.core.sql.IdentifierProcessing;
 
@@ -34,7 +34,7 @@ import org.springframework.data.relational.core.sql.IdentifierProcessing;
 class JdbcPropertyValueProvider implements PropertyValueProvider<RelationalPersistentProperty> {
 
 	private final IdentifierProcessing identifierProcessing;
-	private final PersistentPropertyPathExtension basePath;
+	private final AggregatePath basePath;
 	private final ResultSetAccessor resultSet;
 
 	/**
@@ -43,7 +43,7 @@ class JdbcPropertyValueProvider implements PropertyValueProvider<RelationalPersi
 	 * @param basePath path from the aggregate root relative to which all properties get resolved.
 	 * @param resultSet the ResultSetAccessor from which to obtain the actual values.
 	 */
-	JdbcPropertyValueProvider(IdentifierProcessing identifierProcessing, PersistentPropertyPathExtension basePath,
+	JdbcPropertyValueProvider(IdentifierProcessing identifierProcessing, AggregatePath basePath,
 		ResultSetAccessor resultSet) {
 
 		this.resultSet = resultSet;
@@ -68,11 +68,11 @@ class JdbcPropertyValueProvider implements PropertyValueProvider<RelationalPersi
 	}
 
 	private String getColumnName(RelationalPersistentProperty property) {
-		PersistentPropertyPathExtension path = basePath.extendBy(property);
+		AggregatePath path = basePath.append(property);
 		return PropertyPathUtils.getColumnAlias(path).getReference();
 	}
 
 	public JdbcPropertyValueProvider extendBy(RelationalPersistentProperty property) {
-		return new JdbcPropertyValueProvider(identifierProcessing, basePath.extendBy(property), resultSet);
+		return new JdbcPropertyValueProvider(identifierProcessing, basePath.append(property), resultSet);
 	}
 }

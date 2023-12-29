@@ -18,7 +18,7 @@
 
 package com.navercorp.spring.data.plus.sql.gen.column;
 
-import org.springframework.data.relational.core.mapping.PersistentPropertyPathExtension;
+import org.springframework.data.relational.core.mapping.AggregatePath;
 import org.springframework.data.relational.core.sql.IdentifierProcessing;
 
 /**
@@ -27,7 +27,7 @@ import org.springframework.data.relational.core.sql.IdentifierProcessing;
  * @author Myeonghyeon Lee
  */
 public final class TbInfo {
-	private final PersistentPropertyPathExtension pathExtension;
+	private final AggregatePath aggregatePath;
 	private final IdentifierProcessing identifierProcessing;
 
 	private final String path;
@@ -37,18 +37,18 @@ public final class TbInfo {
 	/**
 	 * Instantiates a new Tb info.
 	 *
-	 * @param pathExtension        the path extension
+	 * @param aggregatePath        the path extension
 	 * @param identifierProcessing the identifier processing
 	 */
-	TbInfo(PersistentPropertyPathExtension pathExtension, IdentifierProcessing identifierProcessing) {
-		this.pathExtension = pathExtension;
+	TbInfo(AggregatePath aggregatePath, IdentifierProcessing identifierProcessing) {
+		this.aggregatePath = aggregatePath;
 		this.identifierProcessing = identifierProcessing;
 
-		this.path = pathExtension.getRequiredPersistentPropertyPath().toDotPath();
-		this.table = pathExtension.getQualifiedTableName().getReference();
+		this.path = aggregatePath.getRequiredPersistentPropertyPath().toDotPath();
+		this.table = aggregatePath.getTableInfo().qualifiedTableName().getReference();
 		String aliasValue = this.table;
-		if (pathExtension.getTableAlias() != null) {
-			aliasValue = pathExtension.getTableAlias().getReference();
+		if (aggregatePath.getTableInfo().tableAlias() != null) {
+			aliasValue = aggregatePath.getTableInfo().tableAlias().getReference();
 		}
 		this.alias = aliasValue;
 	}
@@ -56,15 +56,15 @@ public final class TbInfo {
 	/**
 	 * Create tb info.
 	 *
-	 * @param pathExtension        the path extension
+	 * @param aggregatePath        the aggregate path
 	 * @param identifierProcessing the identifier processing
 	 * @return the tb info
 	 */
 	public static TbInfo create(
-		PersistentPropertyPathExtension pathExtension,
+		AggregatePath aggregatePath,
 		IdentifierProcessing identifierProcessing) {
 
-		return new TbInfo(pathExtension, identifierProcessing);
+		return new TbInfo(aggregatePath, identifierProcessing);
 	}
 
 	/**

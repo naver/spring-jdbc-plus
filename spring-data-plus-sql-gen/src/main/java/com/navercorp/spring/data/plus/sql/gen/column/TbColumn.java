@@ -18,7 +18,7 @@
 
 package com.navercorp.spring.data.plus.sql.gen.column;
 
-import org.springframework.data.relational.core.mapping.PersistentPropertyPathExtension;
+import org.springframework.data.relational.core.mapping.AggregatePath;
 import org.springframework.data.relational.core.sql.IdentifierProcessing;
 
 /**
@@ -27,7 +27,7 @@ import org.springframework.data.relational.core.sql.IdentifierProcessing;
  * @author Myeonghyeon Lee
  */
 public final class TbColumn {
-	private final PersistentPropertyPathExtension pathExtension;
+	private final AggregatePath pathExtension;
 	private final IdentifierProcessing identifierProcessing;
 
 	private final String path;
@@ -37,20 +37,16 @@ public final class TbColumn {
 	/**
 	 * Instantiates a new Tb column.
 	 *
-	 * @param pathExtension        the path extension
+	 * @param aggregatePath        the aggregate path
 	 * @param identifierProcessing the identifier processing
 	 */
-	TbColumn(PersistentPropertyPathExtension pathExtension, IdentifierProcessing identifierProcessing) {
-		this.pathExtension = pathExtension;
+	TbColumn(AggregatePath aggregatePath, IdentifierProcessing identifierProcessing) {
+		this.pathExtension = aggregatePath;
 		this.identifierProcessing = identifierProcessing;
 
-		this.path = pathExtension.getRequiredPersistentPropertyPath().toDotPath();
-		this.column = pathExtension.getColumnName().getReference();
-		String aliasValue = this.column;
-		if (pathExtension.getColumnAlias() != null) {
-			aliasValue = pathExtension.getColumnAlias().getReference();
-		}
-		this.alias = aliasValue;
+		this.path = aggregatePath.getRequiredPersistentPropertyPath().toDotPath();
+		this.column = aggregatePath.getColumnInfo().name().getReference();
+		this.alias = aggregatePath.getColumnInfo().alias().getReference();
 	}
 
 	/**
@@ -61,7 +57,7 @@ public final class TbColumn {
 	 * @return the tb column
 	 */
 	public static TbColumn create(
-		PersistentPropertyPathExtension pathExtension,
+		AggregatePath pathExtension,
 		IdentifierProcessing identifierProcessing) {
 
 		return new TbColumn(pathExtension, identifierProcessing);
