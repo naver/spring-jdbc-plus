@@ -16,9 +16,9 @@ import org.springframework.data.annotation.Version;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.jdbc.core.convert.BasicJdbcConverter;
 import org.springframework.data.jdbc.core.convert.Identifier;
 import org.springframework.data.jdbc.core.convert.JdbcConverter;
+import org.springframework.data.jdbc.core.convert.MappingJdbcConverter;
 import org.springframework.data.jdbc.core.mapping.AggregateReference;
 import org.springframework.data.jdbc.core.mapping.JdbcMappingContext;
 import org.springframework.data.mapping.PersistentPropertyPath;
@@ -49,7 +49,7 @@ class SqlGeneratorTest {
 	SqlGenerator sqlGenerator;
 	NamingStrategy namingStrategy = new PrefixingNamingStrategy();
 	RelationalMappingContext context = new JdbcMappingContext(namingStrategy);
-	JdbcConverter converter = new BasicJdbcConverter(context, (identifier, path) -> {
+	JdbcConverter converter = new MappingJdbcConverter(context, (identifier, path) -> {
 		throw new UnsupportedOperationException();
 	});
 

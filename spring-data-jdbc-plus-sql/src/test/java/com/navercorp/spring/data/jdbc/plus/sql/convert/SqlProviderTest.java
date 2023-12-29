@@ -23,8 +23,8 @@ import static org.assertj.core.api.AssertionsForClassTypes.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.jdbc.core.convert.BasicJdbcConverter;
 import org.springframework.data.jdbc.core.convert.JdbcConverter;
+import org.springframework.data.jdbc.core.convert.MappingJdbcConverter;
 import org.springframework.data.jdbc.core.dialect.JdbcMySqlDialect;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Embedded;
@@ -45,7 +45,7 @@ class SqlProviderTest {
 	void columns() {
 		// given
 		RelationalMappingContext context = new RelationalMappingContext();
-		JdbcConverter converter = new BasicJdbcConverter(context, (identifier, path) -> {
+		JdbcConverter converter = new MappingJdbcConverter(context, (identifier, path) -> {
 			throw new UnsupportedOperationException();
 		});
 		SqlProvider sut = new SqlProvider(context, converter, NonQuotingDialect.INSTANCE);
@@ -56,7 +56,7 @@ class SqlProviderTest {
 		// then
 		assertThat(columns).contains(
 			"test_inner_entity.cty AS cty, "
-			+ "test_inner_entity.state AS state"
+				+ "test_inner_entity.state AS state"
 		);
 	}
 
@@ -65,7 +65,7 @@ class SqlProviderTest {
 	void columnsWithEmbeddedAndAlias() {
 		// given
 		RelationalMappingContext context = new RelationalMappingContext();
-		JdbcConverter converter = new BasicJdbcConverter(context, (identifier, path) -> {
+		JdbcConverter converter = new MappingJdbcConverter(context, (identifier, path) -> {
 			throw new UnsupportedOperationException();
 		});
 		SqlProvider sut = new SqlProvider(context, converter, NonQuotingDialect.INSTANCE);
@@ -76,12 +76,12 @@ class SqlProviderTest {
 		// then
 		assertThat(columns).contains(
 			"ts.tester_id AS tester_id, "
-			+ "address.tester_outer_id AS address_tester_outer_id, "
-			+ "ts.tester_nm AS tester_nm, "
-			+ "address.cty AS address_cty, "
-			+ "address.state AS address_state, "
-			+ "ts.adr_cty AS adr_cty, "
-			+ "ts.adr_state AS adr_state"
+				+ "address.tester_outer_id AS address_tester_outer_id, "
+				+ "ts.tester_nm AS tester_nm, "
+				+ "address.cty AS address_cty, "
+				+ "address.state AS address_state, "
+				+ "ts.adr_cty AS adr_cty, "
+				+ "ts.adr_state AS adr_state"
 		);
 	}
 
@@ -90,7 +90,7 @@ class SqlProviderTest {
 	void columnsWithNoRootTableAlias() {
 		// given
 		RelationalMappingContext context = new RelationalMappingContext();
-		JdbcConverter converter = new BasicJdbcConverter(context, (identifier, path) -> {
+		JdbcConverter converter = new MappingJdbcConverter(context, (identifier, path) -> {
 			throw new UnsupportedOperationException();
 		});
 		SqlProvider sut = new SqlProvider(context, converter, NonQuotingDialect.INSTANCE);
@@ -125,7 +125,7 @@ class SqlProviderTest {
 	void columnsEmbeddedNestedTableAlias() {
 		// given
 		RelationalMappingContext context = new RelationalMappingContext();
-		JdbcConverter converter = new BasicJdbcConverter(context, (identifier, path) -> {
+		JdbcConverter converter = new MappingJdbcConverter(context, (identifier, path) -> {
 			throw new UnsupportedOperationException();
 		});
 		SqlProvider sut = new SqlProvider(context, converter, NonQuotingDialect.INSTANCE);
@@ -163,7 +163,7 @@ class SqlProviderTest {
 	void tablesEmbeddedNestedTableAlias() {
 		// given
 		RelationalMappingContext context = new RelationalMappingContext();
-		JdbcConverter converter = new BasicJdbcConverter(context, (identifier, path) -> {
+		JdbcConverter converter = new MappingJdbcConverter(context, (identifier, path) -> {
 			throw new UnsupportedOperationException();
 		});
 		SqlProvider sut = new SqlProvider(context, converter, NonQuotingDialect.INSTANCE);
@@ -187,7 +187,7 @@ class SqlProviderTest {
 	void columnsWithNonNullValue() {
 		// given
 		RelationalMappingContext context = new RelationalMappingContext();
-		JdbcConverter converter = new BasicJdbcConverter(context, (identifier, path) -> {
+		JdbcConverter converter = new MappingJdbcConverter(context, (identifier, path) -> {
 			throw new UnsupportedOperationException();
 		});
 		SqlProvider sut = new SqlProvider(context, converter, NonQuotingDialect.INSTANCE);
@@ -208,7 +208,7 @@ class SqlProviderTest {
 	void namingStrategyForNonColumnAnnotatedField() {
 		// given
 		RelationalMappingContext context = new RelationalMappingContext(new PrefixingNamingStrategy());
-		JdbcConverter converter = new BasicJdbcConverter(context, (identifier, path) -> {
+		JdbcConverter converter = new MappingJdbcConverter(context, (identifier, path) -> {
 			throw new UnsupportedOperationException();
 		});
 		SqlProvider sut = new SqlProvider(context, converter, NonQuotingDialect.INSTANCE);
@@ -232,7 +232,7 @@ class SqlProviderTest {
 	void columnsQuotingWithTableAlias() {
 		// given
 		RelationalMappingContext context = new RelationalMappingContext(new PrefixingNamingStrategy());
-		JdbcConverter converter = new BasicJdbcConverter(context, (identifier, path) -> {
+		JdbcConverter converter = new MappingJdbcConverter(context, (identifier, path) -> {
 			throw new UnsupportedOperationException();
 		});
 		SqlProvider sut = new SqlProvider(context, converter, JdbcMySqlDialect.INSTANCE);
@@ -256,7 +256,7 @@ class SqlProviderTest {
 	void columnsWithRootTableAlias() {
 		// given
 		RelationalMappingContext context = new RelationalMappingContext();
-		JdbcConverter converter = new BasicJdbcConverter(context, (identifier, path) -> {
+		JdbcConverter converter = new MappingJdbcConverter(context, (identifier, path) -> {
 			throw new UnsupportedOperationException();
 		});
 		SqlProvider sut = new SqlProvider(context, converter, NonQuotingDialect.INSTANCE);
@@ -283,7 +283,7 @@ class SqlProviderTest {
 	void tablesWithRootTableAlias() {
 		// given
 		RelationalMappingContext context = new RelationalMappingContext();
-		JdbcConverter converter = new BasicJdbcConverter(context, (identifier, path) -> {
+		JdbcConverter converter = new MappingJdbcConverter(context, (identifier, path) -> {
 			throw new UnsupportedOperationException();
 		});
 		SqlProvider sut = new SqlProvider(context, converter, NonQuotingDialect.INSTANCE);
@@ -294,10 +294,10 @@ class SqlProviderTest {
 		// then
 		assertThat(tables).contains(
 			"test_table tweta "
-			+ "LEFT OUTER JOIN test_outer_entity testOuter "
-			+ "ON testOuter.test_root_id = tweta.root_id "
-			+ "LEFT OUTER JOIN test_inner_entity testOuter_address "
-			+ "ON testOuter_address.tester_outer_id = tweta.root_id"
+				+ "LEFT OUTER JOIN test_outer_entity testOuter "
+				+ "ON testOuter.test_root_id = tweta.root_id "
+				+ "LEFT OUTER JOIN test_inner_entity testOuter_address "
+				+ "ON testOuter_address.tester_outer_id = tweta.root_id"
 		);
 	}
 

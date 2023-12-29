@@ -10,8 +10,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.jdbc.core.convert.BasicJdbcConverter;
 import org.springframework.data.jdbc.core.convert.JdbcConverter;
+import org.springframework.data.jdbc.core.convert.MappingJdbcConverter;
 import org.springframework.data.jdbc.core.mapping.JdbcMappingContext;
 import org.springframework.data.mapping.PersistentPropertyPath;
 import org.springframework.data.relational.core.mapping.AggregatePath;
@@ -31,7 +31,7 @@ import org.springframework.data.relational.core.sql.SqlIdentifier;
 @SuppressWarnings("checkstyle:linelength")
 class SqlGeneratorEmbeddedTest {
 	private RelationalMappingContext context = new JdbcMappingContext();
-	JdbcConverter converter = new BasicJdbcConverter(context, (identifier, path) -> {
+	JdbcConverter converter = new MappingJdbcConverter(context, (identifier, path) -> {
 		throw new UnsupportedOperationException();
 	});
 	private SqlGenerator sqlGenerator;

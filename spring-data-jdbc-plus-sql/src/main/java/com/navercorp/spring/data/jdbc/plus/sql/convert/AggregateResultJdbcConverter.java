@@ -31,9 +31,9 @@ import java.util.Objects;
 
 import org.springframework.context.ApplicationContext;
 import org.springframework.data.convert.CustomConversions;
-import org.springframework.data.jdbc.core.convert.BasicJdbcConverter;
 import org.springframework.data.jdbc.core.convert.Identifier;
 import org.springframework.data.jdbc.core.convert.JdbcTypeFactory;
+import org.springframework.data.jdbc.core.convert.MappingJdbcConverter;
 import org.springframework.data.jdbc.core.convert.RelationResolver;
 import org.springframework.data.mapping.InstanceCreatorMetadata;
 import org.springframework.data.mapping.MappingException;
@@ -63,7 +63,7 @@ import org.springframework.util.MultiValueMap;
  *
  * @author Myeonghyeon Lee
  */
-public class AggregateResultJdbcConverter extends BasicJdbcConverter {
+public class AggregateResultJdbcConverter extends MappingJdbcConverter {
 	private final IdentifierProcessing identifierProcessing;
 	private SpELContext spElContext;
 
@@ -98,7 +98,7 @@ public class AggregateResultJdbcConverter extends BasicJdbcConverter {
 		JdbcTypeFactory typeFactory,
 		IdentifierProcessing identifierProcessing) {
 
-		super(context, relationResolver, conversions, typeFactory, identifierProcessing);
+		super(context, relationResolver, conversions, typeFactory);
 		this.identifierProcessing = identifierProcessing;
 		this.spElContext = new SpELContext(ResultMapPropertyAccessor.INSTANCE);
 	}
