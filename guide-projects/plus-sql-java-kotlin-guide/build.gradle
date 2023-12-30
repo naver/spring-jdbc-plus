@@ -16,12 +16,14 @@ repositories {
 
 compileKotlin {
     kotlinOptions {
+        javaParameters = true
         freeCompilerArgs = ["-Xjsr305=strict"]
         jvmTarget = "17"
     }
 }
 compileTestKotlin {
     kotlinOptions {
+        javaParameters = true
         freeCompilerArgs = ["-Xjsr305=strict"]
         jvmTarget = "17"
     }

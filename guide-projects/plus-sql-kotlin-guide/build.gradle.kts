@@ -10,7 +10,7 @@ buildscript {
 }
 
 plugins {
-    val kotlinVersion = "1.7.21"
+    val kotlinVersion = "1.9.20"
 
     id("org.jlleitschuh.gradle.ktlint") version "10.2.0"
     kotlin("jvm") version kotlinVersion
@@ -41,4 +41,5 @@ dependencies {
 
 tasks.withType<KotlinCompile> {
     kotlinOptions.jvmTarget = "17"
+    kotlinOptions.javaParameters = true
 }

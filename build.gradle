@@ -62,6 +62,9 @@ subprojects {
     }
 
     tasks.withType(Javadoc).all { enabled = false }
+    tasks.withType(JavaCompile).configureEach {
+        options.compilerArgs << '-parameters'
+    }
 
     java {
         withJavadocJar()
