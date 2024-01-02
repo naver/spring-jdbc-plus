@@ -50,7 +50,6 @@ import org.springframework.data.relational.core.mapping.AggregatePath;
 import org.springframework.data.relational.core.mapping.RelationalMappingContext;
 import org.springframework.data.relational.core.mapping.RelationalPersistentEntity;
 import org.springframework.data.relational.core.mapping.RelationalPersistentProperty;
-import org.springframework.data.relational.core.sql.IdentifierProcessing;
 import org.springframework.data.util.Streamable;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
@@ -64,7 +63,6 @@ import org.springframework.util.MultiValueMap;
  * @author Myeonghyeon Lee
  */
 public class AggregateResultJdbcConverter extends MappingJdbcConverter {
-	private final IdentifierProcessing identifierProcessing;
 	private SpELContext spElContext;
 
 	/**
@@ -78,7 +76,6 @@ public class AggregateResultJdbcConverter extends MappingJdbcConverter {
 		RelationResolver relationResolver) {
 
 		super(context, relationResolver);
-		this.identifierProcessing = IdentifierProcessing.ANSI;
 		this.spElContext = new SpELContext(ResultMapPropertyAccessor.INSTANCE);
 	}
 
@@ -89,17 +86,14 @@ public class AggregateResultJdbcConverter extends MappingJdbcConverter {
 	 * @param relationResolver     the relation resolver
 	 * @param conversions          the conversions
 	 * @param typeFactory          the type factory
-	 * @param identifierProcessing the identifier processing
 	 */
 	public AggregateResultJdbcConverter(
 		RelationalMappingContext context,
 		RelationResolver relationResolver,
 		CustomConversions conversions,
-		JdbcTypeFactory typeFactory,
-		IdentifierProcessing identifierProcessing) {
+		JdbcTypeFactory typeFactory) {
 
 		super(context, relationResolver, conversions, typeFactory);
-		this.identifierProcessing = identifierProcessing;
 		this.spElContext = new SpELContext(ResultMapPropertyAccessor.INSTANCE);
 	}
 
@@ -824,11 +818,8 @@ public class AggregateResultJdbcConverter extends MappingJdbcConverter {
 			this.path = getMappingContext().getAggregatePath(this.entity);
 			this.identifier = identifier;
 			this.key = key;
-			this.propertyValueProvider = new JdbcPropertyValueProvider(
-				identifierProcessing, path, accessor);
-			this.backReferencePropertyValueProvider = new JdbcBackReferencePropertyValueProvider(
-				identifierProcessing, path,
-				accessor);
+			this.propertyValueProvider = new JdbcPropertyValueProvider(path, accessor);
+			this.backReferencePropertyValueProvider = new JdbcBackReferencePropertyValueProvider(path, accessor);
 			this.accessor = accessor;
 		}
 
@@ -844,10 +835,8 @@ public class AggregateResultJdbcConverter extends MappingJdbcConverter {
 			this.path = path;
 			this.identifier = identifier;
 			this.key = key;
-			this.propertyValueProvider = new JdbcPropertyValueProvider(
-				identifierProcessing, path, accessor);
-			this.backReferencePropertyValueProvider = new JdbcBackReferencePropertyValueProvider(
-				identifierProcessing, path, accessor);
+			this.propertyValueProvider = new JdbcPropertyValueProvider(path, accessor);
+			this.backReferencePropertyValueProvider = new JdbcBackReferencePropertyValueProvider(path, accessor);
 			this.accessor = accessor;
 		}
 

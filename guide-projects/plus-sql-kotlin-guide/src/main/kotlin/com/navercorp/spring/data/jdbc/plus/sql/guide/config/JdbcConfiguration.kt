@@ -14,7 +14,6 @@ import org.springframework.data.jdbc.core.convert.JdbcCustomConversions
 import org.springframework.data.jdbc.core.dialect.JdbcMySqlDialect
 import org.springframework.data.relational.core.dialect.Dialect
 import org.springframework.data.relational.core.mapping.RelationalMappingContext
-import org.springframework.data.relational.core.sql.IdentifierProcessing
 
 @Configuration
 class JdbcConfiguration {
@@ -34,8 +33,7 @@ class JdbcConfiguration {
                 NoneFallbackParameterSource()
             ),
             mappingContext,
-            jdbcConverter,
-            IdentifierProcessing.ANSI
+            jdbcConverter
         )
     }
 

@@ -19,7 +19,6 @@
 package com.navercorp.spring.data.plus.sql.gen.column;
 
 import org.springframework.data.relational.core.mapping.AggregatePath;
-import org.springframework.data.relational.core.sql.IdentifierProcessing;
 
 /**
  * The type Tb column.
@@ -28,7 +27,6 @@ import org.springframework.data.relational.core.sql.IdentifierProcessing;
  */
 public final class TbColumn {
 	private final AggregatePath pathExtension;
-	private final IdentifierProcessing identifierProcessing;
 
 	private final String path;
 	private final String column;
@@ -38,11 +36,9 @@ public final class TbColumn {
 	 * Instantiates a new Tb column.
 	 *
 	 * @param aggregatePath        the aggregate path
-	 * @param identifierProcessing the identifier processing
 	 */
-	TbColumn(AggregatePath aggregatePath, IdentifierProcessing identifierProcessing) {
+	TbColumn(AggregatePath aggregatePath) {
 		this.pathExtension = aggregatePath;
-		this.identifierProcessing = identifierProcessing;
 
 		this.path = aggregatePath.getRequiredPersistentPropertyPath().toDotPath();
 		this.column = aggregatePath.getColumnInfo().name().getReference();
@@ -53,14 +49,11 @@ public final class TbColumn {
 	 * Create tb column.
 	 *
 	 * @param pathExtension        the path extension
-	 * @param identifierProcessing the identifier processing
 	 * @return the tb column
 	 */
-	public static TbColumn create(
-		AggregatePath pathExtension,
-		IdentifierProcessing identifierProcessing) {
+	public static TbColumn create(AggregatePath pathExtension) {
 
-		return new TbColumn(pathExtension, identifierProcessing);
+		return new TbColumn(pathExtension);
 	}
 
 	/**

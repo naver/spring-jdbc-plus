@@ -84,8 +84,7 @@ public class JdbcPlusSqlConfiguration {
 			jdbcMappingContext,
 			relationResolver,
 			conversions,
-			jdbcTypeFactory,
-			dialect.getIdentifierProcessing());
+			jdbcTypeFactory);
 
 		return new EntityQueryMappingConfiguration(jdbcMappingContext, jdbcConverter);
 	}
@@ -102,8 +101,7 @@ public class JdbcPlusSqlConfiguration {
 	public SqlParameterSourceFactory sqlParameterSourceFactory(
 		JdbcMappingContext jdbcMappingContext, JdbcConverter jdbcConverter, Dialect dialect) {
 
-		return new DefaultSqlParameterSourceFactory(
-			jdbcMappingContext, jdbcConverter, dialect.getIdentifierProcessing());
+		return new DefaultSqlParameterSourceFactory(jdbcMappingContext, jdbcConverter);
 	}
 
 	/**

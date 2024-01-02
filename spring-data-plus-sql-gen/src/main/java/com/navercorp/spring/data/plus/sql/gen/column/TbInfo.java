@@ -19,7 +19,6 @@
 package com.navercorp.spring.data.plus.sql.gen.column;
 
 import org.springframework.data.relational.core.mapping.AggregatePath;
-import org.springframework.data.relational.core.sql.IdentifierProcessing;
 
 /**
  * The type Tb info.
@@ -28,7 +27,6 @@ import org.springframework.data.relational.core.sql.IdentifierProcessing;
  */
 public final class TbInfo {
 	private final AggregatePath aggregatePath;
-	private final IdentifierProcessing identifierProcessing;
 
 	private final String path;
 	private final String table;
@@ -38,11 +36,9 @@ public final class TbInfo {
 	 * Instantiates a new Tb info.
 	 *
 	 * @param aggregatePath        the path extension
-	 * @param identifierProcessing the identifier processing
 	 */
-	TbInfo(AggregatePath aggregatePath, IdentifierProcessing identifierProcessing) {
+	TbInfo(AggregatePath aggregatePath) {
 		this.aggregatePath = aggregatePath;
-		this.identifierProcessing = identifierProcessing;
 
 		this.path = aggregatePath.getRequiredPersistentPropertyPath().toDotPath();
 		this.table = aggregatePath.getTableInfo().qualifiedTableName().getReference();
@@ -57,14 +53,11 @@ public final class TbInfo {
 	 * Create tb info.
 	 *
 	 * @param aggregatePath        the aggregate path
-	 * @param identifierProcessing the identifier processing
 	 * @return the tb info
 	 */
-	public static TbInfo create(
-		AggregatePath aggregatePath,
-		IdentifierProcessing identifierProcessing) {
+	public static TbInfo create(AggregatePath aggregatePath) {
 
-		return new TbInfo(aggregatePath, identifierProcessing);
+		return new TbInfo(aggregatePath);
 	}
 
 	/**

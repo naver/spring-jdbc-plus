@@ -20,8 +20,6 @@ package com.navercorp.spring.data.jdbc.plus.sql.parametersource;
 
 import java.util.Objects;
 
-import org.springframework.data.relational.core.sql.IdentifierProcessing;
-
 import com.navercorp.spring.jdbc.plus.support.parametersource.converter.IterableExpandPadding;
 import com.navercorp.spring.jdbc.plus.support.parametersource.converter.JdbcParameterSourceConverter;
 import com.navercorp.spring.jdbc.plus.support.parametersource.fallback.FallbackParameterSource;
@@ -42,16 +40,14 @@ class ConvertibleSqlIdentifierParameterSource extends SqlIdentifierParameterSour
 	/**
 	 * Instantiates a new Convertible sql identifier parameter source.
 	 *
-	 * @param identifierProcessing    the identifier processing
 	 * @param converter               the converter
 	 * @param fallbackParameterSource the fallback parameter source
 	 */
 	ConvertibleSqlIdentifierParameterSource(
-		IdentifierProcessing identifierProcessing,
 		JdbcParameterSourceConverter converter,
 		FallbackParameterSource fallbackParameterSource) {
 
-		super(identifierProcessing);
+		super();
 		this.converter = Objects.requireNonNull(converter, "Converter must not be null.");
 		this.fallbackParameterSource = fallbackParameterSource;
 	}
