@@ -18,8 +18,7 @@
 
 package com.navercorp.spring.data.plus.sql.gen.column;
 
-import org.springframework.data.relational.core.mapping.PersistentPropertyPathExtension;
-import org.springframework.data.relational.core.sql.IdentifierProcessing;
+import org.springframework.data.relational.core.mapping.AggregatePath;
 
 /**
  * The type Tb column.
@@ -27,8 +26,7 @@ import org.springframework.data.relational.core.sql.IdentifierProcessing;
  * @author Myeonghyeon Lee
  */
 public final class TbColumn {
-	private final PersistentPropertyPathExtension pathExtension;
-	private final IdentifierProcessing identifierProcessing;
+	private final AggregatePath pathExtension;
 
 	private final String path;
 	private final String column;
@@ -37,34 +35,25 @@ public final class TbColumn {
 	/**
 	 * Instantiates a new Tb column.
 	 *
-	 * @param pathExtension        the path extension
-	 * @param identifierProcessing the identifier processing
+	 * @param aggregatePath        the aggregate path
 	 */
-	TbColumn(PersistentPropertyPathExtension pathExtension, IdentifierProcessing identifierProcessing) {
-		this.pathExtension = pathExtension;
-		this.identifierProcessing = identifierProcessing;
+	TbColumn(AggregatePath aggregatePath) {
+		this.pathExtension = aggregatePath;
 
-		this.path = pathExtension.getRequiredPersistentPropertyPath().toDotPath();
-		this.column = pathExtension.getColumnName().getReference();
-		String aliasValue = this.column;
-		if (pathExtension.getColumnAlias() != null) {
-			aliasValue = pathExtension.getColumnAlias().getReference();
-		}
-		this.alias = aliasValue;
+		this.path = aggregatePath.getRequiredPersistentPropertyPath().toDotPath();
+		this.column = aggregatePath.getColumnInfo().name().getReference();
+		this.alias = aggregatePath.getColumnInfo().alias().getReference();
 	}
 
 	/**
 	 * Create tb column.
 	 *
 	 * @param pathExtension        the path extension
-	 * @param identifierProcessing the identifier processing
 	 * @return the tb column
 	 */
-	public static TbColumn create(
-		PersistentPropertyPathExtension pathExtension,
-		IdentifierProcessing identifierProcessing) {
+	public static TbColumn create(AggregatePath pathExtension) {
 
-		return new TbColumn(pathExtension, identifierProcessing);
+		return new TbColumn(pathExtension);
 	}
 
 	/**

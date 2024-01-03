@@ -31,9 +31,9 @@ import java.util.Objects;
 
 import org.springframework.context.ApplicationContext;
 import org.springframework.data.convert.CustomConversions;
-import org.springframework.data.jdbc.core.convert.BasicJdbcConverter;
 import org.springframework.data.jdbc.core.convert.Identifier;
 import org.springframework.data.jdbc.core.convert.JdbcTypeFactory;
+import org.springframework.data.jdbc.core.convert.MappingJdbcConverter;
 import org.springframework.data.jdbc.core.convert.RelationResolver;
 import org.springframework.data.mapping.InstanceCreatorMetadata;
 import org.springframework.data.mapping.MappingException;
@@ -41,16 +41,15 @@ import org.springframework.data.mapping.Parameter;
 import org.springframework.data.mapping.PersistentProperty;
 import org.springframework.data.mapping.PersistentPropertyAccessor;
 import org.springframework.data.mapping.PersistentPropertyPath;
-import org.springframework.data.mapping.context.MappingContext;
 import org.springframework.data.mapping.model.DefaultSpELExpressionEvaluator;
 import org.springframework.data.mapping.model.ParameterValueProvider;
 import org.springframework.data.mapping.model.SpELContext;
 import org.springframework.data.mapping.model.SpELExpressionEvaluator;
 import org.springframework.data.mapping.model.SpELExpressionParameterValueProvider;
-import org.springframework.data.relational.core.mapping.PersistentPropertyPathExtension;
+import org.springframework.data.relational.core.mapping.AggregatePath;
+import org.springframework.data.relational.core.mapping.RelationalMappingContext;
 import org.springframework.data.relational.core.mapping.RelationalPersistentEntity;
 import org.springframework.data.relational.core.mapping.RelationalPersistentProperty;
-import org.springframework.data.relational.core.sql.IdentifierProcessing;
 import org.springframework.data.util.Streamable;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
@@ -63,8 +62,7 @@ import org.springframework.util.MultiValueMap;
  *
  * @author Myeonghyeon Lee
  */
-public class AggregateResultJdbcConverter extends BasicJdbcConverter {
-	private final IdentifierProcessing identifierProcessing;
+public class AggregateResultJdbcConverter extends MappingJdbcConverter {
 	private SpELContext spElContext;
 
 	/**
@@ -74,11 +72,10 @@ public class AggregateResultJdbcConverter extends BasicJdbcConverter {
 	 * @param relationResolver the relation resolver
 	 */
 	public AggregateResultJdbcConverter(
-		MappingContext<? extends RelationalPersistentEntity<?>, ? extends RelationalPersistentProperty> context,
+		RelationalMappingContext context,
 		RelationResolver relationResolver) {
 
 		super(context, relationResolver);
-		this.identifierProcessing = IdentifierProcessing.ANSI;
 		this.spElContext = new SpELContext(ResultMapPropertyAccessor.INSTANCE);
 	}
 
@@ -89,17 +86,14 @@ public class AggregateResultJdbcConverter extends BasicJdbcConverter {
 	 * @param relationResolver     the relation resolver
 	 * @param conversions          the conversions
 	 * @param typeFactory          the type factory
-	 * @param identifierProcessing the identifier processing
 	 */
 	public AggregateResultJdbcConverter(
-		MappingContext<? extends RelationalPersistentEntity<?>, ? extends RelationalPersistentProperty> context,
+		RelationalMappingContext context,
 		RelationResolver relationResolver,
 		CustomConversions conversions,
-		JdbcTypeFactory typeFactory,
-		IdentifierProcessing identifierProcessing) {
+		JdbcTypeFactory typeFactory) {
 
-		super(context, relationResolver, conversions, typeFactory, identifierProcessing);
-		this.identifierProcessing = identifierProcessing;
+		super(context, relationResolver, conversions, typeFactory);
 		this.spElContext = new SpELContext(ResultMapPropertyAccessor.INSTANCE);
 	}
 
@@ -145,7 +139,7 @@ public class AggregateResultJdbcConverter extends BasicJdbcConverter {
 	 */
 	protected Map<String, Object> mapSingleTableRow(RelationalPersistentEntity<?> entity, ResultSet resultSet) {
 		return new SingleTableMapReadingContext(
-			new PersistentPropertyPathExtension(getMappingContext(), entity),
+			getMappingContext().getAggregatePath(entity),
 			new ResultSetAccessor(resultSet), Identifier.empty(), null).mapRow();
 	}
 
@@ -158,7 +152,7 @@ public class AggregateResultJdbcConverter extends BasicJdbcConverter {
 	 * @return the map
 	 */
 	protected Map<String, Object> mapSingleTableRow(
-		PersistentPropertyPathExtension path, ResultSet resultSet, Identifier identifier) {
+		AggregatePath path, ResultSet resultSet, Identifier identifier) {
 
 		return new SingleTableMapReadingContext(
 			path.getLeafEntity(),
@@ -180,7 +174,7 @@ public class AggregateResultJdbcConverter extends BasicJdbcConverter {
 	 * @return the map . entry
 	 */
 	protected Map.Entry<Object, Map<String, Object>> mapSingleTableMapRow(
-		PersistentPropertyPathExtension path,
+		AggregatePath path,
 		ResultSet resultSet,
 		Identifier identifier,
 		Object key) {
@@ -209,7 +203,7 @@ public class AggregateResultJdbcConverter extends BasicJdbcConverter {
 		RelationalPersistentEntity<T> entity, Map<String, Object> aggregateMap) {
 
 		return (T)new MapReadingContext<>(
-			new PersistentPropertyPathExtension(getMappingContext(), entity),
+			getMappingContext().getAggregatePath(entity),
 			aggregateMap)
 			.mapRow();
 	}
@@ -218,7 +212,7 @@ public class AggregateResultJdbcConverter extends BasicJdbcConverter {
 		ResultSetHolder resultSetHolder,
 		EntityPathRelations entityPathRelations) throws SQLException {
 
-		PersistentPropertyPathExtension rootPath = entityPathRelations.getRootPath();
+		AggregatePath rootPath = entityPathRelations.getRootPath();
 		RelationalPersistentEntity<?> persistentEntity = rootPath.getLeafEntity();
 
 		Map<Object, ExtractedRow> extractedRows = new LinkedHashMap<>();
@@ -241,7 +235,7 @@ public class AggregateResultJdbcConverter extends BasicJdbcConverter {
 		List<Map<String, Object>> result = new ArrayList<>(extractedRows.size());
 		for (Map.Entry<Object, ExtractedRow> row : extractedRows.entrySet()) {
 			ExtractedRow extractedRow = row.getValue();
-			MultiValueMap<PersistentPropertyPathExtension, RelationValue> relations =
+			MultiValueMap<AggregatePath, RelationValue> relations =
 				this.accumulateRelations(extractedRow.getRelations());
 			this.setEntityRelations(
 				extractedRow.getRoot(), extractedRow.getRootEntity(), relations);
@@ -254,15 +248,15 @@ public class AggregateResultJdbcConverter extends BasicJdbcConverter {
 	private void appendExtractRelationRows(
 		ResultSetHolder resultSetHolder,
 		ExtractedRow rootRow,
-		Map<PersistentPropertyPathExtension, EntityPathRelations> relationEntityPaths
+		Map<AggregatePath, EntityPathRelations> relationEntityPaths
 	) throws SQLException {
 
-		MultiValueMap<PersistentPropertyPathExtension, ExtractedRow> relationEntities = rootRow.getRelations();
+		MultiValueMap<AggregatePath, ExtractedRow> relationEntities = rootRow.getRelations();
 
-		for (Map.Entry<PersistentPropertyPathExtension, EntityPathRelations> relationEntityPath
+		for (Map.Entry<AggregatePath, EntityPathRelations> relationEntityPath
 			: relationEntityPaths.entrySet()) {
 
-			PersistentPropertyPathExtension relationPath = relationEntityPath.getKey();
+			AggregatePath relationPath = relationEntityPath.getKey();
 			List<ExtractedRow> relationRows = relationEntities.get(relationPath);
 
 			// extract relation entity Id
@@ -325,10 +319,10 @@ public class AggregateResultJdbcConverter extends BasicJdbcConverter {
 	private ExtractedRow extractRelationRow(
 		ResultSetHolder resultSetHolder,
 		Object rootId,
-		PersistentPropertyPathExtension relationPath,
+		AggregatePath relationPath,
 		Identifier identifier,
 		Object relationEntityId,
-		Map<PersistentPropertyPathExtension, EntityPathRelations> nestedRelations
+		Map<AggregatePath, EntityPathRelations> nestedRelations
 	) throws SQLException {
 
 		Map<String, Object> relationValue;
@@ -356,21 +350,12 @@ public class AggregateResultJdbcConverter extends BasicJdbcConverter {
 	}
 
 	private EntityPathRelations getEntityPathRelations(RelationalPersistentEntity<?> entity) {
-		@SuppressWarnings("unchecked")
-		MappingContext<RelationalPersistentEntity<?>, RelationalPersistentProperty> mappingContext =
-			(MappingContext<RelationalPersistentEntity<?>, RelationalPersistentProperty>)
-				this.getMappingContext();
-		PersistentPropertyPathExtension rootPath = new PersistentPropertyPathExtension(mappingContext, entity);
+		AggregatePath rootPath = this.getMappingContext().getAggregatePath(entity);
 		return this.getEntityPathRelations(rootPath);
 	}
 
-	private EntityPathRelations getEntityPathRelations(PersistentPropertyPathExtension entityPath) {
-		Map<PersistentPropertyPathExtension, EntityPathRelations> relations = new HashMap<>();
-
-		@SuppressWarnings("unchecked")
-		MappingContext<RelationalPersistentEntity<?>, RelationalPersistentProperty> mappingContext =
-			(MappingContext<RelationalPersistentEntity<?>, RelationalPersistentProperty>)
-				this.getMappingContext();
+	private EntityPathRelations getEntityPathRelations(AggregatePath entityPath) {
+		Map<AggregatePath, EntityPathRelations> relations = new HashMap<>();
 
 		for (RelationalPersistentProperty property : entityPath.getLeafEntity()) {
 			if (property.isEmbedded()) {
@@ -381,9 +366,8 @@ public class AggregateResultJdbcConverter extends BasicJdbcConverter {
 				|| (property.isCollectionLike() && property.isEntity())
 				|| property.isMap()) {
 				PersistentPropertyPath<? extends RelationalPersistentProperty> propertyPath =
-					entityPath.extendBy(property).getRequiredPersistentPropertyPath();
-				PersistentPropertyPathExtension relationPath = new PersistentPropertyPathExtension(
-					mappingContext, propertyPath);
+					entityPath.append(property).getRequiredPersistentPropertyPath();
+				AggregatePath relationPath = this.getMappingContext().getAggregatePath(propertyPath);
 				EntityPathRelations entityPathRelations = this.getEntityPathRelations(relationPath);
 				relations.put(relationPath, entityPathRelations);
 			}
@@ -392,14 +376,14 @@ public class AggregateResultJdbcConverter extends BasicJdbcConverter {
 		return new EntityPathRelations(entityPath, relations);
 	}
 
-	private MultiValueMap<PersistentPropertyPathExtension, RelationValue> accumulateRelations(
-		MultiValueMap<PersistentPropertyPathExtension, ExtractedRow> extractedRows) {
+	private MultiValueMap<AggregatePath, RelationValue> accumulateRelations(
+		MultiValueMap<AggregatePath, ExtractedRow> extractedRows) {
 
-		MultiValueMap<PersistentPropertyPathExtension, RelationValue> relations = new LinkedMultiValueMap<>();
-		for (Map.Entry<PersistentPropertyPathExtension, List<ExtractedRow>> extractedRow
+		MultiValueMap<AggregatePath, RelationValue> relations = new LinkedMultiValueMap<>();
+		for (Map.Entry<AggregatePath, List<ExtractedRow>> extractedRow
 			: extractedRows.entrySet()) {
 
-			PersistentPropertyPathExtension path = extractedRow.getKey();
+			AggregatePath path = extractedRow.getKey();
 			List<ExtractedRow> rowValues = extractedRow.getValue();
 			for (ExtractedRow rowValue : rowValues) {
 				relations.add(
@@ -418,12 +402,12 @@ public class AggregateResultJdbcConverter extends BasicJdbcConverter {
 	private void setEntityRelations(
 		Map<String, Object> rootEntity,
 		RelationalPersistentEntity<?> persistentEntity,
-		MultiValueMap<PersistentPropertyPathExtension, RelationValue> relationValues) {
+		MultiValueMap<AggregatePath, RelationValue> relationValues) {
 
-		for (Map.Entry<PersistentPropertyPathExtension, List<RelationValue>> relations
+		for (Map.Entry<AggregatePath, List<RelationValue>> relations
 			: relationValues.entrySet()) {
 
-			PersistentPropertyPathExtension propertyPath = relations.getKey();
+			AggregatePath propertyPath = relations.getKey();
 			RelationalPersistentProperty property =
 				propertyPath.getRequiredPersistentPropertyPath().getLeafProperty();
 
@@ -433,7 +417,7 @@ public class AggregateResultJdbcConverter extends BasicJdbcConverter {
 					property, relations.getValue()));
 			} else {
 				Map<Object, RelationValue> parentValues = relationValues.getOrDefault(
-					propertyPath.getParentPath(), new ArrayList<>()).stream()
+						propertyPath.getParentPath(), new ArrayList<>()).stream()
 					.collect(toMap(RelationValue::getValueId, it -> it));
 
 				MultiValueMap<Object, RelationValue> parentKeyChildren = new LinkedMultiValueMap<>();
@@ -463,23 +447,23 @@ public class AggregateResultJdbcConverter extends BasicJdbcConverter {
 	}
 
 	private Identifier getRelationEntityIdentifier(
-		PersistentPropertyPathExtension relationPath,
+		AggregatePath relationPath,
 		RelationalPersistentEntity<?> entity,
 		Map<String, Object> entityMap) {
 
 		Object id = entityMap.get(entity.getRequiredIdProperty().getName());
-		return Identifier.of(relationPath.getReverseColumnName(), id, Object.class);
+		return Identifier.of(relationPath.getTableInfo().reverseColumnInfo().name(), id, Object.class);
 	}
 
-	protected String getIdColumnAlias(PersistentPropertyPathExtension relationPath) {
+	protected String getIdColumnAlias(AggregatePath relationPath) {
 		return PropertyPathUtils.getColumnAlias(
-			relationPath.extendBy(relationPath.getLeafEntity().getRequiredIdProperty())
+			relationPath.append(relationPath.getLeafEntity().getRequiredIdProperty())
 		).getReference();
 	}
 
-	protected String getQualifierColumnAlias(PersistentPropertyPathExtension relationPath) {
+	protected String getQualifierColumnAlias(AggregatePath relationPath) {
 		return PropertyPathUtils.getTableAlias(relationPath).getReference()
-			+ "_" + relationPath.getQualifierColumn().getReference();
+			+ "_" + relationPath.getTableInfo().qualifierColumnInfo().name().getReference();
 	}
 
 	private Object determineRelationValue(
@@ -598,8 +582,8 @@ public class AggregateResultJdbcConverter extends BasicJdbcConverter {
 	}
 
 	private static class EntityPathRelations {
-		private final PersistentPropertyPathExtension rootPath;
-		private final Map<PersistentPropertyPathExtension, EntityPathRelations> relations;
+		private final AggregatePath rootPath;
+		private final Map<AggregatePath, EntityPathRelations> relations;
 
 		/**
 		 * Instantiates a new Entity path relations.
@@ -608,8 +592,8 @@ public class AggregateResultJdbcConverter extends BasicJdbcConverter {
 		 * @param relations the relations
 		 */
 		EntityPathRelations(
-			PersistentPropertyPathExtension rootPath,
-			Map<PersistentPropertyPathExtension, EntityPathRelations> relations) {
+			AggregatePath rootPath,
+			Map<AggregatePath, EntityPathRelations> relations) {
 
 			this.rootPath = rootPath;
 			this.relations = relations;
@@ -620,7 +604,7 @@ public class AggregateResultJdbcConverter extends BasicJdbcConverter {
 		 *
 		 * @return the root path
 		 */
-		public PersistentPropertyPathExtension getRootPath() {
+		public AggregatePath getRootPath() {
 			return this.rootPath;
 		}
 
@@ -629,7 +613,7 @@ public class AggregateResultJdbcConverter extends BasicJdbcConverter {
 		 *
 		 * @return the relations
 		 */
-		public Map<PersistentPropertyPathExtension, EntityPathRelations> getRelations() {
+		public Map<AggregatePath, EntityPathRelations> getRelations() {
 			return this.relations;
 		}
 	}
@@ -640,7 +624,7 @@ public class AggregateResultJdbcConverter extends BasicJdbcConverter {
 		private final Map<String, Object> root;
 		private final Object rootId;
 		private final Object keyValue;
-		private final MultiValueMap<PersistentPropertyPathExtension, ExtractedRow> relations;
+		private final MultiValueMap<AggregatePath, ExtractedRow> relations;
 
 		/**
 		 * Instantiates a new Extracted row.
@@ -658,7 +642,7 @@ public class AggregateResultJdbcConverter extends BasicJdbcConverter {
 			Map<String, Object> root,
 			Object rootId,
 			Object keyValue,
-			MultiValueMap<PersistentPropertyPathExtension, ExtractedRow> relations) {
+			MultiValueMap<AggregatePath, ExtractedRow> relations) {
 
 			this.parentId = parentId;
 			this.rootEntity = rootEntity;
@@ -709,7 +693,7 @@ public class AggregateResultJdbcConverter extends BasicJdbcConverter {
 		 *
 		 * @return the relations
 		 */
-		public MultiValueMap<PersistentPropertyPathExtension, ExtractedRow> getRelations() {
+		public MultiValueMap<AggregatePath, ExtractedRow> getRelations() {
 			return this.relations;
 		}
 
@@ -810,8 +794,8 @@ public class AggregateResultJdbcConverter extends BasicJdbcConverter {
 
 		private final RelationalPersistentEntity<?> entity;
 
-		private final PersistentPropertyPathExtension rootPath;
-		private final PersistentPropertyPathExtension path;
+		private final AggregatePath rootPath;
+		private final AggregatePath path;
 		private final Identifier identifier;
 		private final Object key;
 
@@ -820,7 +804,7 @@ public class AggregateResultJdbcConverter extends BasicJdbcConverter {
 		private final ResultSetAccessor accessor;
 
 		private SingleTableMapReadingContext(
-			PersistentPropertyPathExtension rootPath,
+			AggregatePath rootPath,
 			ResultSetAccessor accessor,
 			Identifier identifier,
 			Object key) {
@@ -831,22 +815,19 @@ public class AggregateResultJdbcConverter extends BasicJdbcConverter {
 
 			this.entity = entity;
 			this.rootPath = rootPath;
-			this.path = new PersistentPropertyPathExtension(getMappingContext(), this.entity);
+			this.path = getMappingContext().getAggregatePath(this.entity);
 			this.identifier = identifier;
 			this.key = key;
-			this.propertyValueProvider = new JdbcPropertyValueProvider(
-				identifierProcessing, path, accessor);
-			this.backReferencePropertyValueProvider = new JdbcBackReferencePropertyValueProvider(
-				identifierProcessing, path,
-				accessor);
+			this.propertyValueProvider = new JdbcPropertyValueProvider(path, accessor);
+			this.backReferencePropertyValueProvider = new JdbcBackReferencePropertyValueProvider(path, accessor);
 			this.accessor = accessor;
 		}
 
 		private SingleTableMapReadingContext(
 			RelationalPersistentEntity<?> entity,
 			ResultSetAccessor accessor,
-			PersistentPropertyPathExtension rootPath,
-			PersistentPropertyPathExtension path,
+			AggregatePath rootPath,
+			AggregatePath path,
 			Identifier identifier, Object key) {
 
 			this.entity = entity;
@@ -854,16 +835,14 @@ public class AggregateResultJdbcConverter extends BasicJdbcConverter {
 			this.path = path;
 			this.identifier = identifier;
 			this.key = key;
-			this.propertyValueProvider = new JdbcPropertyValueProvider(
-				identifierProcessing, path, accessor);
-			this.backReferencePropertyValueProvider = new JdbcBackReferencePropertyValueProvider(
-				identifierProcessing, path, accessor);
+			this.propertyValueProvider = new JdbcPropertyValueProvider(path, accessor);
+			this.backReferencePropertyValueProvider = new JdbcBackReferencePropertyValueProvider(path, accessor);
 			this.accessor = accessor;
 		}
 
 		private SingleTableMapReadingContext(
-			RelationalPersistentEntity<?> entity, PersistentPropertyPathExtension rootPath,
-			PersistentPropertyPathExtension path, Identifier identifier, Object key,
+			RelationalPersistentEntity<?> entity, AggregatePath rootPath,
+			AggregatePath path, Identifier identifier, Object key,
 			JdbcPropertyValueProvider propertyValueProvider,
 			JdbcBackReferencePropertyValueProvider backReferencePropertyValueProvider,
 			ResultSetAccessor accessor) {
@@ -882,7 +861,7 @@ public class AggregateResultJdbcConverter extends BasicJdbcConverter {
 		private SingleTableMapReadingContext extendBy(RelationalPersistentProperty property) {
 			return new SingleTableMapReadingContext(
 				getMappingContext().getRequiredPersistentEntity(property.getActualType()),
-				/* rootPath.extendBy(property)*/ rootPath, path.extendBy(property), identifier, key,
+				/* rootPath.extendBy(property)*/ rootPath, path.append(property), identifier, key,
 				propertyValueProvider.extendBy(property),
 				backReferencePropertyValueProvider.extendBy(property), accessor);
 		}
@@ -1018,11 +997,11 @@ public class AggregateResultJdbcConverter extends BasicJdbcConverter {
 		private final RelationalPersistentEntity<T> entity;
 
 		private final Map<String, Object> entityMap;
-		private final PersistentPropertyPathExtension path;
+		private final AggregatePath path;
 
 		@SuppressWarnings("unchecked")
 		private MapReadingContext(
-			PersistentPropertyPathExtension rootPath,
+			AggregatePath rootPath,
 			@Nullable Map<String, Object> entityMap) {
 
 			RelationalPersistentEntity<T> entity = (RelationalPersistentEntity<T>)rootPath.getLeafEntity();
@@ -1031,13 +1010,13 @@ public class AggregateResultJdbcConverter extends BasicJdbcConverter {
 
 			this.entity = entity;
 			this.entityMap = entityMap;
-			this.path = new PersistentPropertyPathExtension(getMappingContext(), this.entity);
+			this.path = getMappingContext().getAggregatePath(this.entity);
 		}
 
 		private MapReadingContext(
 			RelationalPersistentEntity<T> entity,
 			@Nullable Map<String, Object> entityMap,
-			PersistentPropertyPathExtension path) {
+			AggregatePath path) {
 
 			this.entity = entity;
 			this.entityMap = entityMap;
@@ -1050,7 +1029,7 @@ public class AggregateResultJdbcConverter extends BasicJdbcConverter {
 
 			return new MapReadingContext(
 				getMappingContext().getRequiredPersistentEntity(property.getActualType()),
-				entityMap, path.extendBy(property));
+				entityMap, path.append(property));
 		}
 
 		/**
@@ -1254,7 +1233,8 @@ public class AggregateResultJdbcConverter extends BasicJdbcConverter {
 			ParameterValueProvider<RelationalPersistentProperty> provider;
 
 			if (creatorMetadata != null && creatorMetadata.hasParameters()) {
-				SpELExpressionEvaluator expressionEvaluator = new DefaultSpELExpressionEvaluator(this.entityMap, spElContext);
+				SpELExpressionEvaluator expressionEvaluator = new DefaultSpELExpressionEvaluator(this.entityMap,
+					spElContext);
 				provider = new SpELExpressionParameterValueProvider<>(expressionEvaluator, getConversionService(),
 					new ResultSetParameterValueProvider(idValue, entity));
 			} else {
@@ -1294,7 +1274,8 @@ public class AggregateResultJdbcConverter extends BasicJdbcConverter {
 
 				String parameterName = parameter.getName();
 
-				Assert.notNull(parameterName, "A constructor parameter name must not be null to be used with Spring Data JDBC");
+				Assert.notNull(parameterName,
+					"A constructor parameter name must not be null to be used with Spring Data JDBC");
 
 				RelationalPersistentProperty property = entity.getRequiredPersistentProperty(parameterName);
 				return (T)readOrLoadProperty(idValue, property);

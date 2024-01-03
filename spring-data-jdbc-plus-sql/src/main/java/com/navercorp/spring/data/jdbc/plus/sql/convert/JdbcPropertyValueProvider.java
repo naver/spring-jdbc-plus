@@ -17,9 +17,8 @@
 package com.navercorp.spring.data.jdbc.plus.sql.convert;
 
 import org.springframework.data.mapping.model.PropertyValueProvider;
-import org.springframework.data.relational.core.mapping.PersistentPropertyPathExtension;
+import org.springframework.data.relational.core.mapping.AggregatePath;
 import org.springframework.data.relational.core.mapping.RelationalPersistentProperty;
-import org.springframework.data.relational.core.sql.IdentifierProcessing;
 
 /**
  * {@link PropertyValueProvider} obtaining values from a ResultSetAccessor.
@@ -32,23 +31,17 @@ import org.springframework.data.relational.core.sql.IdentifierProcessing;
  * Verified: c0803ddafef7a4bc4ec070df6581d46c4d59ff4a
  */
 class JdbcPropertyValueProvider implements PropertyValueProvider<RelationalPersistentProperty> {
-
-	private final IdentifierProcessing identifierProcessing;
-	private final PersistentPropertyPathExtension basePath;
+	private final AggregatePath basePath;
 	private final ResultSetAccessor resultSet;
 
 	/**
-	 * @param identifierProcessing used for converting the
-	 *          {@link org.springframework.data.relational.core.sql.SqlIdentifier} from a property to a column label
 	 * @param basePath path from the aggregate root relative to which all properties get resolved.
 	 * @param resultSet the ResultSetAccessor from which to obtain the actual values.
 	 */
-	JdbcPropertyValueProvider(IdentifierProcessing identifierProcessing, PersistentPropertyPathExtension basePath,
-		ResultSetAccessor resultSet) {
+	JdbcPropertyValueProvider(AggregatePath basePath, ResultSetAccessor resultSet) {
 
 		this.resultSet = resultSet;
 		this.basePath = basePath;
-		this.identifierProcessing = identifierProcessing;
 	}
 
 	@Override
@@ -68,11 +61,11 @@ class JdbcPropertyValueProvider implements PropertyValueProvider<RelationalPersi
 	}
 
 	private String getColumnName(RelationalPersistentProperty property) {
-		PersistentPropertyPathExtension path = basePath.extendBy(property);
+		AggregatePath path = basePath.append(property);
 		return PropertyPathUtils.getColumnAlias(path).getReference();
 	}
 
 	public JdbcPropertyValueProvider extendBy(RelationalPersistentProperty property) {
-		return new JdbcPropertyValueProvider(identifierProcessing, basePath.extendBy(property), resultSet);
+		return new JdbcPropertyValueProvider(basePath.append(property), resultSet);
 	}
 }

@@ -23,7 +23,6 @@ import java.util.Map;
 import org.springframework.data.jdbc.core.convert.JdbcConverter;
 import org.springframework.data.relational.core.mapping.RelationalMappingContext;
 import org.springframework.data.relational.core.mapping.RelationalPersistentEntity;
-import org.springframework.data.relational.core.sql.IdentifierProcessing;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
@@ -38,7 +37,6 @@ import com.navercorp.spring.jdbc.plus.support.parametersource.ConvertibleParamet
 public class EntityConvertibleSqlParameterSourceFactory implements SqlParameterSourceFactory {
 	private final ConvertibleParameterSourceFactory delegate;
 	private final RelationalMappingContext mappingContext;
-	private final IdentifierProcessing identifierProcessing;
 	private final EntitySqlParameterSourceApplier parameterSourceApplier;
 
 	/**
@@ -47,17 +45,14 @@ public class EntityConvertibleSqlParameterSourceFactory implements SqlParameterS
 	 * @param delegate             the delegate
 	 * @param mappingContext       the mapping context
 	 * @param jdbcConverter        the jdbc converter
-	 * @param identifierProcessing the identifier processing
 	 */
 	public EntityConvertibleSqlParameterSourceFactory(
 		ConvertibleParameterSourceFactory delegate,
 		RelationalMappingContext mappingContext,
-		JdbcConverter jdbcConverter,
-		IdentifierProcessing identifierProcessing) {
+		JdbcConverter jdbcConverter) {
 
 		this.delegate = delegate;
 		this.mappingContext = mappingContext;
-		this.identifierProcessing = identifierProcessing;
 		this.parameterSourceApplier = new EntitySqlParameterSourceApplier(mappingContext, jdbcConverter);
 	}
 
@@ -78,7 +73,7 @@ public class EntityConvertibleSqlParameterSourceFactory implements SqlParameterS
 	@Override
 	public SqlParameterSource entityParameterSource(Object entity) {
 		SqlIdentifierParameterSource parameterSource = new ConvertibleSqlIdentifierParameterSource(
-			this.identifierProcessing, this.delegate.getConverter(), this.delegate.getFallback());
+			this.delegate.getConverter(), this.delegate.getFallback());
 		RelationalPersistentEntity<?> persistentEntity =
 			this.mappingContext.getRequiredPersistentEntity(entity.getClass());
 		this.parameterSourceApplier.addParameterSource(parameterSource, entity, persistentEntity, "");

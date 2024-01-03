@@ -38,13 +38,12 @@ import javax.tools.JavaFileObject;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
+import org.springframework.data.relational.core.mapping.AggregatePath;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Embedded;
 import org.springframework.data.relational.core.mapping.MappedCollection;
-import org.springframework.data.relational.core.mapping.PersistentPropertyPathExtension;
 import org.springframework.data.relational.core.mapping.RelationalMappingContext;
 import org.springframework.data.relational.core.mapping.Table;
-import org.springframework.data.relational.core.sql.IdentifierProcessing;
 
 import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.ArrayTypeName;
@@ -119,7 +118,7 @@ public class SpringDataTableGenerator extends AbstractProcessor {
 	}
 
 	/**
-	 * Create type spec type spec.
+	 * Create type spec.
 	 *
 	 * @param element the element
 	 * @return the type spec
@@ -214,16 +213,14 @@ public class SpringDataTableGenerator extends AbstractProcessor {
 		MethodSpec.Builder transformConstructorBuilder = MethodSpec.constructorBuilder()
 			.addModifiers(Modifier.PUBLIC)
 			.addParameter(ClassName.get(RelationalMappingContext.class), "relationalMappingContext")
-			.addParameter(ClassName.get(IdentifierProcessing.class), "identifierProcessing")
 			.addStatement(
 				"org.springframework.data.relational.core.mapping.RelationalPersistentEntity<?> "
 					+ "entity = relationalMappingContext.getRequiredPersistentEntity($N)",
 				ENTITY_TYPE_FIELD_NAME)
 			.addStatement(
-				"org.springframework.data.relational.core.mapping.PersistentPropertyPathExtension "
-					+ "persistentPropertyPath = "
-					+ "new org.springframework.data.relational.core.mapping."
-					+ "PersistentPropertyPathExtension(relationalMappingContext, entity)");
+				"org.springframework.data.relational.core.mapping.AggregatePath "
+					+ "aggregatePath = "
+					+ "relationalMappingContext.getAggregatePath(entity)");
 
 		for (FieldSpec fieldSpec : fieldSpecs) {
 			if (fieldSpec.modifiers.contains(Modifier.STATIC)) {
@@ -233,23 +230,23 @@ public class SpringDataTableGenerator extends AbstractProcessor {
 			if (fieldSpec.type.toString().equals(TbInfo.class.getName())) {
 				transformConstructorBuilder.addStatement(
 					"this.$N = com.navercorp.spring.data.plus.sql.gen.column.TbInfo.create("
-					+ "persistentPropertyPath, identifierProcessing)", TABLE_INFO_FIELD_NAME);
+						+ "aggregatePath)", TABLE_INFO_FIELD_NAME);
 				continue;
 			}
 
 			String fieldName = fieldSpec.name;
 			transformConstructorBuilder.addStatement(
-				"org.springframework.data.relational.core.mapping.PersistentPropertyPathExtension "
+				"org.springframework.data.relational.core.mapping.AggregatePath "
 					+ "$NPropertyPath = "
-					+ "persistentPropertyPath.extendBy(entity.getRequiredPersistentProperty($S))",
+					+ "aggregatePath.append(entity.getRequiredPersistentProperty($S))",
 				fieldName, fieldName);
 			if (fieldSpec.type.toString().equals(TbColumn.class.getName())) {
 				transformConstructorBuilder.addStatement(
 					"this.$N = com.navercorp.spring.data.plus.sql.gen.column.TbColumn.create("
-						+ "$NPropertyPath, identifierProcessing)", fieldName, fieldName);
+						+ "$NPropertyPath)", fieldName, fieldName);
 			} else {
 				transformConstructorBuilder.addStatement(
-					"this.$N = new $N($NPropertyPath, identifierProcessing)",
+					"this.$N = new $N($NPropertyPath)",
 					fieldName, fieldSpec.type.toString(), fieldName);
 			}
 		}
@@ -257,11 +254,10 @@ public class SpringDataTableGenerator extends AbstractProcessor {
 
 		MethodSpec.Builder pathConstructorBuilder = MethodSpec.constructorBuilder()
 			.addModifiers(Modifier.PUBLIC)
-			.addParameter(ClassName.get(PersistentPropertyPathExtension.class), "persistentPropertyPath")
-			.addParameter(ClassName.get(IdentifierProcessing.class), "identifierProcessing")
+			.addParameter(ClassName.get(AggregatePath.class), "aggregatePath")
 			.addStatement(
 				"org.springframework.data.relational.core.mapping.RelationalPersistentEntity<?> "
-					+ "entity = persistentPropertyPath.getLeafEntity()");
+					+ "entity = aggregatePath.getLeafEntity()");
 
 		for (FieldSpec fieldSpec : fieldSpecs) {
 			if (fieldSpec.modifiers.contains(Modifier.STATIC)) {
@@ -271,24 +267,24 @@ public class SpringDataTableGenerator extends AbstractProcessor {
 			if (fieldSpec.type.toString().equals(TbInfo.class.getName())) {
 				pathConstructorBuilder.addStatement(
 					"this.$N = com.navercorp.spring.data.plus.sql.gen.column.TbInfo"
-						+ ".create(persistentPropertyPath, identifierProcessing)",
+						+ ".create(aggregatePath)",
 					TABLE_INFO_FIELD_NAME);
 				continue;
 			}
 
 			String fieldName = fieldSpec.name;
 			pathConstructorBuilder.addStatement(
-				"org.springframework.data.relational.core.mapping.PersistentPropertyPathExtension "
+				"org.springframework.data.relational.core.mapping.AggregatePath "
 					+ "$NPropertyPath = "
-					+ "persistentPropertyPath.extendBy(entity.getRequiredPersistentProperty($S))",
+					+ "aggregatePath.append(entity.getRequiredPersistentProperty($S))",
 				fieldName, fieldName);
 			if (fieldSpec.type.toString().equals(TbColumn.class.getName())) {
 				pathConstructorBuilder.addStatement(
 					"this.$N = com.navercorp.spring.data.plus.sql.gen.column.TbColumn.create("
-						+ "$NPropertyPath, identifierProcessing)", fieldName, fieldName);
+						+ "$NPropertyPath)", fieldName, fieldName);
 			} else {
 				pathConstructorBuilder.addStatement(
-					"this.$N = new $N($NPropertyPath, identifierProcessing)",
+					"this.$N = new $N($NPropertyPath)",
 					fieldName, fieldSpec.type.toString(), fieldName);
 			}
 		}
@@ -297,8 +293,7 @@ public class SpringDataTableGenerator extends AbstractProcessor {
 		MethodSpec defaultConstructor = MethodSpec.constructorBuilder()
 			.addModifiers(Modifier.PUBLIC)
 			.addStatement(
-				"this(new org.springframework.data.relational.core.mapping.RelationalMappingContext(), "
-				+ "org.springframework.data.relational.core.sql.IdentifierProcessing.ANSI)")
+				"this(new org.springframework.data.relational.core.mapping.RelationalMappingContext())")
 			.build();
 		methodSpecs.add(defaultConstructor);
 

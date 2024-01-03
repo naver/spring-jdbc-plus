@@ -25,8 +25,8 @@ import java.util.function.Consumer;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.jdbc.core.convert.BasicJdbcConverter;
 import org.springframework.data.jdbc.core.convert.JdbcConverter;
+import org.springframework.data.jdbc.core.convert.MappingJdbcConverter;
 import org.springframework.data.jdbc.core.mapping.JdbcMappingContext;
 import org.springframework.data.mapping.PersistentPropertyPath;
 import org.springframework.data.relational.core.mapping.NamingStrategy;
@@ -219,7 +219,7 @@ public class SqlGeneratorContextBasedNamingStrategyTest {
 	private SqlGenerator configureSqlGenerator(NamingStrategy namingStrategy) {
 
 		RelationalMappingContext context = new JdbcMappingContext(namingStrategy);
-		JdbcConverter converter = new BasicJdbcConverter(context, (identifier, path) -> {
+		JdbcConverter converter = new MappingJdbcConverter(context, (identifier, path) -> {
 			throw new UnsupportedOperationException();
 		});
 		RelationalPersistentEntity<?> persistentEntity = context.getRequiredPersistentEntity(DummyEntity.class);

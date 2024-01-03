@@ -15,7 +15,7 @@
  */
 package com.navercorp.spring.data.jdbc.plus.sql.convert;
 
-import org.springframework.data.relational.core.mapping.PersistentPropertyPathExtension;
+import org.springframework.data.relational.core.mapping.AggregatePath;
 import org.springframework.data.relational.core.mapping.RelationalPersistentEntity;
 import org.springframework.data.relational.core.sql.Aliased;
 import org.springframework.data.relational.core.sql.Column;
@@ -87,22 +87,22 @@ class SqlContext implements SqlContexts {
 	}
 
 	@Override
-	public Table getTable(PersistentPropertyPathExtension path) {
+	public Table getTable(AggregatePath path) {
 		SqlIdentifier tableAlias = PropertyPathUtils.getTableAlias(path);
-		Table table = Table.create(path.getQualifiedTableName());
+		Table table = Table.create(path.getTableInfo().qualifiedTableName());
 		return tableAlias == null ? table : table.as(tableAlias);
 	}
 
 	@Override
-	public Column getColumn(PersistentPropertyPathExtension path) {
-		SqlIdentifier columnName = path.getColumnName();
+	public Column getColumn(AggregatePath path) {
+		SqlIdentifier columnName = path.getColumnInfo().name();
 		SqlIdentifier columnAlias = PropertyPathUtils.getColumnAlias(path, columnName);
 		return getTable(path).column(columnName).as(columnAlias);
 	}
 
 	@Override
-	public Column getReverseColumn(PersistentPropertyPathExtension path) {
-		SqlIdentifier reverseColumnName = path.getReverseColumnName();
+	public Column getReverseColumn(AggregatePath path) {
+		SqlIdentifier reverseColumnName = path.getTableInfo().reverseColumnInfo().name();
 		SqlIdentifier reverseColumnAlias = PropertyPathUtils.getReverseColumnAlias(path, reverseColumnName);
 		return getTable(path).column(reverseColumnName).as(reverseColumnAlias);
 	}

@@ -20,13 +20,13 @@ package com.navercorp.spring.data.jdbc.plus.repository.support;
 
 import java.io.Serializable;
 
+import javax.annotation.Nullable;
+
 import org.springframework.beans.factory.BeanFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationEventPublisherAware;
-import org.springframework.data.jdbc.core.convert.BatchJdbcOperations;
 import org.springframework.data.jdbc.core.convert.DataAccessStrategy;
-import org.springframework.data.jdbc.core.convert.DefaultDataAccessStrategy;
+import org.springframework.data.jdbc.core.convert.DataAccessStrategyFactory;
 import org.springframework.data.jdbc.core.convert.InsertStrategyFactory;
 import org.springframework.data.jdbc.core.convert.JdbcConverter;
 import org.springframework.data.jdbc.core.convert.SqlGeneratorSource;
@@ -109,7 +109,6 @@ public class JdbcPlusRepositoryFactoryBean<T extends Repository<S, ID>, S, ID ex
 	 *
 	 * @param mappingContext the mapping context
 	 */
-	@Autowired
 	public void setMappingContext(RelationalMappingContext mappingContext) {
 
 		Assert.notNull(mappingContext, "MappingContext must not be null");
@@ -123,7 +122,6 @@ public class JdbcPlusRepositoryFactoryBean<T extends Repository<S, ID>, S, ID ex
 	 *
 	 * @param dialect the dialect
 	 */
-	@Autowired
 	public void setDialect(Dialect dialect) {
 
 		Assert.notNull(dialect, "Dialect must not be null");
@@ -150,10 +148,10 @@ public class JdbcPlusRepositoryFactoryBean<T extends Repository<S, ID>, S, ID ex
 	 * {@link #afterPropertiesSet()} defaults to
 	 * {@link QueryMappingConfiguration#EMPTY} if {@literal null}.
 	 */
-	@Autowired(required = false)
-	public void setQueryMappingConfiguration(QueryMappingConfiguration queryMappingConfiguration) {
-
-		Assert.notNull(queryMappingConfiguration, "QueryMappingConfiguration must not be null");
+	public void setQueryMappingConfiguration(@Nullable QueryMappingConfiguration queryMappingConfiguration) {
+		if (queryMappingConfiguration == null) {
+			return;
+		}
 
 		this.queryMappingConfiguration = queryMappingConfiguration;
 	}
@@ -175,7 +173,6 @@ public class JdbcPlusRepositoryFactoryBean<T extends Repository<S, ID>, S, ID ex
 	 *
 	 * @param converter the converter
 	 */
-	@Autowired
 	public void setConverter(JdbcConverter converter) {
 
 		Assert.notNull(converter, "JdbcConverter must not be null");
@@ -222,16 +219,17 @@ public class JdbcPlusRepositoryFactoryBean<T extends Repository<S, ID>, S, ID ex
 					SqlGeneratorSource sqlGeneratorSource = new SqlGeneratorSource(
 						this.mappingContext, this.converter, this.dialect);
 					SqlParametersFactory sqlParametersFactory = new SqlParametersFactory(
-						this.mappingContext, this.converter, this.dialect);
+						this.mappingContext, this.converter);
 					InsertStrategyFactory insertStrategyFactory = new InsertStrategyFactory(this.operations,
-						new BatchJdbcOperations(this.operations.getJdbcOperations()), this.dialect);
-					return new DefaultDataAccessStrategy(
+						this.dialect);
+					DataAccessStrategyFactory factory = new DataAccessStrategyFactory(
 						sqlGeneratorSource,
-						this.mappingContext,
 						this.converter,
 						this.operations,
 						sqlParametersFactory,
-						insertStrategyFactory);
+						insertStrategyFactory
+					);
+					return factory.create();
 				});
 		}
 

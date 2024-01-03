@@ -3,7 +3,7 @@ package com.navercorp.spring.data.jdbc.plus.sql.convert;
 import javax.annotation.Nullable;
 
 import org.springframework.data.mapping.PersistentPropertyPath;
-import org.springframework.data.relational.core.mapping.PersistentPropertyPathExtension;
+import org.springframework.data.relational.core.mapping.AggregatePath;
 import org.springframework.data.relational.core.mapping.RelationalPersistentEntity;
 import org.springframework.data.relational.core.mapping.RelationalPersistentProperty;
 import org.springframework.data.relational.core.sql.SqlIdentifier;
@@ -40,7 +40,11 @@ class TableAliasUtils {
 	 * @return
 	 */
 	@Nullable
-	static String getTableAliasPropertyPathPrefix(PersistentPropertyPathExtension path) {
+	static String getTableAliasPropertyPathPrefix(AggregatePath path) {
+		if (path.isRoot()) {
+			return null;
+		}
+
 		PersistentPropertyPath<? extends RelationalPersistentProperty> propertyPath =
 			path.getRequiredPersistentPropertyPath();
 		RelationalPersistentProperty leafProperty = propertyPath.getLeafProperty();
