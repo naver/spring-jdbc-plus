@@ -38,37 +38,12 @@ public class IterableExpandPadding {
 	/**
 	 * Expand if iterable object.
 	 *
-	 * @param source the source
-	 * @return the object
-	 * @deprecated use {@link #expandIfIterable(Object, boolean)} instead
-	 */
-	@Deprecated(forRemoval = true)
-	public static Object expandIfIterable(Object source) {
-		return expandIfIterable(source, true, REGULAR_SIZES);
-	}
-
-	/**
-	 * Expand if iterable object.
-	 *
 	 * @param source    the source
 	 * @param padArray    the pad array y/n
 	 * @return the object
 	 */
 	public static Object expandIfIterable(Object source, boolean padArray) {
 		return expandIfIterable(source, padArray, REGULAR_SIZES);
-	}
-
-	/**
-	 * Expand if iterable object.
-	 *
-	 * @param source            the source
-	 * @param paddingBoundaries the padding boundaries
-	 * @return the object
-	 * @deprecated Use {@link #expandIfIterable(Object, boolean, int[])} instead
-	 */
-	@Deprecated(forRemoval = true)
-	public static Object expandIfIterable(Object source, @Nullable int[] paddingBoundaries) {
-		return expandIfIterable(source, true, paddingBoundaries);
 	}
 
 	/**
