@@ -90,6 +90,11 @@ class IterableExpandPaddingTest {
 		assertThat(
 			(String[])IterableExpandPadding.expandIfIterable(array, true, paddingBoundaries)
 		).hasSize(5);
+
+		int[] intArr = new int[] {1, 2, 3, 4};
+		assertThat(
+			(int[])IterableExpandPadding.expandIfIterable(intArr, true, paddingBoundaries)
+		).hasSize(5).satisfies(actual -> assertThat(actual[4]).isEqualTo(4));
 	}
 
 	@Test

@@ -18,6 +18,7 @@
 
 package com.navercorp.spring.jdbc.plus.support.parametersource.converter;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -91,7 +92,7 @@ public class IterableExpandPadding {
 		if (source instanceof Collection) {
 			return CollectionExpandPadding.INSTANCE.expand((Collection<?>)source, paddingBoundaries);
 		} else if (source.getClass().isArray() && padArray) {
-			return ArrayExpandPadding.INSTANCE.expand((Object[])source, paddingBoundaries);
+			return ArrayExpandPadding.INSTANCE.expand(source, paddingBoundaries);
 		}
 
 		return source;
@@ -116,6 +117,53 @@ public class IterableExpandPadding {
 		Object value = source[sourceSize - 1];
 		for (int i = sourceSize; i < targetSize; i++) {
 			result[i] = value;
+		}
+
+		return result;
+	}
+
+	private static Object expandRegularSizePaddingForArray(Object source, int[] paddingBoundaries) {
+		if (source == null) {
+			return null;
+		}
+
+		int sourceSize = Array.getLength(source);
+		if (sourceSize <= 1) {
+			return source;
+		}
+
+		int targetSize = findRegularSize(paddingBoundaries, sourceSize);
+		Class<?> componentType = source.getClass().getComponentType();
+
+		if (targetSize == 0) {
+			return source;
+		}
+
+		Object result;
+
+		if (componentType.equals(int.class)) {
+			result = Arrays.copyOf((int[])source, targetSize);
+		} else if (componentType.equals(byte.class)) {
+			result = Arrays.copyOf((byte[])source, targetSize);
+		} else if (componentType.equals(long.class)) {
+			result = Arrays.copyOf((long[])source, targetSize);
+		} else if (componentType.equals(char.class)) {
+			result = Arrays.copyOf((char[])source, targetSize);
+		} else if (componentType.equals(float.class)) {
+			result = Arrays.copyOf((float[])source, targetSize);
+		} else if (componentType.equals(short.class)) {
+			result = Arrays.copyOf((short[])source, targetSize);
+		} else if (componentType.equals(boolean.class)) {
+			result = Arrays.copyOf((boolean[])source, targetSize);
+		} else if (componentType.equals(double.class)) {
+			result = Arrays.copyOf((double[])source, targetSize);
+		} else {
+			result = Arrays.copyOf((Object[])source, targetSize);
+		}
+
+		Object value = Array.get(source, sourceSize - 1);
+		for (int i = sourceSize; i < targetSize; i++) {
+			Array.set(result, i, value);
 		}
 
 		return result;
@@ -174,8 +222,8 @@ public class IterableExpandPadding {
 		 * @param source the source
 		 * @return the object [ ]
 		 */
-		public Object[] expand(Object[] source) {
-			return expandRegularSizePadding(source, REGULAR_SIZES);
+		public Object expand(Object source) {
+			return expandRegularSizePaddingForArray(source, REGULAR_SIZES);
 		}
 
 		/**
@@ -185,8 +233,8 @@ public class IterableExpandPadding {
 		 * @param paddingBoundaries the padding boundaries
 		 * @return the object [ ]
 		 */
-		public Object[] expand(Object[] source, int[] paddingBoundaries) {
-			return expandRegularSizePadding(source, paddingBoundaries);
+		public Object expand(Object source, int[] paddingBoundaries) {
+			return expandRegularSizePaddingForArray(source, paddingBoundaries);
 		}
 	}
 
