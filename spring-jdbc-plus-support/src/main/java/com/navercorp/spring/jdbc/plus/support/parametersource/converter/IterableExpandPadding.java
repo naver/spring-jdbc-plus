@@ -98,30 +98,6 @@ public class IterableExpandPadding {
 		return source;
 	}
 
-	private static Object[] expandRegularSizePadding(Object[] source, int[] paddingBoundaries) {
-		if (source == null) {
-			return null;
-		}
-
-		int sourceSize = source.length;
-		if (sourceSize <= 1) {
-			return source;
-		}
-
-		int targetSize = findRegularSize(paddingBoundaries, sourceSize);
-		if (targetSize == 0) {
-			return Arrays.copyOf(source, 0);
-		}
-
-		Object[] result = Arrays.copyOf(source, targetSize);
-		Object value = source[sourceSize - 1];
-		for (int i = sourceSize; i < targetSize; i++) {
-			result[i] = value;
-		}
-
-		return result;
-	}
-
 	private static Object expandRegularSizePaddingForArray(Object source, int[] paddingBoundaries) {
 		if (source == null) {
 			return null;
