@@ -81,7 +81,7 @@ class EntitySqlParameterSourceApplier {
 			if (property.isEmbedded()) {
 				Object value = propertyAccessor.getProperty(property);
 				RelationalPersistentEntity<?> embeddedEntity =
-					this.mappingContext.getRequiredPersistentEntity(property.getType());
+					this.mappingContext.getRequiredPersistentEntity(property.getTypeInformation());
 				this.addParameterSource(
 					parameterSource, value, embeddedEntity, prefix + property.getEmbeddedPrefix());
 			} else {

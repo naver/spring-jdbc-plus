@@ -1122,7 +1122,7 @@ class SqlGenerator {
 		));
 
 		RelationalPersistentEntity<?> embeddedEntity = mappingContext
-			.getRequiredPersistentEntity(propertyToSortBy.getType());
+			.getRequiredPersistentEntity(propertyToSortBy.getTypeInformation());
 		return embeddedEntity.getRequiredPersistentProperty(extractFieldNameFromEmbeddedProperty(order))
 			.getColumnName(); // @checkstyle:ignoreLength
 	}
