@@ -1107,7 +1107,7 @@ class SqlGenerator {
 		}
 
 		PersistentPropertyPath<RelationalPersistentProperty> persistentPropertyPath = mappingContext
-			.getPersistentPropertyPath(order.getProperty(), entity.getType());
+			.getPersistentPropertyPath(order.getProperty(), entity.getTypeInformation());
 
 		propertyToSortBy = persistentPropertyPath.getBaseProperty();
 
@@ -1122,7 +1122,7 @@ class SqlGenerator {
 		));
 
 		RelationalPersistentEntity<?> embeddedEntity = mappingContext
-			.getRequiredPersistentEntity(propertyToSortBy.getType());
+			.getRequiredPersistentEntity(propertyToSortBy.getTypeInformation());
 		return embeddedEntity.getRequiredPersistentProperty(extractFieldNameFromEmbeddedProperty(order))
 			.getColumnName(); // @checkstyle:ignoreLength
 	}

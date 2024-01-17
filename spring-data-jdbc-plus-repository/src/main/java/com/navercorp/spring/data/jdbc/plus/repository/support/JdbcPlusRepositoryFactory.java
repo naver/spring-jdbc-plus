@@ -81,7 +81,8 @@ public class JdbcPlusRepositoryFactory extends JdbcRepositoryFactory {
 		}
 
 		RelationalPersistentEntity<?> persistentEntity = context.getRequiredPersistentEntity(
-			repositoryInformation.getDomainType());
+			repositoryInformation.getDomainTypeInformation()
+		);
 
 		return getTargetRepositoryViaReflection(repositoryInformation, template, persistentEntity,
 			converter);
