@@ -170,7 +170,9 @@ public class ConvertibleBeanPropertySqlParameterSource extends BeanPropertySqlPa
 	 * Sets pad array.
 	 *
 	 * @param padArray the pad array y/n
+	 * @deprecated No plans to replacement
 	 */
+	@Deprecated
 	public void setPadArray(boolean padArray) {
 		this.padArray = padArray;
 	}

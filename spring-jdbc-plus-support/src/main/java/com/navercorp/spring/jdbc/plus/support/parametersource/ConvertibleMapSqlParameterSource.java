@@ -38,7 +38,7 @@ public class ConvertibleMapSqlParameterSource extends MapSqlParameterSource {
 	private final JdbcParameterSourceConverter converter;
 	private final FallbackParameterSource fallbackParameterSource;
 
-	private boolean padArray = true;
+	private boolean padArray = false;
 	private boolean paddingIterableParams = false;
 	private int[] paddingIterableBoundaries = null;
 
@@ -110,7 +110,9 @@ public class ConvertibleMapSqlParameterSource extends MapSqlParameterSource {
 	 * Sets pad array.
 	 *
 	 * @param padArray the pad array y/n
+	 * @deprecated No plan to replacement
 	 */
+	@Deprecated
 	public void setPadArray(boolean padArray) {
 		this.padArray = padArray;
 	}

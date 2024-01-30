@@ -36,7 +36,7 @@ public class ConvertibleParameterSourceFactory {
 	private final JdbcParameterSourceConverter converter;
 	private final FallbackParameterSource fallbackParameterSource;
 
-	private boolean padArray = true;
+	private boolean padArray = false;
 	private boolean paddingIterableParams = false;
 	private int[] paddingIterableBoundaries = null;
 
@@ -148,7 +148,9 @@ public class ConvertibleParameterSourceFactory {
 	 * Sets pad array.
 	 *
 	 * @param padArray the pad array y/n
+	 * @deprecated No plans to replacement
 	 */
+	@Deprecated(forRemoval = true, since = "3.2")
 	public void setPadArray(boolean padArray) {
 		this.padArray = padArray;
 	}
@@ -157,7 +159,9 @@ public class ConvertibleParameterSourceFactory {
 	 * Is pad array boolean.
 	 *
 	 * @return the boolean
+	 * @deprecated No plans to replacement
 	 */
+	@Deprecated(forRemoval = true, since = "3.2")
 	public boolean isPadArray() {
 		return padArray;
 	}
