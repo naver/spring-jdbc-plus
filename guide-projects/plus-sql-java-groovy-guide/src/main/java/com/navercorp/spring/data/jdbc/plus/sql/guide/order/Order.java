@@ -18,7 +18,10 @@
 
 package com.navercorp.spring.data.jdbc.plus.sql.guide.order;
 
+import javax.annotation.Nullable;
+
 import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Embedded;
 import org.springframework.data.relational.core.mapping.Table;
 
 import lombok.Builder;
@@ -43,7 +46,27 @@ public class Order {
 
 	private String purchaserNo;
 
+	@Nullable
+	@Embedded.Nullable(prefix = "discount_")
+	private Discount discount;
+
 	public void complete() {
 		this.status = OrderStatus.COMPLETED;
+	}
+
+	@Builder
+	public record Discount(
+		@Nullable
+		Long amount,
+
+		@Embedded.Nullable
+		DiscountType type
+	) {
+	}
+
+	@Builder
+	public record DiscountType(
+		String type
+	) {
 	}
 }
