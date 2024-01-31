@@ -19,15 +19,20 @@
 package com.navercorp.spring.data.jdbc.plus.sql.guide.order;
 
 import static java.util.Comparator.*;
+import static java.util.function.Function.*;
+import static java.util.stream.Collectors.*;
 import static org.assertj.core.api.Assertions.*;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.util.Streamable;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -51,12 +56,43 @@ class OrderRepositoryTest {
 			.price(5000L)
 			.status(OrderStatus.PLACE)
 			.purchaserNo("navercorp")
+			.discount(Order.Discount.builder()
+				.type(new Order.DiscountType("coupon"))
+				.build())
 			.build(),
 		Order.builder()
 			.price(3000L)
 			.status(OrderStatus.COMPLETED)
 			.purchaserNo("navercorp")
-			.build());
+			.discount(Order.Discount.builder()
+				.amount(1000L)
+				.type(new Order.DiscountType("coupon"))
+				.build()
+			).build(),
+		Order.builder()
+			.price(9000L)
+			.status(OrderStatus.COMPLETED)
+			.purchaserNo("navercorp")
+			.discount(Order.Discount.builder()
+				.amount(1000L)
+				.build()
+			).build()
+	);
+
+	@Test
+	void findById() {
+		// given
+		var insertedOrder = sut.save(orders.get(0));
+
+		// when
+		Optional<Order> actual = sut.findById(insertedOrder.getId());
+
+		// then
+		assertThat(actual).hasValueSatisfying(it -> {
+			assertThat(it.getId()).isEqualTo(insertedOrder.getId());
+			assertThat(it.getDiscount()).isNull();
+		});
+	}
 
 	@Test
 	void findByPurchaserNo() {
@@ -68,13 +104,34 @@ class OrderRepositoryTest {
 
 		// then
 		actual.sort(comparing(Order::getPrice));
-		Assertions.assertThat(actual).hasSize(3);
+		assertThat(actual).hasSize(4);
 		assertThat(actual.get(0).getPrice()).isEqualTo(1000L);
 		assertThat(actual.get(0).getStatus()).isEqualTo(OrderStatus.PLACE);
 		assertThat(actual.get(1).getPrice()).isEqualTo(3000L);
 		assertThat(actual.get(1).getStatus()).isEqualTo(OrderStatus.COMPLETED);
 		assertThat(actual.get(2).getPrice()).isEqualTo(5000L);
 		assertThat(actual.get(2).getStatus()).isEqualTo(OrderStatus.PLACE);
+	}
+
+	@Test
+	void findByIds() {
+		// given
+		var ids = Streamable.of(sut.saveAll(orders)).stream()
+			.map(Order::getId)
+			.toList();
+
+		Map<Long, Order> orderByPrice = orders.stream()
+			.collect(toMap(Order::getPrice, identity()));
+
+		// when
+		List<Order> actual = Streamable.of(sut.findAllById(ids)).toList();
+
+		// then
+		assertThat(actual).allSatisfy(it ->
+			assertThat(it).usingRecursiveComparison()
+				.ignoringFields("id")
+				.isEqualTo(orderByPrice.get(it.getPrice()))
+		);
 	}
 
 	@Test
