@@ -1126,6 +1126,10 @@ public class AggregateResultJdbcConverter extends BasicJdbcConverter {
 		private Object readEmbeddedEntityFrom(
 			@Nullable Object idValue, RelationalPersistentProperty property) {
 
+			if (this.entityMap == null) {
+				return null;
+			}
+
 			Object value = this.entityMap.get(property.getName());
 			MapReadingContext<?> newContext = extendEntityBy(property, (Map<String, Object>)value);
 
