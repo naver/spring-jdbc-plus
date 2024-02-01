@@ -55,8 +55,12 @@ import com.navercorp.spring.data.jdbc.plus.sql.support.template.JdbcReactiveTemp
 @Configuration(proxyBeanMethods = false)
 @ConditionalOnBean({NamedParameterJdbcOperations.class, PlatformTransactionManager.class})
 @ConditionalOnClass({NamedParameterJdbcOperations.class, AbstractJdbcConfiguration.class, EntityJdbcProvider.class})
-@ConditionalOnProperty(prefix = "spring.data.jdbc.plus.sql", name = "enabled", havingValue = "true",
-	matchIfMissing = true)
+@ConditionalOnProperty(
+	prefix = "spring.data.jdbc.plus.sql",
+	name = "enabled",
+	havingValue = "true",
+	matchIfMissing = true
+)
 @AutoConfigureAfter({JdbcTemplateAutoConfiguration.class, DataSourceTransactionManagerAutoConfiguration.class})
 public class JdbcPlusSqlAutoConfiguration {
 
@@ -82,8 +86,8 @@ public class JdbcPlusSqlAutoConfiguration {
 			NamedParameterJdbcOperations operations,
 			@Lazy RelationResolver relationResolver,
 			JdbcCustomConversions conversions,
-			Dialect dialect) {
-
+			Dialect dialect
+		) {
 			return super.queryMappingConfiguration(
 				mappingContext, operations, relationResolver, conversions, dialect);
 		}
@@ -91,8 +95,10 @@ public class JdbcPlusSqlAutoConfiguration {
 		@Bean
 		@ConditionalOnMissingBean
 		public SqlParameterSourceFactory sqlParameterSourceFactory(
-			JdbcMappingContext mappingContext, JdbcConverter jdbcConverter, Dialect dialect) {
-
+			JdbcMappingContext mappingContext,
+			JdbcConverter jdbcConverter,
+			Dialect dialect
+		) {
 			return super.sqlParameterSourceFactory(mappingContext, jdbcConverter, dialect);
 		}
 
@@ -103,8 +109,8 @@ public class JdbcPlusSqlAutoConfiguration {
 			SqlProvider sqlProvider,
 			SqlParameterSourceFactory sqlParameterSourceFactory,
 			QueryMappingConfiguration queryMappingConfiguration,
-			ApplicationContext applicationContext) {
-
+			ApplicationContext applicationContext
+		) {
 			return super.entityJdbcProvider(
 				jdbcOperations,
 				sqlProvider,

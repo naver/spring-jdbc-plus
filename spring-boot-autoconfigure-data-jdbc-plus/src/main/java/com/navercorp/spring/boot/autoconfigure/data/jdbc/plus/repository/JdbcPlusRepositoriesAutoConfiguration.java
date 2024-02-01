@@ -58,8 +58,9 @@ import com.navercorp.spring.data.jdbc.plus.repository.config.JdbcPlusRepositoryR
 @Configuration(proxyBeanMethods = false)
 @ConditionalOnBean({NamedParameterJdbcOperations.class, PlatformTransactionManager.class})
 @ConditionalOnClass({NamedParameterJdbcOperations.class, AbstractJdbcConfiguration.class, JdbcRepository.class})
-@ConditionalOnExpression("!${spring.data.jdbc.repositories.enabled:true} "
-	+ " && ${spring.data.jdbc.plus.repositories.enabled:true}")
+@ConditionalOnExpression(
+	"!${spring.data.jdbc.repositories.enabled:true} " + " && ${spring.data.jdbc.plus.repositories.enabled:true}"
+)
 @AutoConfigureAfter({JdbcTemplateAutoConfiguration.class, DataSourceTransactionManagerAutoConfiguration.class})
 public class JdbcPlusRepositoriesAutoConfiguration {
 
@@ -67,8 +68,12 @@ public class JdbcPlusRepositoriesAutoConfiguration {
 	 * The type Jdbc plus repositories configuration.
 	 */
 	@Configuration(proxyBeanMethods = false)
-	@ConditionalOnProperty(prefix = "spring.data.jdbc.plus.repositories", name = "reactive-support",
-		havingValue = "false", matchIfMissing = true)
+	@ConditionalOnProperty(
+		prefix = "spring.data.jdbc.plus.repositories",
+		name = "reactive-support",
+		havingValue = "false",
+		matchIfMissing = true
+	)
 	@ConditionalOnMissingBean(JdbcPlusRepositoryConfigExtension.class)
 	@Import(JdbcPlusRepositoriesRegistrar.class)
 	static class JdbcPlusRepositoriesConfiguration {
@@ -78,8 +83,11 @@ public class JdbcPlusRepositoriesAutoConfiguration {
 	 * The type Jdbc plus reactive support repositories configuration.
 	 */
 	@Configuration(proxyBeanMethods = false)
-	@ConditionalOnProperty(prefix = "spring.data.jdbc.plus.repositories", name = "reactive-support",
-		havingValue = "true")
+	@ConditionalOnProperty(
+		prefix = "spring.data.jdbc.plus.repositories",
+		name = "reactive-support",
+		havingValue = "true"
+	)
 	@ConditionalOnMissingBean(JdbcPlusRepositoryReactiveSupportConfigExtension.class)
 	@Import(JdbcPlusReactiveSupportRepositoriesRegistrar.class)
 	static class JdbcPlusReactiveSupportRepositoriesConfiguration {
@@ -101,16 +109,24 @@ public class JdbcPlusRepositoriesAutoConfiguration {
 		@Override
 		@Bean
 		@ConditionalOnMissingBean
-		public JdbcMappingContext jdbcMappingContext(Optional<NamingStrategy> namingStrategy,
-			JdbcCustomConversions customConversions, RelationalManagedTypes jdbcManagedTypes) {
+		public JdbcMappingContext jdbcMappingContext(
+			Optional<NamingStrategy> namingStrategy,
+			JdbcCustomConversions customConversions,
+			RelationalManagedTypes jdbcManagedTypes
+		) {
 			return super.jdbcMappingContext(namingStrategy, customConversions, jdbcManagedTypes);
 		}
 
 		@Override
 		@Bean
 		@ConditionalOnMissingBean
-		public JdbcConverter jdbcConverter(JdbcMappingContext mappingContext, NamedParameterJdbcOperations operations,
-			@Lazy RelationResolver relationResolver, JdbcCustomConversions conversions, Dialect dialect) {
+		public JdbcConverter jdbcConverter(
+			JdbcMappingContext mappingContext,
+			NamedParameterJdbcOperations operations,
+			@Lazy RelationResolver relationResolver,
+			JdbcCustomConversions conversions,
+			Dialect dialect
+		) {
 			return super.jdbcConverter(mappingContext, operations, relationResolver, conversions, dialect);
 		}
 
@@ -124,16 +140,23 @@ public class JdbcPlusRepositoriesAutoConfiguration {
 		@Override
 		@Bean
 		@ConditionalOnMissingBean
-		public JdbcAggregateTemplate jdbcAggregateTemplate(ApplicationContext applicationContext,
-			JdbcMappingContext mappingContext, JdbcConverter converter, DataAccessStrategy dataAccessStrategy) {
+		public JdbcAggregateTemplate jdbcAggregateTemplate(
+			ApplicationContext applicationContext,
+			JdbcMappingContext mappingContext,
+			JdbcConverter converter,
+			DataAccessStrategy dataAccessStrategy
+		) {
 			return super.jdbcAggregateTemplate(applicationContext, mappingContext, converter, dataAccessStrategy);
 		}
 
 		@Override
 		@Bean
 		@ConditionalOnMissingBean
-		public DataAccessStrategy dataAccessStrategyBean(NamedParameterJdbcOperations operations,
-			JdbcConverter jdbcConverter, JdbcMappingContext context, Dialect dialect) {
+		public DataAccessStrategy dataAccessStrategyBean(
+			NamedParameterJdbcOperations operations,
+			JdbcConverter jdbcConverter, JdbcMappingContext context,
+			Dialect dialect
+		) {
 			return super.dataAccessStrategyBean(operations, jdbcConverter, context, dialect);
 		}
 
