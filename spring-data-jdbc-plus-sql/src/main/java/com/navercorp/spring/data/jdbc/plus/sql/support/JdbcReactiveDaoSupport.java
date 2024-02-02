@@ -71,8 +71,8 @@ public abstract class JdbcReactiveDaoSupport extends JdbcDaoSupport {
 	protected <R> Flux<R> selectFlux(
 		String sql,
 		SqlParameterSource params,
-		Class<R> returnType) {
-
+		Class<R> returnType
+	) {
 		RowMapper<R> rowMapper = this.getRowMapper(returnType);
 		return this.jdbcReactiveTemplate.queryFlux(
 			sql, this.getEntityJdbcProvider().getJdbcOperations(), params, rowMapper);
@@ -91,8 +91,8 @@ public abstract class JdbcReactiveDaoSupport extends JdbcDaoSupport {
 	protected <R> Flux<R> selectFlux(
 		String sql,
 		SqlParameterSource params,
-		RowMapper<R> rowMapper) {
-
+		RowMapper<R> rowMapper
+	) {
 		return this.jdbcReactiveTemplate.queryFlux(
 			sql, this.getEntityJdbcProvider().getJdbcOperations(), params, rowMapper);
 	}
@@ -111,8 +111,8 @@ public abstract class JdbcReactiveDaoSupport extends JdbcDaoSupport {
 		String sql,
 		NamedParameterJdbcOperations jdbcOperations,
 		SqlParameterSource params,
-		RowMapper<R> rowMapper) {
-
+		RowMapper<R> rowMapper
+	) {
 		return this.jdbcReactiveTemplate.queryFlux(sql, jdbcOperations, params, rowMapper);
 	}
 
@@ -132,8 +132,8 @@ public abstract class JdbcReactiveDaoSupport extends JdbcDaoSupport {
 		NamedParameterJdbcOperations jdbcOperations,
 		SqlParameterSource params,
 		RowMapper<R> rowMapper,
-		Scheduler scheduler) {
-
+		Scheduler scheduler
+	) {
 		return this.jdbcReactiveTemplate.queryFlux(sql, jdbcOperations, params, rowMapper, scheduler);
 	}
 
@@ -155,8 +155,8 @@ public abstract class JdbcReactiveDaoSupport extends JdbcDaoSupport {
 		SqlParameterSource params,
 		RowMapper<R> rowMapper,
 		int queueSize,
-		long bufferTimeout) {
-
+		long bufferTimeout
+	) {
 		return this.jdbcReactiveTemplate.queryFlux(
 			sql, jdbcOperations, params, rowMapper, queueSize, bufferTimeout);
 	}
@@ -181,8 +181,8 @@ public abstract class JdbcReactiveDaoSupport extends JdbcDaoSupport {
 		RowMapper<R> rowMapper,
 		Scheduler scheduler,
 		int queueSize,
-		long bufferTimeout) {
-
+		long bufferTimeout
+	) {
 		return this.jdbcReactiveTemplate.queryFlux(
 			sql, jdbcOperations, params, rowMapper, scheduler, queueSize, bufferTimeout);
 	}

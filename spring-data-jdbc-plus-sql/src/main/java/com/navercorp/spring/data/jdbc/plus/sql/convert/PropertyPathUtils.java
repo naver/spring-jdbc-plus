@@ -76,10 +76,12 @@ public class PropertyPathUtils {
 	 * @return
 	 */
 	static SqlIdentifier getReverseColumnAlias(
-		AggregatePath path, SqlIdentifier reverseColumnName
+		AggregatePath path,
+		SqlIdentifier reverseColumnName
 	) {
 		SqlIdentifier tableAlias = getTableAlias(path);
-		return tableAlias == null ? reverseColumnName
+		return tableAlias == null
+			? reverseColumnName
 			: reverseColumnName.transform(name -> tableAlias.getReference() + "_" + name);
 	}
 

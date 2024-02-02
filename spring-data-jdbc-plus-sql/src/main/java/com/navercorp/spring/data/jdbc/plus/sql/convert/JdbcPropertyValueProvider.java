@@ -44,6 +44,7 @@ class JdbcPropertyValueProvider implements PropertyValueProvider<RelationalPersi
 		this.basePath = basePath;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public <T> T getPropertyValue(RelationalPersistentProperty property) {
 		return (T)resultSet.getObject(getColumnName(property));

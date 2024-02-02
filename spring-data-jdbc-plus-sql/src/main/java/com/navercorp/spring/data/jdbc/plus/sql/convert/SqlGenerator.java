@@ -158,8 +158,8 @@ class SqlGenerator {
 		RelationalMappingContext mappingContext,
 		JdbcConverter converter,
 		RelationalPersistentEntity<?> entity,
-		Dialect dialect) {
-
+		Dialect dialect
+	) {
 		this.mappingContext = mappingContext;
 		this.entity = entity;
 		this.sqlContext = new SqlContext(entity);
@@ -179,8 +179,8 @@ class SqlGenerator {
 		JdbcConverter converter,
 		RelationalPersistentEntity<?> entity,
 		Dialect dialect,
-		SqlContexts sqlContexts) {
-
+		SqlContexts sqlContexts
+	) {
 		this.mappingContext = mappingContext;
 		this.entity = entity;
 		this.columns = new Columns(entity, mappingContext, converter);
@@ -236,9 +236,11 @@ class SqlGenerator {
 	 * @param filterColumn  the column to apply the IN-condition to.
 	 * @return the IN condition
 	 */
-	private Condition getSubselectCondition(AggregatePath path,
-		Function<Column, Condition> rootCondition, Column filterColumn) {
-
+	private Condition getSubselectCondition(
+		AggregatePath path,
+		Function<Column, Condition> rootCondition,
+		Column filterColumn
+	) {
 		AggregatePath parentPath = path.getParentPath();
 
 		if (!parentPath.hasIdProperty()) {
@@ -329,9 +331,10 @@ class SqlGenerator {
 	 * @return a SQL String.
 	 * @since 3.0
 	 */
-	String getFindAllByProperty(Identifier parentIdentifier,
-		PersistentPropertyPath<? extends RelationalPersistentProperty> propertyPath) {
-
+	String getFindAllByProperty(
+		Identifier parentIdentifier,
+		PersistentPropertyPath<? extends RelationalPersistentProperty> propertyPath
+	) {
 		Assert.notNull(parentIdentifier, "identifier must not be null");
 		Assert.notNull(propertyPath, "propertyPath must not be null");
 
@@ -353,9 +356,11 @@ class SqlGenerator {
 	 *                            If this is {@code true}, the keyColumn must not be {@code null}.
 	 * @return a SQL String.
 	 */
-	String getFindAllByProperty(Identifier parentIdentifier, @Nullable AggregatePath.ColumnInfo keyColumn,
-		boolean ordered) {
-
+	String getFindAllByProperty(
+		Identifier parentIdentifier,
+		@Nullable AggregatePath.ColumnInfo keyColumn,
+		boolean ordered
+	) {
 		Assert.isTrue(keyColumn != null || !ordered,
 			"If the SQL statement should be ordered a keyColumn to order by must be provided");
 
@@ -523,8 +528,7 @@ class SqlGenerator {
 	 * @param path can be {@literal null}.
 	 * @return the statement as a {@link String}. Guaranteed to be not {@literal null}.
 	 */
-	String createDeleteAllSql(
-		@Nullable PersistentPropertyPath<RelationalPersistentProperty> path) {
+	String createDeleteAllSql(@Nullable PersistentPropertyPath<RelationalPersistentProperty> path) {
 
 		Table table = getDmlTable();
 
@@ -642,8 +646,11 @@ class SqlGenerator {
 		return (SelectBuilder.SelectWhere)baseSelect;
 	}
 
-	private SelectBuilder.SelectOrdered selectBuilder(Collection<SqlIdentifier> keyColumns, Sort sort,
-		Pageable pageable) {
+	private SelectBuilder.SelectOrdered selectBuilder(
+		Collection<SqlIdentifier> keyColumns,
+		Sort sort,
+		Pageable pageable
+	) {
 
 		SelectBuilder.SelectOrdered sortable = this.selectBuilder(keyColumns);
 		sortable = applyPagination(pageable, sortable);
@@ -651,7 +658,9 @@ class SqlGenerator {
 	}
 
 	private SelectBuilder.SelectOrdered applyPagination(
-		Pageable pageable, SelectBuilder.SelectOrdered select) {
+		Pageable pageable,
+		SelectBuilder.SelectOrdered select
+	) {
 
 		if (!pageable.isPaged()) {
 			return select;
@@ -1000,8 +1009,10 @@ class SqlGenerator {
 			.where(getDmlIdColumn().in(getBindMarker(IDS_SQL_PARAMETER)));
 	}
 
-	private String createDeleteByPathAndCriteria(AggregatePath path,
-		Function<Column, Condition> rootCondition) {
+	private String createDeleteByPathAndCriteria(
+		AggregatePath path,
+		Function<Column, Condition> rootCondition
+	) {
 
 		Table table = Table.create(path.getTableInfo().qualifiedTableName());
 
@@ -1410,9 +1421,11 @@ class SqlGenerator {
 		private final Set<SqlIdentifier> insertableColumns;
 		private final Set<SqlIdentifier> updatableColumns;
 
-		Columns(RelationalPersistentEntity<?> entity,
+		Columns(
+			RelationalPersistentEntity<?> entity,
 			MappingContext<RelationalPersistentEntity<?>, RelationalPersistentProperty> mappingContext,
-			JdbcConverter converter) {
+			JdbcConverter converter
+		) {
 
 			this.mappingContext = mappingContext;
 			this.converter = converter;
@@ -1433,8 +1446,7 @@ class SqlGenerator {
 			this.updatableColumns = Collections.unmodifiableSet(updatable);
 		}
 
-		private void populateColumnNameCache(
-			RelationalPersistentEntity<?> entity, String prefix) {
+		private void populateColumnNameCache(RelationalPersistentEntity<?> entity, String prefix) {
 
 			entity.doWithAll(property -> {
 

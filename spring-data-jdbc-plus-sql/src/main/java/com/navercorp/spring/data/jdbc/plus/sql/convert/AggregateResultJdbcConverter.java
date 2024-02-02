@@ -154,8 +154,10 @@ public class AggregateResultJdbcConverter extends MappingJdbcConverter {
 	 * @return the map
 	 */
 	protected Map<String, Object> mapSingleTableRow(
-		AggregatePath path, ResultSet resultSet, Identifier identifier) {
-
+		AggregatePath path,
+		ResultSet resultSet,
+		Identifier identifier
+	) {
 		return new SingleTableMapReadingContext(
 			path.getLeafEntity(),
 			new ResultSetAccessor(resultSet),
@@ -179,8 +181,8 @@ public class AggregateResultJdbcConverter extends MappingJdbcConverter {
 		AggregatePath path,
 		ResultSet resultSet,
 		Identifier identifier,
-		Object key) {
-
+		Object key
+	) {
 		Map<String, Object> mapValue = new SingleTableMapReadingContext(
 			path.getLeafEntity(),
 			new ResultSetAccessor(resultSet),
@@ -206,7 +208,6 @@ public class AggregateResultJdbcConverter extends MappingJdbcConverter {
 		RelationalPersistentEntity<T> entity,
 		Map<String, Object> aggregateMap
 	) {
-
 		return (T)new MapReadingContext<>(
 			getMappingContext().getAggregatePath(entity),
 			aggregateMap
@@ -381,8 +382,8 @@ public class AggregateResultJdbcConverter extends MappingJdbcConverter {
 	}
 
 	private MultiValueMap<AggregatePath, RelationValue> accumulateRelations(
-		MultiValueMap<AggregatePath, ExtractedRow> extractedRows) {
-
+		MultiValueMap<AggregatePath, ExtractedRow> extractedRows
+	) {
 		MultiValueMap<AggregatePath, RelationValue> relations = new LinkedMultiValueMap<>();
 		for (Map.Entry<AggregatePath, List<ExtractedRow>> extractedRow : extractedRows.entrySet()) {
 
@@ -401,8 +402,7 @@ public class AggregateResultJdbcConverter extends MappingJdbcConverter {
 		RelationalPersistentEntity<?> persistentEntity,
 		MultiValueMap<AggregatePath, RelationValue> relationValues
 	) {
-		for (Map.Entry<AggregatePath, List<RelationValue>> relations
-			: relationValues.entrySet()) {
+		for (Map.Entry<AggregatePath, List<RelationValue>> relations : relationValues.entrySet()) {
 
 			AggregatePath propertyPath = relations.getKey();
 			RelationalPersistentProperty property =
@@ -435,16 +435,16 @@ public class AggregateResultJdbcConverter extends MappingJdbcConverter {
 
 	private Object getRootId(
 		ResultSetHolder resultSet,
-		RelationalPersistentEntity<?> entity) throws SQLException {
-
+		RelationalPersistentEntity<?> entity
+	) throws SQLException {
 		return resultSet.getResultSet().getObject(entity.getIdColumn().getReference());
 	}
 
 	private Identifier getRelationEntityIdentifier(
 		AggregatePath relationPath,
 		RelationalPersistentEntity<?> entity,
-		Map<String, Object> entityMap) {
-
+		Map<String, Object> entityMap
+	) {
 		Object id = entityMap.get(entity.getRequiredIdProperty().getName());
 		return Identifier.of(relationPath.getTableInfo().reverseColumnInfo().name(), id, Object.class);
 	}

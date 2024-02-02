@@ -346,8 +346,8 @@ public abstract class JdbcRepositorySupport<T> {
 	protected <R> List<R> find(
 		String sql,
 		SqlParameterSource params,
-		ResultSetExtractor<List<R>> resultSetExtractor) {
-
+		ResultSetExtractor<List<R>> resultSetExtractor
+	) {
 		return this.getJdbcOperations().query(sql, params, resultSetExtractor).stream()
 			.map(this::triggerAfterConvert)
 			.collect(toList());
@@ -481,8 +481,8 @@ public abstract class JdbcRepositorySupport<T> {
 	protected <R> R requiredOne(
 		String sql,
 		SqlParameterSource params,
-		ResultSetExtractor<List<R>> resultSetExtractor) {
-
+		ResultSetExtractor<List<R>> resultSetExtractor
+	) {
 		return this.findOne(sql, params, resultSetExtractor)
 			.orElseThrow(() -> new EmptyResultDataAccessException("RequiredOne result must be One.", 1));
 	}

@@ -49,8 +49,8 @@ public class EntityConvertibleSqlParameterSourceFactory implements SqlParameterS
 	public EntityConvertibleSqlParameterSourceFactory(
 		ConvertibleParameterSourceFactory delegate,
 		RelationalMappingContext mappingContext,
-		JdbcConverter jdbcConverter) {
-
+		JdbcConverter jdbcConverter
+	) {
 		this.delegate = delegate;
 		this.mappingContext = mappingContext;
 		this.parameterSourceApplier = new EntitySqlParameterSourceApplier(mappingContext, jdbcConverter);

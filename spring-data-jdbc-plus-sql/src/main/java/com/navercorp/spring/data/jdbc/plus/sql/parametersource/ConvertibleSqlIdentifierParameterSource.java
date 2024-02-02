@@ -45,8 +45,8 @@ class ConvertibleSqlIdentifierParameterSource extends SqlIdentifierParameterSour
 	 */
 	ConvertibleSqlIdentifierParameterSource(
 		JdbcParameterSourceConverter converter,
-		FallbackParameterSource fallbackParameterSource) {
-
+		FallbackParameterSource fallbackParameterSource
+	) {
 		super();
 		this.converter = Objects.requireNonNull(converter, "Converter must not be null.");
 		this.fallbackParameterSource = fallbackParameterSource;

@@ -181,7 +181,7 @@ public class DefaultJdbcParameterSourceConverter implements JdbcParameterSourceC
 		return this.convert(value);
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({"unchecked", "rawtypes"})
 	private Object convert(Object value) {
 		Unwrapper unwrapper = resolveUnwrapper(value);
 		if (unwrapper != null) {
@@ -211,6 +211,7 @@ public class DefaultJdbcParameterSourceConverter implements JdbcParameterSourceC
 		return value;
 	}
 
+	@SuppressWarnings("rawtypes")
 	@Nullable
 	private Unwrapper resolveUnwrapper(Object value) {
 		Class<?> clazz = value.getClass();
@@ -227,6 +228,7 @@ public class DefaultJdbcParameterSourceConverter implements JdbcParameterSourceC
 		return null;
 	}
 
+	@SuppressWarnings("rawtypes")
 	@Nullable
 	private Converter resolveConverter(Object value) {
 		Class<?> clazz = value.getClass();

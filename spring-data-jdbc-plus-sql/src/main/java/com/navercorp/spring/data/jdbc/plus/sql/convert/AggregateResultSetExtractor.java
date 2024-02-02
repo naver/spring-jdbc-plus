@@ -41,6 +41,7 @@ public class AggregateResultSetExtractor<T> implements ResultSetExtractor<List<T
 	 * @param type          the type
 	 * @param jdbcConverter the jdbc converter
 	 */
+	@SuppressWarnings("unchecked")
 	public AggregateResultSetExtractor(Class<T> type, AggregateResultJdbcConverter jdbcConverter) {
 		this.entity = (RelationalPersistentEntity<T>)jdbcConverter.getMappingContext()
 			.getRequiredPersistentEntity(type);
@@ -55,8 +56,8 @@ public class AggregateResultSetExtractor<T> implements ResultSetExtractor<List<T
 	 */
 	public AggregateResultSetExtractor(
 		RelationalPersistentEntity<T> entity,
-		AggregateResultJdbcConverter jdbcConverter) {
-
+		AggregateResultJdbcConverter jdbcConverter
+	) {
 		this.entity = entity;
 		this.jdbcConverter = jdbcConverter;
 	}

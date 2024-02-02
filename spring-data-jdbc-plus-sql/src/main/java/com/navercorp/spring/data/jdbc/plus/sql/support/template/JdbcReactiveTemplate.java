@@ -69,8 +69,8 @@ public class JdbcReactiveTemplate {
 	public JdbcReactiveTemplate(
 		Scheduler scheduler,
 		int defaultQueueSize,
-		long defaultBufferTimeout) {
-
+		long defaultBufferTimeout
+	) {
 		this.scheduler = scheduler;
 		this.defaultQueueSize = defaultQueueSize;
 		this.defaultBufferTimeout = defaultBufferTimeout;
@@ -128,8 +128,8 @@ public class JdbcReactiveTemplate {
 		NamedParameterJdbcOperations jdbcOperations,
 		SqlParameterSource params,
 		RowMapper<R> rowMapper,
-		Scheduler scheduler) {
-
+		Scheduler scheduler
+	) {
 		return this.queryFlux(
 			sql,
 			jdbcOperations,
@@ -158,8 +158,8 @@ public class JdbcReactiveTemplate {
 		SqlParameterSource params,
 		RowMapper<R> rowMapper,
 		int queueSize,
-		long bufferTimeout) {
-
+		long bufferTimeout
+	) {
 		return this.queryFlux(
 			sql, jdbcOperations, params, rowMapper, this.scheduler, queueSize, bufferTimeout);
 	}
@@ -184,8 +184,8 @@ public class JdbcReactiveTemplate {
 		RowMapper<R> rowMapper,
 		Scheduler scheduler,
 		int queueSize,
-		long bufferTimeout) {
-
+		long bufferTimeout
+	) {
 		BlockingQueue<FluxItem<R>> queue = new LinkedBlockingQueue<>(queueSize);
 		AtomicBoolean isClosed = new AtomicBoolean(false);
 
@@ -232,8 +232,8 @@ public class JdbcReactiveTemplate {
 		BlockingQueue<FluxItem<R>> queue,
 		FluxItem<R> item,
 		AtomicBoolean isClosed,
-		long bufferTimeout) {
-
+		long bufferTimeout
+	) {
 		try {
 			if (!queue.offer(item, bufferTimeout, TimeUnit.MILLISECONDS)) {
 				/* Close the flux. */
@@ -249,8 +249,10 @@ public class JdbcReactiveTemplate {
 	}
 
 	private <R> Flux<R> generateFluxFromQueue(
-		BlockingQueue<FluxItem<R>> queue, long bufferTimeout, AtomicBoolean isClosed) {
-
+		BlockingQueue<FluxItem<R>> queue,
+		long bufferTimeout,
+		AtomicBoolean isClosed
+	) {
 		return Flux.generate(sink -> {
 			if (isClosed.get()) {
 				/* Flux is closed by db. */

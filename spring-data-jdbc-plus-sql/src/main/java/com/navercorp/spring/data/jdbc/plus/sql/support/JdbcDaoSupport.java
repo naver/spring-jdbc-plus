@@ -267,8 +267,8 @@ public abstract class JdbcDaoSupport {
 	protected <R> List<R> select(
 		String sql,
 		SqlParameterSource params,
-		ResultSetExtractor<List<R>> resultSetExtractor) {
-
+		ResultSetExtractor<List<R>> resultSetExtractor)
+	{
 		return this.getJdbcOperations().query(sql, params, resultSetExtractor);
 	}
 
@@ -325,8 +325,8 @@ public abstract class JdbcDaoSupport {
 	protected <R> Optional<R> selectOne(
 		String sql,
 		SqlParameterSource params,
-		ResultSetExtractor<List<R>> resultSetExtractor) {
-
+		ResultSetExtractor<List<R>> resultSetExtractor
+	) {
 		List<R> list = this.select(sql, params, resultSetExtractor);
 		if (CollectionUtils.isEmpty(list)) {
 			return Optional.empty();
@@ -378,8 +378,8 @@ public abstract class JdbcDaoSupport {
 	protected <R> R requiredOne(
 		String sql,
 		SqlParameterSource params,
-		ResultSetExtractor<List<R>> resultSetExtractor) {
-
+		ResultSetExtractor<List<R>> resultSetExtractor
+	) {
 		return this.selectOne(sql, params, resultSetExtractor)
 			.orElseThrow(() -> new EmptyResultDataAccessException("RequiredOne result must be One.", 1));
 	}

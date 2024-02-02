@@ -66,8 +66,8 @@ public class EntityJdbcProvider {
 		SqlParameterSourceFactory sqlParameterSourceFactory,
 		QueryMappingConfiguration queryMappingConfiguration,
 		ApplicationEventPublisher publisher,
-		EntityCallbacks entityCallbacks) {
-
+		EntityCallbacks entityCallbacks
+	) {
 		this.jdbcOperations = jdbcOperations;
 		this.sqlProvider = sqlProvider;
 		this.sqlParameterSourceFactory = sqlParameterSourceFactory;
@@ -137,17 +137,14 @@ public class EntityJdbcProvider {
 	 * @return the aggregate result set extractor
 	 */
 	public <T> AggregateResultSetExtractor<T> getAggregateResultSetExtractor(Class<T> entityType) {
-		if (!EntityQueryMappingConfiguration.class
-			.isAssignableFrom(this.queryMappingConfiguration.getClass())) {
-
+		if (this.queryMappingConfiguration instanceof EntityQueryMappingConfiguration entityQueryMappingConfiguration) {
+			return entityQueryMappingConfiguration.getAggregateResultSetExtractor(entityType);
+		} else {
 			throw new IllegalStateException(
 				"AggregateResultSetExtractor supports with EntityQueryMappingConfiguration. "
 					+ "queryMappingConfiguration: "
 					+ this.queryMappingConfiguration.getClass());
 		}
-
-		return ((EntityQueryMappingConfiguration)this.queryMappingConfiguration)
-			.getAggregateResultSetExtractor(entityType);
 	}
 
 	/**
@@ -208,8 +205,8 @@ public class EntityJdbcProvider {
 	 * @return the bean property sql parameter source
 	 */
 	public BeanPropertySqlParameterSource beanParameterSource(String prefix, Object bean) {
-		if (this.sqlParameterSourceFactory instanceof EntityConvertibleSqlParameterSourceFactory) {
-			return ((EntityConvertibleSqlParameterSourceFactory) this.sqlParameterSourceFactory).beanParameterSource(prefix, bean);
+		if (this.sqlParameterSourceFactory instanceof EntityConvertibleSqlParameterSourceFactory convertible) {
+			return convertible.beanParameterSource(prefix, bean);
 		} else {
 			throw new UnsupportedOperationException("Prefix saving is not supported as default.");
 		}

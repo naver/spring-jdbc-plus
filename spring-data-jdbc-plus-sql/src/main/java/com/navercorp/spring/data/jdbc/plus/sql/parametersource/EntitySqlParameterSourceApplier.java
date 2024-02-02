@@ -63,8 +63,8 @@ class EntitySqlParameterSourceApplier {
 		SqlIdentifierParameterSource parameterSource,
 		Object instance,
 		RelationalPersistentEntity<?> persistentEntity,
-		String prefix) {
-
+		String prefix
+	) {
 		PersistentPropertyAccessor<?> propertyAccessor = instance != null
 			? persistentEntity.getPropertyAccessor(instance)
 			: NoValuePropertyAccessor.instance();
@@ -97,8 +97,8 @@ class EntitySqlParameterSourceApplier {
 		SqlIdentifierParameterSource parameterSource,
 		RelationalPersistentProperty property,
 		Object value,
-		SqlIdentifier name) {
-
+		SqlIdentifier name
+	) {
 		Class<?> javaType = this.jdbcConverter.getColumnType(property);
 		SQLType sqlType = this.jdbcConverter.getTargetSqlType(property);
 		JdbcValue jdbcValue = this.jdbcConverter.writeJdbcValue(value, javaType, sqlType);

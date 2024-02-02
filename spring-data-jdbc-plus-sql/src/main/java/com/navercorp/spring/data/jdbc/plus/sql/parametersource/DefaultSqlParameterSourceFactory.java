@@ -44,8 +44,8 @@ public class DefaultSqlParameterSourceFactory implements SqlParameterSourceFacto
 	 */
 	public DefaultSqlParameterSourceFactory(
 		RelationalMappingContext mappingContext,
-		JdbcConverter jdbcConverter) {
-
+		JdbcConverter jdbcConverter
+	) {
 		this.mappingContext = mappingContext;
 		this.parameterSourceApplier = new EntitySqlParameterSourceApplier(mappingContext, jdbcConverter);
 	}

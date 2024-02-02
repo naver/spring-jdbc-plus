@@ -11,9 +11,11 @@ import org.springframework.data.relational.core.mapping.RelationalPersistentProp
  */
 @SuppressWarnings("checkstyle:linelength")
 public class PersistentPropertyPathTestUtils {
-	public static PersistentPropertyPath<RelationalPersistentProperty> getPath(RelationalMappingContext context,
-		String path, Class<?> baseType) {
-
+	public static PersistentPropertyPath<RelationalPersistentProperty> getPath(
+		RelationalMappingContext context,
+		String path,
+		Class<?> baseType
+	) {
 		return context.findPersistentPropertyPaths(baseType, p -> p.isEntity()) //
 			.filter(p -> p.toDotPath().equals(path)) //
 			.stream() //
