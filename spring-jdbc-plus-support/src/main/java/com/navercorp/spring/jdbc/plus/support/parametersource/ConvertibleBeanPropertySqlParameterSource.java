@@ -39,7 +39,7 @@ public class ConvertibleBeanPropertySqlParameterSource extends BeanPropertySqlPa
 	private final FallbackParameterSource fallbackParameterSource;
 	private final String prefix;
 
-	private boolean padArray = true;
+	private boolean padArray = false;
 
 	private boolean paddingIterableParams = false;
 	private int[] paddingIterableBoundaries = null;
@@ -172,7 +172,7 @@ public class ConvertibleBeanPropertySqlParameterSource extends BeanPropertySqlPa
 	 * @param padArray the pad array y/n
 	 * @deprecated No plans to replacement
 	 */
-	@Deprecated
+	@Deprecated(forRemoval = true, since = "3.2")
 	public void setPadArray(boolean padArray) {
 		this.padArray = padArray;
 	}

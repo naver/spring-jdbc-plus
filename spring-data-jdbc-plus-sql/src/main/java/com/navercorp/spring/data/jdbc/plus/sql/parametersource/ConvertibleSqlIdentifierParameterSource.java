@@ -33,7 +33,7 @@ class ConvertibleSqlIdentifierParameterSource extends SqlIdentifierParameterSour
 	private final JdbcParameterSourceConverter converter;
 	private final FallbackParameterSource fallbackParameterSource;
 
-	private boolean padArray = true;
+	private boolean padArray = false;
 	private boolean paddingIterableParams = false;
 	private int[] paddingIterableBoundaries = null;
 
@@ -102,6 +102,7 @@ class ConvertibleSqlIdentifierParameterSource extends SqlIdentifierParameterSour
 	 *
 	 * @param padArray the pad array y/n
 	 */
+	@Deprecated(forRemoval = true, since = "3.2")
 	public void setPadArray(boolean padArray) {
 		this.padArray = padArray;
 	}
