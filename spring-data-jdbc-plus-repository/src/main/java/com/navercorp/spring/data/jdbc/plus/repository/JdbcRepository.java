@@ -19,6 +19,7 @@
 package com.navercorp.spring.data.jdbc.plus.repository;
 
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.NoRepositoryBean;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.QueryByExampleExecutor;
 
@@ -30,6 +31,7 @@ import org.springframework.data.repository.query.QueryByExampleExecutor;
  * @param <T>  the entity type parameter
  * @param <ID> the id type parameter
  */
+@NoRepositoryBean
 public interface JdbcRepository<T, ID>
 	extends PagingAndSortingRepository<T, ID>, CrudRepository<T, ID>, QueryByExampleExecutor<T> {
 
