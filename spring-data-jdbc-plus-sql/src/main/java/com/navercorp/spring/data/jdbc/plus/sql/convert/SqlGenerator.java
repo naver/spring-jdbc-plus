@@ -1345,8 +1345,8 @@ class SqlGenerator {
 
 		SimpleFunction function = SimpleFunction.create(
 			sqlFunction.functionName(), functionExpressions);
-		if (column instanceof Aliased) {
-			function = function.as(((Aliased)column).getAlias());
+		if (column instanceof Aliased aliased) {
+			function = function.as(aliased.getAlias());
 		}
 		return function;
 	}

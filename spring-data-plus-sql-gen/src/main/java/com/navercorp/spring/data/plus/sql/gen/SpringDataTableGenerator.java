@@ -310,8 +310,7 @@ public class SpringDataTableGenerator extends AbstractProcessor {
 		TypeName type = ClassName.get(TbColumn.class);
 		TypeName typeName = ClassName.get(fieldElement.asType());
 
-		if (typeName instanceof ParameterizedTypeName) {
-			ParameterizedTypeName parameterizedTypeName = (ParameterizedTypeName)typeName;
+		if (typeName instanceof ParameterizedTypeName parameterizedTypeName) {
 			if (parameterizedTypeName.typeArguments.size() == 1) {    // List, Set
 				ClassName componentName = (ClassName)parameterizedTypeName.typeArguments.get(0);
 				type = ClassName.get(
@@ -323,8 +322,8 @@ public class SpringDataTableGenerator extends AbstractProcessor {
 					componentName.packageName(),
 					convertTableTypeName(componentName.simpleName()));
 			}
-		} else if (typeName instanceof ArrayTypeName) {
-			ClassName componentName = (ClassName)((ArrayTypeName)typeName).componentType;
+		} else if (typeName instanceof ArrayTypeName arrayTypeName) {
+			ClassName componentName = (ClassName)arrayTypeName.componentType;
 			type = ClassName.get(
 				componentName.packageName(),
 				convertTableTypeName(componentName.simpleName()));

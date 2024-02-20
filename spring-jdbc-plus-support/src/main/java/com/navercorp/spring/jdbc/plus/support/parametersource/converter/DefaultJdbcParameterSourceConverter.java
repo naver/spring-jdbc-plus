@@ -74,8 +74,8 @@ public class DefaultJdbcParameterSourceConverter implements JdbcParameterSourceC
 	private static List<ConditionalConverter<?, ?>> getConditionalConverters(List<Converter<?, ?>> converters) {
 		List<ConditionalConverter<?, ?>> conditionalConverters = new ArrayList<>();
 		for (Converter<?, ?> converter : converters) {
-			if (converter instanceof ConditionalConverter) {
-				conditionalConverters.add((ConditionalConverter<?, ?>)converter);
+			if (converter instanceof ConditionalConverter<?, ?> conditionalConverter) {
+				conditionalConverters.add(conditionalConverter);
 			}
 		}
 		return conditionalConverters;
@@ -118,8 +118,8 @@ public class DefaultJdbcParameterSourceConverter implements JdbcParameterSourceC
 	private static List<ConditionalUnwrapper<?>> getConditionalUnwrappers(List<Unwrapper<?>> unwrappers) {
 		List<ConditionalUnwrapper<?>> conditionalUnwrappers = new ArrayList<>();
 		for (Unwrapper<?> unwrapper : unwrappers) {
-			if (unwrapper instanceof ConditionalUnwrapper) {
-				conditionalUnwrappers.add((ConditionalUnwrapper<?>)unwrapper);
+			if (unwrapper instanceof ConditionalUnwrapper<?> conditionalUnwrapper) {
+				conditionalUnwrappers.add(conditionalUnwrapper);
 			}
 		}
 		return conditionalUnwrappers;
@@ -196,15 +196,15 @@ public class DefaultJdbcParameterSourceConverter implements JdbcParameterSourceC
 		if (converter != null) {
 			value = converter.convert(value);
 		} else {
-			if (value instanceof Iterable) {
-				value = this.convertElements((Iterable)value);
+			if (value instanceof Iterable iterable) {
+				value = this.convertElements(iterable);
 			} else if (value.getClass().isArray()) {
 				if (value.getClass().getComponentType().isPrimitive()) {
 					return value;
 				}
 				value = this.convertElements((Object[])value);
-			} else if (value instanceof Enum) {
-				value = enumConverter.convert((Enum)value);
+			} else if (value instanceof Enum enumValue) {
+				value = enumConverter.convert(enumValue);
 			}
 		}
 

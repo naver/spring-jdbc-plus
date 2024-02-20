@@ -63,8 +63,8 @@ public class IterableExpandPadding {
 			paddingBoundaries = REGULAR_SIZES;
 		}
 
-		if (source instanceof Collection) {
-			return CollectionExpandPadding.INSTANCE.expand((Collection<?>)source, paddingBoundaries);
+		if (source instanceof Collection<?> collection) {
+			return CollectionExpandPadding.INSTANCE.expand(collection, paddingBoundaries);
 		} else if (source.getClass().isArray() && padArray) {
 			return ArrayExpandPadding.INSTANCE.expand((Object[])source, paddingBoundaries);
 		}
