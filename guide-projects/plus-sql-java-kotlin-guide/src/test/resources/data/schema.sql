@@ -62,3 +62,17 @@ CREATE TABLE IF NOT EXISTS n_config (
   board_id INT,
   post_id INT,
   PRIMARY KEY(id));
+
+CREATE TABLE IF NOT EXISTS n_pay (
+  id INT AUTO_INCREMENT,
+  amount INT,
+  order_id INT,
+  PRIMARY KEY(id));
+
+CREATE TABLE IF NOT EXISTS n_pay_adms (
+  id INT AUTO_INCREMENT,
+  amount INT,
+  pay_id INT,
+  pay_method_type VARCHAR(20),
+  PRIMARY KEY(id));
+
