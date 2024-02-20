@@ -37,6 +37,7 @@ import org.springframework.data.relational.core.sql.Aliased;
 import org.springframework.data.relational.core.sql.SqlIdentifier;
 import org.springframework.data.relational.core.sql.TableLike;
 
+import com.navercorp.spring.data.jdbc.plus.sql.annotation.SoftDeleteColumn;
 import com.navercorp.spring.data.jdbc.plus.sql.annotation.SqlTableAlias;
 
 /**
@@ -768,7 +769,7 @@ class SqlGeneratorTest {
 	@Test
 	void deleteWithAlias() {
 		assertThat(createSqlGenerator(DummyAliasEntity.class, NonQuotingDialect.INSTANCE).getDeleteById())
-			.contains("WHERE dummy_entity.id1 = :id");
+			.contains("UPDATE dummy_entity SET x_valid = false WHERE dummy_entity.id1 = :id1");
 	}
 
 	@Test
@@ -825,6 +826,9 @@ class SqlGeneratorTest {
 		@Id
 		Long id;
 		String name;
+
+		@SoftDeleteColumn.Boolean
+		boolean valid;
 		ReferencedEntity ref;
 		Set<Element> elements;
 		Map<Integer, Element> mappedElements;

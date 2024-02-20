@@ -25,6 +25,7 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.OptionalLong;
 import java.util.Set;
 import java.util.TreeSet;
@@ -82,10 +83,13 @@ import org.springframework.data.relational.core.sql.render.RenderNamingStrategy;
 import org.springframework.data.relational.core.sql.render.SqlRenderer;
 import org.springframework.data.util.Lazy;
 import org.springframework.data.util.ReflectionUtils;
+import org.springframework.data.util.TypeInformation;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
+import com.navercorp.spring.data.jdbc.plus.sql.annotation.SoftDeleteColumn;
+import com.navercorp.spring.data.jdbc.plus.sql.annotation.SoftDeleteColumn.DeleteValueType;
 import com.navercorp.spring.data.jdbc.plus.sql.annotation.SqlFunction;
 import com.navercorp.spring.data.jdbc.plus.sql.parametersource.BindParameterNameSanitizer;
 
@@ -125,6 +129,13 @@ class SqlGenerator {
 	private final SqlContexts sqlContext;
 	private final SqlRenderer sqlRenderer;
 	private final Columns columns;
+	private final JdbcConverter jdbcConverter;
+
+	@Nullable
+	private final RelationalPersistentProperty softDeleteProperty;
+
+	@Nullable
+	private final Object softDeleteValue;
 
 	private final Lazy<String> findOneSql = Lazy.of(this::createFindOneSql);
 	private final Lazy<String> findAllSql = Lazy.of(this::createFindAllSql);
@@ -160,6 +171,7 @@ class SqlGenerator {
 		RelationalPersistentEntity<?> entity,
 		Dialect dialect
 	) {
+		this.jdbcConverter = converter;
 		this.mappingContext = mappingContext;
 		this.entity = entity;
 		this.sqlContext = new SqlContext(entity);
@@ -168,6 +180,16 @@ class SqlGenerator {
 		this.columns = new Columns(entity, mappingContext, converter);
 		this.queryMapper = new QueryMapper(dialect, converter);
 		this.dialect = dialect;
+		this.softDeleteProperty = this.getAnnotatedProperty(entity);
+		this.softDeleteValue = Optional.ofNullable(softDeleteProperty)
+			.map(props -> props.getRequiredAnnotation(SoftDeleteColumn.class))
+			.map(softDeleteColumn ->
+				softDeleteColumn.deleteValueType() == DeleteValueType.USE_BOOLEAN
+					? softDeleteColumn.deleteValueBoolean()
+					: softDeleteColumn.deleteValueString()
+			)
+			.map(it -> converter.writeValue(it, TypeInformation.of(converter.getColumnType(this.softDeleteProperty))))
+			.orElse(null);
 	}
 
 	/**
@@ -181,6 +203,7 @@ class SqlGenerator {
 		Dialect dialect,
 		SqlContexts sqlContexts
 	) {
+		this.jdbcConverter = converter;
 		this.mappingContext = mappingContext;
 		this.entity = entity;
 		this.columns = new Columns(entity, mappingContext, converter);
@@ -189,6 +212,15 @@ class SqlGenerator {
 		this.sqlContext = sqlContexts;
 		this.queryMapper = new QueryMapper(dialect, converter);
 		this.dialect = dialect;
+		this.softDeleteProperty = this.getAnnotatedProperty(entity);
+		this.softDeleteValue = Optional.ofNullable(softDeleteProperty)
+			.map(props -> props.getRequiredAnnotation(SoftDeleteColumn.class))
+			.map(softDeleteColumn ->
+				softDeleteColumn.deleteValueType() == DeleteValueType.USE_BOOLEAN
+					? softDeleteColumn.deleteValueBoolean()
+					: softDeleteColumn.deleteValueString()
+			)
+			.orElse(null);
 	}
 
 	/**
@@ -981,7 +1013,9 @@ class SqlGenerator {
 	}
 
 	private String createDeleteByIdSql() {
-		return render(createBaseDeleteById(getDmlTable()).build());
+		return this.softDeleteProperty == null
+			? render(createBaseDeleteById(getDmlTable()).build())
+			: render(createSoftDeleteById(getDmlTable()).build());
 	}
 
 	private String createDeleteByIdInSql() {
@@ -1001,6 +1035,19 @@ class SqlGenerator {
 	private DeleteBuilder.DeleteWhereAndOr createBaseDeleteById(Table table) {
 		return Delete.builder().from(table) //
 			.where(getDmlIdColumn().isEqualTo(getBindMarker(ID_SQL_PARAMETER)));
+	}
+
+	private UpdateBuilder.UpdateWhereAndOr createSoftDeleteById(Table table) {
+		Assert.notNull(softDeleteProperty, "Must be @SoftDeleteColumn");
+		Assert.notNull(softDeleteValue, "@SoftDeleteColumn deleteValue must not be null");
+
+		return Update.builder() //
+			.table(table) //
+			.set(Assignments.value(
+					table.column(softDeleteProperty.getColumnName()),
+					getBindMarker(softDeleteProperty.getColumnName())
+			)) //
+			.where(getDmlIdColumn().isEqualTo(getBindMarker(entity.getIdColumn())));
 	}
 
 	private DeleteBuilder.DeleteWhereAndOr createBaseDeleteByIdIn(Table table) {
@@ -1325,6 +1372,31 @@ class SqlGenerator {
 		return criteria == null || criteria.isEmpty() // Check for null and empty criteria
 			? whereBuilder //
 			: whereBuilder.where(queryMapper.getMappedObject(parameterSource, criteria, table, entity));
+	}
+
+	private RelationalPersistentProperty getAnnotatedProperty(RelationalPersistentEntity<?> persistentEntity) {
+		List<RelationalPersistentProperty> embeddedProperties = new ArrayList<>();
+		for (RelationalPersistentProperty property : persistentEntity) {
+			if (property.isAnnotationPresent(SoftDeleteColumn.class)) {
+				return property;
+			}
+
+			if (property.isEmbedded()) {
+				embeddedProperties.add(property);
+			}
+		}
+
+		for (RelationalPersistentProperty embeddedProperty : embeddedProperties) {
+			RelationalPersistentEntity<?> embedded =
+				this.mappingContext.getPersistentEntity(embeddedProperty.getTypeInformation());
+
+			RelationalPersistentProperty property = this.getAnnotatedProperty(embedded);
+			if (property != null) {
+				return property;
+			}
+		}
+
+		return null;
 	}
 
 	private Expression getColumnExpression(AggregatePath extPath, Column column) {
