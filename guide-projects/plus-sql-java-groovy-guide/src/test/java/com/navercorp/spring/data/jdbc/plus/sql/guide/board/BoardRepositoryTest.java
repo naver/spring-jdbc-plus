@@ -387,10 +387,10 @@ public class BoardRepositoryTest {
 		assertLabelsEquals(
 			actual1.get().getLabels().stream()
 				.sorted(comparingLong(Label::getId))
-				.collect(toList()),
+				.toList(),
 			boards.get(0).getLabels().stream()
 				.sorted(comparingLong(Label::getId))
-				.collect(toList()));
+				.toList());
 
 		Assertions.assertThat(actual2).isPresent();
 		assertThat(actual2.get().getId()).isEqualTo(boards.get(0).getPosts().get(1).getId());
@@ -398,11 +398,11 @@ public class BoardRepositoryTest {
 		assertLabelsEquals(
 			actual2.get().getLabels().stream()
 				.sorted(comparingLong(Label::getId))
-				.collect(toList()),
+				.toList(),
 			boards.get(0).getLabels()
 				.stream()
 				.sorted(comparingLong(Label::getId))
-				.collect(toList()));
+				.toList());
 
 		Assertions.assertThat(actual3).isPresent();
 		assertThat(actual3.get().getId()).isEqualTo(boards.get(1).getPosts().get(0).getId());
@@ -410,10 +410,10 @@ public class BoardRepositoryTest {
 		assertLabelsEquals(
 			actual3.get().getLabels().stream()
 				.sorted(comparingLong(Label::getId))
-				.collect(toList()),
+				.toList(),
 			boards.get(1).getLabels().stream()
 				.sorted(comparingLong(Label::getId))
-				.collect(toList()));
+				.toList());
 
 		Assertions.assertThat(actual4).isPresent();
 		assertThat(actual4.get().getId()).isEqualTo(boards.get(1).getPosts().get(1).getId());
@@ -421,10 +421,10 @@ public class BoardRepositoryTest {
 		assertLabelsEquals(
 			actual4.get().getLabels().stream()
 				.sorted(comparingLong(Label::getId))
-				.collect(toList()),
+				.toList(),
 			boards.get(1).getLabels().stream()
 				.sorted(comparingLong(Label::getId))
-				.collect(toList()));
+				.toList());
 
 		Assertions.assertThat(actual5).isPresent();
 		assertThat(actual5.get().getId()).isEqualTo(boards.get(2).getPosts().get(0).getId());
@@ -432,10 +432,10 @@ public class BoardRepositoryTest {
 		assertLabelsEquals(
 			actual5.get().getLabels().stream()
 				.sorted(comparingLong(Label::getId))
-				.collect(toList()),
+				.toList(),
 			boards.get(2).getLabels().stream()
 				.sorted(comparingLong(Label::getId))
-				.collect(toList()));
+				.toList());
 
 		Assertions.assertThat(actual6).isPresent();
 		assertThat(actual6.get().getId()).isEqualTo(boards.get(2).getPosts().get(1).getId());
@@ -443,10 +443,10 @@ public class BoardRepositoryTest {
 		assertLabelsEquals(
 			actual6.get().getLabels().stream()
 				.sorted(comparingLong(Label::getId))
-				.collect(toList()),
+				.toList(),
 			boards.get(2).getLabels().stream()
 				.sorted(comparingLong(Label::getId))
-				.collect(toList()));
+				.toList());
 	}
 
 	private void assertEquals(Board actual, Board target) {
@@ -488,11 +488,11 @@ public class BoardRepositoryTest {
 			List<Map.Entry<String, Config>> actualConfigs = actual.getConfigMap().entrySet()
 				.stream()
 				.sorted(Map.Entry.comparingByKey())
-				.collect(toList());
+				.toList();
 			List<Map.Entry<String, Config>> targetConfigs = target.getConfigMap().entrySet()
 				.stream()
 				.sorted(Map.Entry.comparingByKey())
-				.collect(toList());
+				.toList();
 
 			assertThat(actualConfigs.size()).isEqualTo(targetConfigs.size());
 			for (int i = 0; i < actualConfigs.size(); i++) {
@@ -509,10 +509,10 @@ public class BoardRepositoryTest {
 
 		List<Label> actualLabels = actual.getLabels().stream()
 			.sorted(comparingLong(Label::getId))
-			.collect(toList());
+			.toList();
 		List<Label> boardLabels = actual.getLabels().stream()
 			.sorted(comparingLong(Label::getId))
-			.collect(toList());
+			.toList();
 		assertLabelsEquals(actualLabels, boardLabels);
 
 		List<Post> actualPosts = actual.getPosts();
@@ -574,10 +574,10 @@ public class BoardRepositoryTest {
 
 		List<Tag> actualTags = actualPost.getTags().stream()
 			.sorted(comparingLong(Tag::getId))
-			.collect(toList());
+			.toList();
 		List<Tag> postTags = targetPost.getTags().stream()
 			.sorted(comparingLong(Tag::getId))
-			.collect(toList());
+			.toList();
 
 		assertThat(actualTags.size()).isEqualTo(postTags.size());
 
@@ -630,11 +630,11 @@ public class BoardRepositoryTest {
 			List<Map.Entry<String, Config>> actualConfigs = actualPost.getConfigMap().entrySet()
 				.stream()
 				.sorted(Map.Entry.comparingByKey())
-				.collect(toList());
+				.toList();
 			List<Map.Entry<String, Config>> targetConfigs = targetPost.getConfigMap().entrySet()
 				.stream()
 				.sorted(Map.Entry.comparingByKey())
-				.collect(toList());
+				.toList();
 
 			assertThat(actualConfigs.size()).isEqualTo(targetConfigs.size());
 			for (int i = 0; i < actualConfigs.size(); i++) {

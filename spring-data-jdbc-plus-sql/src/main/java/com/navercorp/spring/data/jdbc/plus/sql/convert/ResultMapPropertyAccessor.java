@@ -21,7 +21,7 @@ class ResultMapPropertyAccessor implements PropertyAccessor {
 
 	@Override
 	public boolean canRead(EvaluationContext context, @Nullable Object target, String name) {
-		return target instanceof Map && ((Map) target).containsKey(name);
+		return target instanceof Map<?, ?> map && map.containsKey(name);
 	}
 
 	@Override
@@ -31,7 +31,7 @@ class ResultMapPropertyAccessor implements PropertyAccessor {
 			return TypedValue.NULL;
 		}
 
-		Object value = ((Map) target).get(name);
+		Object value = ((Map<?, ?>) target).get(name);
 
 		if (value == null) {
 			return TypedValue.NULL;
