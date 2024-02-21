@@ -46,10 +46,10 @@ public class JdbcConfiguration {
 	private static List<Converter<?, ?>> storeConverters() {
 		List<Converter<?, ?>> converters = new ArrayList<>();
 		for (Object obj : JdbcCustomConversions.storeConverters()) {
-			if (obj instanceof Converter<?, ?>
+			if (obj instanceof Converter<?, ?> converter
 				&& obj.getClass().getAnnotation(ReadingConverter.class) == null
 			) {
-				converters.add((Converter<?, ?>)obj);
+				converters.add(converter);
 			}
 		}
 		return converters;

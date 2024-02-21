@@ -47,7 +47,7 @@ class IterableExpandPaddingTest {
 	private static List<String> list(int size) {
 		return RANDOM.ints(size)
 			.mapToObj(String::valueOf)
-			.collect(toList());
+			.toList();
 	}
 
 	@Test
