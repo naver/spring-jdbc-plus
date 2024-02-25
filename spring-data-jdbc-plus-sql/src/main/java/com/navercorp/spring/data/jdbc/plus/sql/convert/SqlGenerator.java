@@ -142,8 +142,10 @@ class SqlGenerator {
 	private final Lazy<String> deleteByIdInSql = Lazy.of(this::createDeleteByIdInSql);
 	private final Lazy<String> deleteByIdAndVersionSql = Lazy.of(this::createDeleteByIdAndVersionSql);
 	private final Lazy<String> deleteByListSql = Lazy.of(this::createDeleteByListSql);
+	private final Lazy<String> softDeleteByIdSql = Lazy.of(this::createSoftDeleteById);
 	private final QueryMapper queryMapper;
 	private final Dialect dialect;
+	private final SoftDeleteProperty softDeleteProperty;
 
 	/**
 	 * Create a new {@link SqlGenerator} given {@link RelationalMappingContext}
@@ -168,6 +170,7 @@ class SqlGenerator {
 		this.columns = new Columns(entity, mappingContext, converter);
 		this.queryMapper = new QueryMapper(dialect, converter);
 		this.dialect = dialect;
+		this.softDeleteProperty = SoftDeleteProperty.from(entity);
 	}
 
 	/**
@@ -189,6 +192,7 @@ class SqlGenerator {
 		this.sqlContext = sqlContexts;
 		this.queryMapper = new QueryMapper(dialect, converter);
 		this.dialect = dialect;
+		this.softDeleteProperty = SoftDeleteProperty.from(entity);
 	}
 
 	/**
@@ -522,6 +526,10 @@ class SqlGenerator {
 		return deleteByListSql.get();
 	}
 
+	String getSoftDeleteById() {
+		return softDeleteByIdSql.get();
+	}
+
 	/**
 	 * Create a {@code DELETE} query and optionally filter by {@link PersistentPropertyPath}.
 	 *
@@ -563,6 +571,14 @@ class SqlGenerator {
 
 		return createDeleteByPathAndCriteria(mappingContext.getAggregatePath(path),
 			filterColumn -> filterColumn.in(getBindMarker(IDS_SQL_PARAMETER)));
+	}
+
+	String createSoftDeleteById() {
+		if (!supportsSoftDelete()) {
+			throw new IllegalStateException("SoftDeleteProperty should exist");
+		}
+
+		return createSoftDeleteByIdSql();
 	}
 
 	private String createFindOneSql() {
@@ -1048,6 +1064,25 @@ class SqlGenerator {
 		return render(delete);
 	}
 
+	private String createSoftDeleteByIdSql() {
+		Table table = getDmlTable();
+
+		List<AssignValue> assignments = List.of(
+			Assignments.value(
+				table.column(softDeleteProperty.getColumnName()),
+				getBindMarker(softDeleteProperty.getColumnName())
+			)
+		);
+
+		Update update = Update.builder()
+			.table(table) //
+			.set(assignments) //
+			.where(getDmlIdColumn().isEqualTo(getBindMarker(entity.getIdColumn())))
+			.build();
+
+		return render(update);
+	}
+
 	private String render(Select select) {
 		return this.sqlRenderer.render(select);
 	}
@@ -1349,6 +1384,10 @@ class SqlGenerator {
 			function = function.as(aliased.getAlias());
 		}
 		return function;
+	}
+
+	private boolean supportsSoftDelete() {
+		return softDeleteProperty.exists();
 	}
 
 	/**

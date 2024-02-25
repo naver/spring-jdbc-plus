@@ -37,6 +37,7 @@ import org.springframework.data.relational.core.sql.Aliased;
 import org.springframework.data.relational.core.sql.SqlIdentifier;
 import org.springframework.data.relational.core.sql.TableLike;
 
+import com.navercorp.spring.data.jdbc.plus.sql.annotation.SoftDeleteColumn;
 import com.navercorp.spring.data.jdbc.plus.sql.annotation.SqlTableAlias;
 
 /**
@@ -783,6 +784,18 @@ class SqlGeneratorTest {
 			.contains("versioned_entity.id1 = :id AND versioned_entity.x_version = :___old");
 	}
 
+	@Test
+	void softDeleteByIdWithBoolean() {
+		assertThat(createSqlGenerator(BooleanValueSoftDeleteArticle.class, NonQuotingDialect.INSTANCE).getSoftDeleteById())
+			.isEqualTo("UPDATE boolean_value_article SET x_deleted = :x_deleted WHERE boolean_value_article.x_id = :x_id");
+	}
+
+	@Test
+	void softDeleteByIdWithString() {
+		assertThat(createSqlGenerator(StringValueSoftDeleteArticle.class, NonQuotingDialect.INSTANCE).getSoftDeleteById())
+			.isEqualTo("UPDATE string_value_article SET x_state = :x_state WHERE string_value_article.x_id = :x_id");
+	}
+
 	private SqlIdentifier getAlias(Object maybeAliased) {
 
 		if (maybeAliased instanceof Aliased) {
@@ -996,5 +1009,33 @@ class SqlGeneratorTest {
 		@Id
 		Long id;
 		IdNoIdChain idNoIdChain;
+	}
+
+	@Table("boolean_value_article")
+	static class BooleanValueSoftDeleteArticle {
+
+		@Id
+		Long id;
+
+		String contents;
+
+		@SoftDeleteColumn.Boolean(valueAsDeleted = true)
+		boolean deleted;
+	}
+
+	@Table("string_value_article")
+	static class StringValueSoftDeleteArticle {
+
+		@Id
+		Long id;
+
+		String contents;
+
+		@SoftDeleteColumn.String(valueAsDeleted = "DELETE")
+		ArticleState state;
+
+		enum ArticleState {
+			OPEN, CLOSE, DELETE
+		}
 	}
 }
