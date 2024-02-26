@@ -6,6 +6,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import org.springframework.core.annotation.AliasFor;
+
 /**
  * The annotation to configure a soft delete column in the current table.
  * <p>
@@ -20,6 +22,8 @@ import java.lang.annotation.Target;
 public @interface SoftDeleteColumn {
 
 	ValueType type();
+
+	java.lang.String valueAsDeleted() default "";
 
 	/**
 	 * Type fo value to be used for updating soft delete column.
@@ -60,7 +64,8 @@ public @interface SoftDeleteColumn {
 	@Target({ ElementType.FIELD, ElementType.METHOD })
 	@SoftDeleteColumn(type = ValueType.BOOLEAN)
 	@interface Boolean {
-		boolean valueAsDeleted();
+		@AliasFor(annotation = SoftDeleteColumn.class, attribute = "valueAsDeleted")
+		java.lang.String valueAsDeleted();
 	}
 
 	/**
@@ -85,6 +90,7 @@ public @interface SoftDeleteColumn {
 	@Target({ ElementType.FIELD, ElementType.METHOD })
 	@SoftDeleteColumn(type = ValueType.STRING)
 	@interface String {
+		@AliasFor(annotation = SoftDeleteColumn.class, attribute = "valueAsDeleted")
 		java.lang.String valueAsDeleted();
 	}
 }

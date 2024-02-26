@@ -796,6 +796,40 @@ class SqlGeneratorTest {
 			.isEqualTo("UPDATE string_value_article SET x_state = :x_state WHERE string_value_article.x_id = :x_id");
 	}
 
+	@Test
+	void softDeleteByIdInWithBoolean() {
+		assertThat(createSqlGenerator(BooleanValueSoftDeleteArticle.class, NonQuotingDialect.INSTANCE).getSoftDeleteByIdIn())
+			.isEqualTo("UPDATE boolean_value_article SET x_deleted = :x_deleted WHERE boolean_value_article.x_id IN (:ids)");
+	}
+
+	@Test
+	void softDeleteByIdInWithString() {
+		assertThat(createSqlGenerator(StringValueSoftDeleteArticle.class, NonQuotingDialect.INSTANCE).getSoftDeleteByIdIn())
+			.isEqualTo("UPDATE string_value_article SET x_state = :x_state WHERE string_value_article.x_id IN (:ids)");
+	}
+
+	@Test
+	void softDeleteByIdAndVersionWithBoolean() {
+		assertThat(createSqlGenerator(BooleanValueSoftDeleteArticle.class, NonQuotingDialect.INSTANCE).getSoftDeleteByIdAndVersion())
+			.isEqualTo(
+				"UPDATE boolean_value_article "
+					+ "SET x_deleted = :x_deleted "
+					+ "WHERE boolean_value_article.x_id = :x_id "
+					+ "AND boolean_value_article.x_version = :___oldOptimisticLockingVersion"
+			);
+	}
+
+	@Test
+	void softDeleteByIdAndVersionWithString() {
+		assertThat(createSqlGenerator(StringValueSoftDeleteArticle.class, NonQuotingDialect.INSTANCE).getSoftDeleteByIdAndVersion())
+			.isEqualTo(
+				"UPDATE string_value_article "
+					+ "SET x_state = :x_state "
+					+ "WHERE string_value_article.x_id = :x_id "
+					+ "AND string_value_article.x_version = :___oldOptimisticLockingVersion"
+			);
+	}
+
 	private SqlIdentifier getAlias(Object maybeAliased) {
 
 		if (maybeAliased instanceof Aliased) {
@@ -1019,8 +1053,11 @@ class SqlGeneratorTest {
 
 		String contents;
 
-		@SoftDeleteColumn.Boolean(valueAsDeleted = true)
+		@SoftDeleteColumn.Boolean(valueAsDeleted = "true")
 		boolean deleted;
+
+		@Version
+		Integer version;
 	}
 
 	@Table("string_value_article")
@@ -1033,6 +1070,9 @@ class SqlGeneratorTest {
 
 		@SoftDeleteColumn.String(valueAsDeleted = "DELETE")
 		ArticleState state;
+
+		@Version
+		Integer version;
 
 		enum ArticleState {
 			OPEN, CLOSE, DELETE

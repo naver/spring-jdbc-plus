@@ -6,6 +6,7 @@ import org.springframework.data.relational.core.mapping.RelationalPersistentEnti
 import org.springframework.data.relational.core.mapping.RelationalPersistentProperty;
 import org.springframework.data.relational.core.sql.SqlIdentifier;
 import org.springframework.lang.Nullable;
+import org.springframework.util.StringUtils;
 
 import com.navercorp.spring.data.jdbc.plus.sql.annotation.SoftDeleteColumn;
 
@@ -54,21 +55,28 @@ class SoftDeleteProperty {
 	}
 
 	private static Object getSoftDeleteColumnUpdateValue(RelationalPersistentProperty property) {
-		SoftDeleteColumn.Boolean booleanAnnotation = property.findAnnotation(SoftDeleteColumn.Boolean.class);
-		SoftDeleteColumn.String stringAnnotation = property.findAnnotation(SoftDeleteColumn.String.class);
-
-		if (booleanAnnotation != null) {
-			return booleanAnnotation.valueAsDeleted();
+		SoftDeleteColumn annotation = property.getRequiredAnnotation(SoftDeleteColumn.class);
+		if (!StringUtils.hasText(annotation.valueAsDeleted())) {
+			throw new IllegalArgumentException("SoftDeleteColum.valueAsDeleted() is Empty.");
 		}
 
-		if (stringAnnotation != null) {
-			return getUpdateValueFromString(property, stringAnnotation.valueAsDeleted());
-		}
-
-		throw new IllegalArgumentException("SoftDeleteColumn annotation not exists.");
+		return switch (annotation.type()) {
+			case BOOLEAN -> getBooleanUpdateValue(annotation.valueAsDeleted());
+			case STRING -> getStringUpdateValue(property, annotation.valueAsDeleted());
+		};
 	}
 
-	private static Object getUpdateValueFromString(
+	private static boolean getBooleanUpdateValue(String value) {
+		if ("true".equals(value) || "false".equals(value)) {
+			return java.lang.Boolean.parseBoolean(value);
+		}
+
+		throw new IllegalArgumentException(
+			"Invalid value %s provided for Boolean type of SoftDeleteColumn".formatted(value)
+		);
+	}
+
+	private static Object getStringUpdateValue(
 		RelationalPersistentProperty property,
 		String value
 	) {

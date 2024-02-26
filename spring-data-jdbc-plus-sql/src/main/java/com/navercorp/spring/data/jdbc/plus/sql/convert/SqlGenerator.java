@@ -142,7 +142,10 @@ class SqlGenerator {
 	private final Lazy<String> deleteByIdInSql = Lazy.of(this::createDeleteByIdInSql);
 	private final Lazy<String> deleteByIdAndVersionSql = Lazy.of(this::createDeleteByIdAndVersionSql);
 	private final Lazy<String> deleteByListSql = Lazy.of(this::createDeleteByListSql);
-	private final Lazy<String> softDeleteByIdSql = Lazy.of(this::createSoftDeleteById);
+	private final Lazy<String> softDeleteByIdSql = Lazy.of(this::createSoftDeleteByIdSql);
+
+	private final Lazy<String> softDeleteByIdInSql = Lazy.of(this::createSoftDeleteByIdInSql);
+	private final Lazy<String> softDeleteByIdAndVersionSql = Lazy.of(this::createSoftDeleteByIdAndVersionSql);
 	private final QueryMapper queryMapper;
 	private final Dialect dialect;
 	private final SoftDeleteProperty softDeleteProperty;
@@ -526,8 +529,32 @@ class SqlGenerator {
 		return deleteByListSql.get();
 	}
 
+	/**
+	 * Create a {@code UPDATE … SET … WHERE :id = …} statement.
+	 *
+	 * @return the statement as a {@link String}. Guaranteed to be not {@literal null}.
+	 */
 	String getSoftDeleteById() {
 		return softDeleteByIdSql.get();
+	}
+
+	/**
+	 * Create a {@code UPDATE … SET … WHERE :id IN …} statement.
+	 *
+	 * @return the statement as a {@link String}. Guaranteed to be not {@literal null}.
+	 */
+	String getSoftDeleteByIdIn() {
+		return softDeleteByIdInSql.get();
+	}
+
+	/**
+	 * Create a {@code UPDATE … SET … WHERE :id = …
+	 * and :___oldOptimisticLockingVersion = ...} statement.
+	 *
+	 * @return the statement as a {@link String}. Guaranteed to be not {@literal null}.
+	 */
+	String getSoftDeleteByIdAndVersion() {
+		return softDeleteByIdAndVersionSql.get();
 	}
 
 	/**
@@ -571,14 +598,6 @@ class SqlGenerator {
 
 		return createDeleteByPathAndCriteria(mappingContext.getAggregatePath(path),
 			filterColumn -> filterColumn.in(getBindMarker(IDS_SQL_PARAMETER)));
-	}
-
-	String createSoftDeleteById() {
-		if (!supportsSoftDelete()) {
-			throw new IllegalStateException("SoftDeleteProperty should exist");
-		}
-
-		return createSoftDeleteByIdSql();
 	}
 
 	private String createFindOneSql() {
@@ -1065,7 +1084,26 @@ class SqlGenerator {
 	}
 
 	private String createSoftDeleteByIdSql() {
-		Table table = getDmlTable();
+		return render(createBaseSoftDeleteById(getDmlTable()).build());
+	}
+
+	private String createSoftDeleteByIdInSql() {
+		return render(createBaseSoftDeleteByIdIn(getDmlTable()).build());
+	}
+
+	private String createSoftDeleteByIdAndVersionSql() {
+		Update update = createBaseSoftDeleteById(getDmlTable())
+			.and(getDmlVersionColumn().isEqualTo(
+				getBindMarker(VERSION_SQL_PARAMETER)))
+			.build();
+
+		return render(update);
+	}
+
+	private UpdateBuilder.UpdateWhereAndOr createBaseSoftDeleteById(Table table) {
+		if (!supportsSoftDelete()) {
+			throw new IllegalStateException("SoftDeleteProperty should exist");
+		}
 
 		List<AssignValue> assignments = List.of(
 			Assignments.value(
@@ -1074,13 +1112,28 @@ class SqlGenerator {
 			)
 		);
 
-		Update update = Update.builder()
-			.table(table) //
-			.set(assignments) //
-			.where(getDmlIdColumn().isEqualTo(getBindMarker(entity.getIdColumn())))
-			.build();
+		return Update.builder()
+			.table(table)
+			.set(assignments)
+			.where(getDmlIdColumn().isEqualTo(getBindMarker(entity.getIdColumn())));
+	}
 
-		return render(update);
+	private UpdateBuilder.UpdateWhereAndOr createBaseSoftDeleteByIdIn(Table table) {
+		if (!supportsSoftDelete()) {
+			throw new IllegalStateException("SoftDeleteProperty should exist");
+		}
+
+		List<AssignValue> assignments = List.of(
+			Assignments.value(
+				table.column(softDeleteProperty.getColumnName()),
+				getBindMarker(softDeleteProperty.getColumnName())
+			)
+		);
+
+		return Update.builder()
+			.table(table)
+			.set(assignments)
+			.where(getDmlIdColumn().in(getBindMarker(IDS_SQL_PARAMETER)));
 	}
 
 	private String render(Select select) {

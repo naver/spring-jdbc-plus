@@ -62,6 +62,17 @@ class SoftDeletePropertyTest {
 			.hasMessage("SoftDeleteProperty should exist to use columnName/updateValue.");
 	}
 
+	@Test
+	void throwsWhenInvalidBooleanUpdateValue() {
+		// given
+		RelationalPersistentEntity<?> entity = createRelationalPersistentEntity(InvalidBooleanValueSoftDeleteArticle.class);
+
+		// when-then
+		assertThatThrownBy(() -> SoftDeleteProperty.from(entity))
+			.isExactlyInstanceOf(IllegalArgumentException.class)
+			.hasMessageContainingAll("Invalid value", "provided for Boolean type of SoftDeleteColumn");
+	}
+
 	private static Stream<Function<SoftDeleteProperty, Object>> retrieveValueFunctionSource() {
 		return Stream.of(
 			SoftDeleteProperty::getColumnName,
@@ -90,7 +101,19 @@ class SoftDeletePropertyTest {
 
 		String contents;
 
-		@SoftDeleteColumn.Boolean(valueAsDeleted = true)
+		@SoftDeleteColumn.Boolean(valueAsDeleted = "true")
+		boolean deleted;
+	}
+
+	@Table("invalid_boolean_value_article")
+	static class InvalidBooleanValueSoftDeleteArticle {
+
+		@Id
+		Long id;
+
+		String contents;
+
+		@SoftDeleteColumn.Boolean(valueAsDeleted = "tx")
 		boolean deleted;
 	}
 
