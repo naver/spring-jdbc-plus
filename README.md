@@ -1,7 +1,7 @@
 [![GitHub release](https://img.shields.io/github/v/release/naver/spring-jdbc-plus.svg)](https://img.shields.io/github/v/release/naver/spring-jdbc-plus.svg?include_prereleases)
 [![GitHub license](https://img.shields.io/github/license/naver/spring-jdbc-plus.svg)](https://github.com/naver/spring-jdbc-plus.js/blob/master/LICENSE)
 
-# Spring JDBC Plus ![build](https://github.com/naver/spring-jdbc-plus/workflows/build/badge.svg) [![Gitter chat](https://badges.gitter.im/gitterHQ/gitter.png)](https://gitter.im/naver/spring-jdbc-plus) [![Project Diagrams](https://sourcespy.com/shield.svg)](https://sourcespy.com/github/naverspringjdbcplus/)
+# Spring JDBC Plus ![build](https://github.com/naver/spring-jdbc-plus/actions/workflows/gradle.yml/badge.svg) [![Gitter chat](https://badges.gitter.im/gitterHQ/gitter.png)](https://gitter.im/naver/spring-jdbc-plus) [![Project Diagrams](https://sourcespy.com/shield.svg)](https://sourcespy.com/github/naverspringjdbcplus/)
 
 Spring JDBC Plus provides [Spring Data JDBC](https://github.com/spring-projects/spring-data-relational) based extension.
 It provides necessary features when writing more complex SQL than the functions supported by `CrudRepository`.
