@@ -205,6 +205,10 @@ static class TestEntityWithNonNullValue {
 }
 ```
 
+`@SqlFunction` is typically used to map fields or methods of entity classes to SQL functions. 
+
+For example, it can be utilized to define default values for certain fields, or to transform values based on specific conditions.
+
 
 
 ## Examples
