@@ -37,6 +37,8 @@ import org.springframework.data.relational.core.sql.Aliased;
 import org.springframework.data.relational.core.sql.SqlIdentifier;
 import org.springframework.data.relational.core.sql.TableLike;
 
+import com.navercorp.spring.data.jdbc.plus.sql.annotation.SoftDeleteColumn;
+import com.navercorp.spring.data.jdbc.plus.sql.annotation.SoftDeleteColumn.ValueType;
 import com.navercorp.spring.data.jdbc.plus.sql.annotation.SqlTableAlias;
 
 /**
@@ -783,6 +785,58 @@ class SqlGeneratorTest {
 			.contains("versioned_entity.id1 = :id AND versioned_entity.x_version = :___old");
 	}
 
+	@Test
+	void softDeleteByIdWithBoolean() {
+		assertThat(createSqlGenerator(BooleanValueSoftDeleteArticle.class, NonQuotingDialect.INSTANCE).getSoftDeleteById())
+			.isEqualTo("UPDATE boolean_value_article SET x_deleted = :x_deleted WHERE boolean_value_article.x_id = :x_id");
+	}
+
+	@Test
+	void softDeleteByIdWithPlainBoolean() {
+		assertThat(createSqlGenerator(SoftDeleteArticle.class, NonQuotingDialect.INSTANCE).getSoftDeleteById())
+			.isEqualTo("UPDATE article SET x_deleted = :x_deleted WHERE article.x_id = :x_id");
+	}
+
+	@Test
+	void softDeleteByIdWithString() {
+		assertThat(createSqlGenerator(StringValueSoftDeleteArticle.class, NonQuotingDialect.INSTANCE).getSoftDeleteById())
+			.isEqualTo("UPDATE string_value_article SET x_state = :x_state WHERE string_value_article.x_id = :x_id");
+	}
+
+	@Test
+	void softDeleteByIdInWithBoolean() {
+		assertThat(createSqlGenerator(BooleanValueSoftDeleteArticle.class, NonQuotingDialect.INSTANCE).getSoftDeleteByIdIn())
+			.isEqualTo("UPDATE boolean_value_article SET x_deleted = :x_deleted WHERE boolean_value_article.x_id IN (:ids)");
+	}
+
+	@Test
+	void softDeleteByIdInWithString() {
+		assertThat(createSqlGenerator(StringValueSoftDeleteArticle.class, NonQuotingDialect.INSTANCE).getSoftDeleteByIdIn())
+			.isEqualTo("UPDATE string_value_article SET x_state = :x_state WHERE string_value_article.x_id IN (:ids)");
+	}
+
+	@Test
+	void softDeleteByIdAndVersionWithBoolean() {
+		assertThat(createSqlGenerator(BooleanValueSoftDeleteArticle.class, NonQuotingDialect.INSTANCE).getSoftDeleteByIdAndVersion())
+			.isEqualTo(
+				"UPDATE boolean_value_article "
+					+ "SET x_deleted = :x_deleted "
+					+ "WHERE boolean_value_article.x_id = :x_id "
+					+ "AND boolean_value_article.x_version = :___oldOptimisticLockingVersion"
+			);
+	}
+
+	@Test
+	void softDeleteByIdAndVersionWithString() {
+		assertThat(createSqlGenerator(StringValueSoftDeleteArticle.class, NonQuotingDialect.INSTANCE).getSoftDeleteByIdAndVersion())
+			.isEqualTo(
+				"UPDATE string_value_article "
+					+ "SET x_state = :x_state "
+					+ "WHERE string_value_article.x_id = :x_id "
+					+ "AND string_value_article.x_version = :___oldOptimisticLockingVersion"
+			);
+	}
+
 	private SqlIdentifier getAlias(Object maybeAliased) {
 
 		if (maybeAliased instanceof Aliased) {
@@ -996,5 +1050,54 @@ class SqlGeneratorTest {
 		@Id
 		Long id;
 		IdNoIdChain idNoIdChain;
+	}
+
+	@Table("boolean_value_article")
+	static class BooleanValueSoftDeleteArticle {
+
+		@Id
+		Long id;
+
+		String contents;
+
+		@SoftDeleteColumn.Boolean(valueAsDeleted = "true")
+		boolean deleted;
+
+		@Version
+		Integer version;
+	}
+
+	@Table("string_value_article")
+	static class StringValueSoftDeleteArticle {
+
+		@Id
+		Long id;
+
+		String contents;
+
+		@SoftDeleteColumn.String(valueAsDeleted = "DELETE")
+		ArticleState state;
+
+		@Version
+		Integer version;
+
+		enum ArticleState {
+			OPEN, CLOSE, DELETE
+		}
+	}
+
+	@Table("article")
+	static class SoftDeleteArticle {
+
+		@Id
+		Long id;
+
+		String contents;
+
+		@SoftDeleteColumn(type = ValueType.BOOLEAN, valueAsDeleted = "true")
+		boolean deleted;
+
+		@Version
+		Integer version;
 	}
 }
