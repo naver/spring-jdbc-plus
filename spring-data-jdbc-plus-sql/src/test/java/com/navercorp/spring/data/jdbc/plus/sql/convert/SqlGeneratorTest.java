@@ -38,6 +38,7 @@ import org.springframework.data.relational.core.sql.SqlIdentifier;
 import org.springframework.data.relational.core.sql.TableLike;
 
 import com.navercorp.spring.data.jdbc.plus.sql.annotation.SoftDeleteColumn;
+import com.navercorp.spring.data.jdbc.plus.sql.annotation.SoftDeleteColumn.ValueType;
 import com.navercorp.spring.data.jdbc.plus.sql.annotation.SqlTableAlias;
 
 /**
@@ -791,6 +792,12 @@ class SqlGeneratorTest {
 	}
 
 	@Test
+	void softDeleteByIdWithPlainBoolean() {
+		assertThat(createSqlGenerator(SoftDeleteArticle.class, NonQuotingDialect.INSTANCE).getSoftDeleteById())
+			.isEqualTo("UPDATE article SET x_deleted = :x_deleted WHERE article.x_id = :x_id");
+	}
+
+	@Test
 	void softDeleteByIdWithString() {
 		assertThat(createSqlGenerator(StringValueSoftDeleteArticle.class, NonQuotingDialect.INSTANCE).getSoftDeleteById())
 			.isEqualTo("UPDATE string_value_article SET x_state = :x_state WHERE string_value_article.x_id = :x_id");
@@ -1077,5 +1084,20 @@ class SqlGeneratorTest {
 		enum ArticleState {
 			OPEN, CLOSE, DELETE
 		}
+	}
+
+	@Table("article")
+	static class SoftDeleteArticle {
+
+		@Id
+		Long id;
+
+		String contents;
+
+		@SoftDeleteColumn(type = ValueType.BOOLEAN, valueAsDeleted = "true")
+		boolean deleted;
+
+		@Version
+		Integer version;
 	}
 }

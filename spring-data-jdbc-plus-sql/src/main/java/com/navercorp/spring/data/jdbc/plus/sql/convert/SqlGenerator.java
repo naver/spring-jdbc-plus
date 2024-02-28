@@ -1093,8 +1093,7 @@ class SqlGenerator {
 
 	private String createSoftDeleteByIdAndVersionSql() {
 		Update update = createBaseSoftDeleteById(getDmlTable())
-			.and(getDmlVersionColumn().isEqualTo(
-				getBindMarker(VERSION_SQL_PARAMETER)))
+			.and(getDmlVersionColumn().isEqualTo(getBindMarker(VERSION_SQL_PARAMETER)))
 			.build();
 
 		return render(update);
