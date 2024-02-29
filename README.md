@@ -111,7 +111,7 @@ may be an appropriate choice.
 
     ```groovy
     class OrderSql extends SqlGeneratorSupport {
-
+    
         String selectByPurchaserNo() {
             """
             SELECT ${sql.columns(Order)}
@@ -134,7 +134,7 @@ Be careful when use string interpolation in Groovy and Kotlin.
 * Bad  :-1:
     ```groovy
     class OrderSql extends SqlGeneratorSupport {
-
+    
         String selectByPurchaserNo(String purchaserNo) {
         """
         SELECT ${sql.columns(Order)}
@@ -148,7 +148,7 @@ Be careful when use string interpolation in Groovy and Kotlin.
 * Good :+1:
     ```groovy
     class OrderSql extends SqlGeneratorSupport {
-
+    
         String selectByPurchaserNo() {
         """
         SELECT ${sql.columns(Order)}
@@ -158,6 +158,58 @@ Be careful when use string interpolation in Groovy and Kotlin.
         }
     }
     ```
+
+
+
+##  Annotation Guide
+
+### @SqlTableAlias
+
+``` JAVA
+@Value
+@Builder
+@Table("post")
+public class PostDto {
+	@Id
+	Long id;
+
+	@Column
+	Post post;
+
+	@SqlTableAlias("p_labels")
+	@MappedCollection(idColumn = "board_id")
+	Set<Label> labels;
+}
+```
+
+`@SqlTableAlias` is used to attach a separate identifier to the table. `@SqlTableAlias` can be applied to class, field and method.
+
+`@SqlTableAlias` is used in the form of `@SqlTableAlias("value")` .
+
+
+
+### @SqlFunction
+
+```java
+@SqlTableAlias("ts")
+static class TestEntityWithNonNullValue {
+    @Column
+    private Long testerId;
+
+    @Column("tester_nm")
+    private String testerName;
+
+    @SqlFunction(expressions = {SqlFunction.COLUMN_NAME, "0"})
+    @Column
+    private int age;
+}
+```
+
+`@SqlFunction` is typically used to map fields or methods of entity classes to SQL functions. 
+
+For example, it can be utilized to define default values for certain fields, or to transform values based on specific conditions.
+
+
 
 ## Examples
 
