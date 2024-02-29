@@ -124,6 +124,16 @@ subprojects {
                             name = "Youngdae Lee"
                             email = "yd.2@navercorp.com"
                         }
+                        developer {
+                            id = "chanhyeong"
+                            name = "Chanhyeong Cho"
+                            email = "chu7825@gmail.com"
+                        }
+                        developer {
+                            id = "wool0826"
+                            name = "Chanwool Jo"
+                            email = "chanwool94@gmail.com"
+                        }
                     }
                     scm {
                         connection = "scm:git:git://github.com/naver/spring-jdbc-plus.git"
