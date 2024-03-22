@@ -41,16 +41,19 @@ import org.springframework.data.mapping.Parameter;
 import org.springframework.data.mapping.PersistentProperty;
 import org.springframework.data.mapping.PersistentPropertyAccessor;
 import org.springframework.data.mapping.PersistentPropertyPath;
-import org.springframework.data.mapping.model.DefaultSpELExpressionEvaluator;
+import org.springframework.data.mapping.model.CachingValueExpressionEvaluatorFactory;
 import org.springframework.data.mapping.model.ParameterValueProvider;
 import org.springframework.data.mapping.model.SpELContext;
-import org.springframework.data.mapping.model.SpELExpressionEvaluator;
-import org.springframework.data.mapping.model.SpELExpressionParameterValueProvider;
+import org.springframework.data.mapping.model.ValueExpressionEvaluator;
+import org.springframework.data.mapping.model.ValueExpressionParameterValueProvider;
+import org.springframework.data.projection.SpelAwareProxyProjectionFactory;
 import org.springframework.data.relational.core.mapping.AggregatePath;
 import org.springframework.data.relational.core.mapping.RelationalMappingContext;
 import org.springframework.data.relational.core.mapping.RelationalPersistentEntity;
 import org.springframework.data.relational.core.mapping.RelationalPersistentProperty;
 import org.springframework.data.util.Streamable;
+import org.springframework.expression.ExpressionParser;
+import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
@@ -64,6 +67,14 @@ import org.springframework.util.MultiValueMap;
  */
 public class AggregateResultJdbcConverter extends MappingJdbcConverter {
 	private SpELContext spElContext;
+
+	private final ExpressionParser expressionParser = new SpelExpressionParser();
+
+	private final SpelAwareProxyProjectionFactory projectionFactory = new SpelAwareProxyProjectionFactory(
+		expressionParser);
+
+	private final CachingValueExpressionEvaluatorFactory valueExpressionEvaluatorFactory = new CachingValueExpressionEvaluatorFactory(
+		expressionParser, this, o -> spElContext.getEvaluationContext(o));
 
 	/**
 	 * Instantiates a new Aggregate result jdbc converter.
@@ -1249,9 +1260,8 @@ public class AggregateResultJdbcConverter extends MappingJdbcConverter {
 			ParameterValueProvider<RelationalPersistentProperty> provider;
 
 			if (creatorMetadata != null && creatorMetadata.hasParameters()) {
-				SpELExpressionEvaluator expressionEvaluator = new DefaultSpELExpressionEvaluator(this.entityMap,
-					spElContext);
-				provider = new SpELExpressionParameterValueProvider<>(expressionEvaluator, getConversionService(),
+				ValueExpressionEvaluator expressionEvaluator = valueExpressionEvaluatorFactory.create(this.entityMap);
+				provider = new ValueExpressionParameterValueProvider<>(expressionEvaluator, getConversionService(),
 					new ResultSetParameterValueProvider(idValue, entity));
 			} else {
 				provider = NoOpParameterValueProvider.INSTANCE;
