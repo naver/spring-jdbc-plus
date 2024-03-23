@@ -788,19 +788,19 @@ class SqlGeneratorTest {
 	@Test
 	void softDeleteByIdWithBoolean() {
 		assertThat(createSqlGenerator(BooleanValueSoftDeleteArticle.class, NonQuotingDialect.INSTANCE).getSoftDeleteById())
-			.isEqualTo("UPDATE boolean_value_article SET x_deleted = :x_deleted WHERE boolean_value_article.x_id = :x_id");
+			.isEqualTo("UPDATE boolean_value_article SET x_deleted = :x_deleted WHERE boolean_value_article.x_id = :id");
 	}
 
 	@Test
 	void softDeleteByIdWithPlainBoolean() {
 		assertThat(createSqlGenerator(SoftDeleteArticle.class, NonQuotingDialect.INSTANCE).getSoftDeleteById())
-			.isEqualTo("UPDATE article SET x_deleted = :x_deleted WHERE article.x_id = :x_id");
+			.isEqualTo("UPDATE article SET x_deleted = :x_deleted WHERE article.x_id = :id");
 	}
 
 	@Test
 	void softDeleteByIdWithString() {
 		assertThat(createSqlGenerator(StringValueSoftDeleteArticle.class, NonQuotingDialect.INSTANCE).getSoftDeleteById())
-			.isEqualTo("UPDATE string_value_article SET x_state = :x_state WHERE string_value_article.x_id = :x_id");
+			.isEqualTo("UPDATE string_value_article SET x_state = :x_state WHERE string_value_article.x_id = :id");
 	}
 
 	@Test
@@ -821,7 +821,7 @@ class SqlGeneratorTest {
 			.isEqualTo(
 				"UPDATE boolean_value_article "
 					+ "SET x_deleted = :x_deleted "
-					+ "WHERE boolean_value_article.x_id = :x_id "
+					+ "WHERE boolean_value_article.x_id = :id "
 					+ "AND boolean_value_article.x_version = :___oldOptimisticLockingVersion"
 			);
 	}
@@ -832,7 +832,7 @@ class SqlGeneratorTest {
 			.isEqualTo(
 				"UPDATE string_value_article "
 					+ "SET x_state = :x_state "
-					+ "WHERE string_value_article.x_id = :x_id "
+					+ "WHERE string_value_article.x_id = :id "
 					+ "AND string_value_article.x_version = :___oldOptimisticLockingVersion"
 			);
 	}

@@ -1114,7 +1114,7 @@ class SqlGenerator {
 		return Update.builder()
 			.table(table)
 			.set(assignments)
-			.where(getDmlIdColumn().isEqualTo(getBindMarker(entity.getIdColumn())));
+			.where(getDmlIdColumn().isEqualTo(getBindMarker(ID_SQL_PARAMETER)));
 	}
 
 	private UpdateBuilder.UpdateWhereAndOr createBaseSoftDeleteByIdIn(Table table) {
