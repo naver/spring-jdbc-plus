@@ -26,8 +26,6 @@ import org.springframework.data.relational.core.mapping.AggregatePath;
  * @author Myeonghyeon Lee
  */
 public final class TbInfo {
-	private final AggregatePath aggregatePath;
-
 	private final String path;
 	private final String table;
 	private final String alias;
@@ -38,8 +36,6 @@ public final class TbInfo {
 	 * @param aggregatePath        the path extension
 	 */
 	TbInfo(AggregatePath aggregatePath) {
-		this.aggregatePath = aggregatePath;
-
 		this.path = aggregatePath.getRequiredPersistentPropertyPath().toDotPath();
 		this.table = aggregatePath.getTableInfo().qualifiedTableName().getReference();
 		String aliasValue = this.table;

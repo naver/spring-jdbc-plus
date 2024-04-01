@@ -26,8 +26,6 @@ import org.springframework.data.relational.core.mapping.AggregatePath;
  * @author Myeonghyeon Lee
  */
 public final class TbColumn {
-	private final AggregatePath pathExtension;
-
 	private final String path;
 	private final String column;
 	private final String alias;
@@ -38,8 +36,6 @@ public final class TbColumn {
 	 * @param aggregatePath        the aggregate path
 	 */
 	TbColumn(AggregatePath aggregatePath) {
-		this.pathExtension = aggregatePath;
-
 		this.path = aggregatePath.getRequiredPersistentPropertyPath().toDotPath();
 		this.column = aggregatePath.getColumnInfo().name().getReference();
 		this.alias = aggregatePath.getColumnInfo().alias().getReference();
