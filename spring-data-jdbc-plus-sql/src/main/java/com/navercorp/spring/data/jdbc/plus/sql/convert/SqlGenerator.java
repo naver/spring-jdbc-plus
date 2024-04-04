@@ -190,10 +190,10 @@ class SqlGenerator {
 		this.mappingContext = mappingContext;
 		this.entity = entity;
 		this.columns = new Columns(entity, mappingContext, converter);
-		this.sqlRenderer = SqlRenderer.create(new RenderContextFactory(dialect).createRenderContext());
 		this.renderContext = new RenderContextFactory(dialect).createRenderContext();
+		this.sqlRenderer = SqlRenderer.create(renderContext);
 		this.sqlContext = sqlContexts;
-		this.queryMapper = new QueryMapper(dialect, converter);
+		this.queryMapper = new QueryMapper(converter);
 		this.dialect = dialect;
 		this.softDeleteProperty = SoftDeleteProperty.from(entity);
 	}
