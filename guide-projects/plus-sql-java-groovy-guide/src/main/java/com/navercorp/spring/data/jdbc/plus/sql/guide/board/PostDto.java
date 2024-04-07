@@ -28,9 +28,9 @@ import org.springframework.data.relational.core.mapping.Table;
 import lombok.Builder;
 import lombok.Value;
 
-import com.navercorp.spring.data.jdbc.plus.sql.annotation.SqlTableAlias;
 import com.navercorp.spring.data.jdbc.plus.sql.guide.board.Board.Label;
 import com.navercorp.spring.data.jdbc.plus.sql.guide.board.Board.Post;
+import com.navercorp.spring.jdbc.plus.commons.annotations.SqlTableAlias;
 
 /**
  * @author Myeonghyeon Lee

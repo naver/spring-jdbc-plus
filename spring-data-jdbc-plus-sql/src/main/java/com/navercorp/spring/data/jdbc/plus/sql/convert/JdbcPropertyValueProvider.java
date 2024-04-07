@@ -20,6 +20,8 @@ import org.springframework.data.mapping.model.PropertyValueProvider;
 import org.springframework.data.relational.core.mapping.AggregatePath;
 import org.springframework.data.relational.core.mapping.RelationalPersistentProperty;
 
+import com.navercorp.spring.data.jdbc.plus.support.convert.PropertyPathUtils;
+
 /**
  * {@link PropertyValueProvider} obtaining values from a ResultSetAccessor.
  *

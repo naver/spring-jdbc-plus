@@ -30,6 +30,8 @@ import org.springframework.data.relational.core.mapping.RelationalPersistentProp
 import org.springframework.data.relational.core.sql.SqlIdentifier;
 import org.springframework.lang.Nullable;
 
+import com.navercorp.spring.data.jdbc.plus.support.parametersource.AppendableSqlIdentifierParameterSource;
+
 /**
  * The type Entity sql parameter source applier.
  *
@@ -60,7 +62,7 @@ class EntitySqlParameterSourceApplier {
 	 */
 	// DefaultDataAccessStrategy#getParameterSource
 	void addParameterSource(
-		SqlIdentifierParameterSource parameterSource,
+		AppendableSqlIdentifierParameterSource parameterSource,
 		Object instance,
 		RelationalPersistentEntity<?> persistentEntity,
 		String prefix
@@ -94,7 +96,7 @@ class EntitySqlParameterSourceApplier {
 
 	// DefaultDataAccessStrategy#addConvertedPropertyValue
 	private void addConvertedPropertyValue(
-		SqlIdentifierParameterSource parameterSource,
+		AppendableSqlIdentifierParameterSource parameterSource,
 		RelationalPersistentProperty property,
 		Object value,
 		SqlIdentifier name

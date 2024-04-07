@@ -27,6 +27,7 @@ import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 
+import com.navercorp.spring.data.jdbc.plus.support.parametersource.AppendableSqlIdentifierParameterSource;
 import com.navercorp.spring.jdbc.plus.support.parametersource.ConvertibleParameterSourceFactory;
 
 /**
@@ -72,7 +73,7 @@ public class EntityConvertibleSqlParameterSourceFactory implements SqlParameterS
 
 	@Override
 	public SqlParameterSource entityParameterSource(Object entity) {
-		SqlIdentifierParameterSource parameterSource = new ConvertibleSqlIdentifierParameterSource(
+		AppendableSqlIdentifierParameterSource parameterSource = new ConvertibleSqlIdentifierParameterSource(
 			this.delegate.getConverter(), this.delegate.getFallback());
 		RelationalPersistentEntity<?> persistentEntity =
 			this.mappingContext.getRequiredPersistentEntity(entity.getClass());

@@ -19,7 +19,11 @@
 package com.navercorp.spring.data.jdbc.plus.sql.parametersource;
 
 import java.util.Objects;
+import java.util.Set;
 
+import org.springframework.data.relational.core.sql.SqlIdentifier;
+
+import com.navercorp.spring.data.jdbc.plus.support.parametersource.AppendableSqlIdentifierParameterSource;
 import com.navercorp.spring.jdbc.plus.support.parametersource.converter.IterableExpandPadding;
 import com.navercorp.spring.jdbc.plus.support.parametersource.converter.JdbcParameterSourceConverter;
 import com.navercorp.spring.jdbc.plus.support.parametersource.fallback.FallbackParameterSource;
@@ -29,7 +33,8 @@ import com.navercorp.spring.jdbc.plus.support.parametersource.fallback.FallbackP
  *
  * @author Myeonghyeon Lee
  */
-class ConvertibleSqlIdentifierParameterSource extends SqlIdentifierParameterSource {
+class ConvertibleSqlIdentifierParameterSource implements AppendableSqlIdentifierParameterSource {
+	private final AppendableSqlIdentifierParameterSource delegate;
 	private final JdbcParameterSourceConverter converter;
 	private final FallbackParameterSource fallbackParameterSource;
 
@@ -47,7 +52,7 @@ class ConvertibleSqlIdentifierParameterSource extends SqlIdentifierParameterSour
 		JdbcParameterSourceConverter converter,
 		FallbackParameterSource fallbackParameterSource
 	) {
-		super();
+		this.delegate = AppendableSqlIdentifierParameterSource.create();
 		this.converter = Objects.requireNonNull(converter, "Converter must not be null.");
 		this.fallbackParameterSource = fallbackParameterSource;
 	}
@@ -56,7 +61,7 @@ class ConvertibleSqlIdentifierParameterSource extends SqlIdentifierParameterSour
 	public Object getValue(String paramName) throws IllegalArgumentException {
 		Object value = null;
 		try {
-			value = super.getValue(paramName);
+			value = delegate.getValue(paramName);
 		} catch (IllegalArgumentException e) {
 			if (!this.isFallback(paramName)) {
 				throw e;
@@ -77,6 +82,46 @@ class ConvertibleSqlIdentifierParameterSource extends SqlIdentifierParameterSour
 		}
 
 		return value;
+	}
+
+	@Override
+	public Set<SqlIdentifier> getIdentifiers() {
+		return delegate.getIdentifiers();
+	}
+
+	@Override
+	public void addValue(SqlIdentifier name, Object value) {
+		delegate.addValue(name, value);
+	}
+
+	@Override
+	public void addValue(SqlIdentifier identifier, Object value, int sqlType) {
+		delegate.addValue(identifier, value, sqlType);
+	}
+
+	@Override
+	public void addAll(AppendableSqlIdentifierParameterSource others) {
+		delegate.addAll(others);
+	}
+
+	@Override
+	public boolean hasValue(String paramName) {
+		return delegate.hasValue(paramName);
+	}
+
+	@Override
+	public int getSqlType(String paramName) {
+		return delegate.getSqlType(paramName);
+	}
+
+	@Override
+	public String getTypeName(String paramName) {
+		return delegate.getTypeName(paramName);
+	}
+
+	@Override
+	public String[] getParameterNames() {
+		return delegate.getParameterNames();
 	}
 
 	/**

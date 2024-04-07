@@ -18,7 +18,7 @@
 
 package com.navercorp.spring.data.jdbc.plus.sql.guide.board
 
-import com.navercorp.spring.data.jdbc.plus.sql.annotation.SqlTableAlias
+import com.navercorp.spring.jdbc.plus.commons.annotations.SqlTableAlias
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Column
 import org.springframework.data.relational.core.mapping.Embedded
