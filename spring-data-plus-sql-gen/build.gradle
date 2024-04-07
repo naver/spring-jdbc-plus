@@ -1,8 +1,8 @@
 dependencies {
     api(project(":spring-data-jdbc-plus-sql"))
 
-    api("org.springframework.data:spring-data-relational:${springDataVersion}")
-    api("org.springframework.data:spring-data-commons:${springDataCommonsVersion}")
+    api("org.springframework.data:spring-data-relational")
+    api("org.springframework.data:spring-data-commons")
     api("com.squareup:javapoet:1.12.1")
 
     testImplementation("org.junit.jupiter:junit-jupiter")

@@ -3,7 +3,7 @@ dependencies {
     api(project(":spring-boot-autoconfigure-data-jdbc-plus"))
     api("org.springframework.boot:spring-boot-starter-jdbc")
 
-    implementation("org.springframework.data:spring-data-jdbc:${springDataVersion}")
-    implementation("org.springframework.data:spring-data-relational:${springDataVersion}")
-    implementation("org.springframework.data:spring-data-commons:${springDataCommonsVersion}")
+    implementation("org.springframework.data:spring-data-jdbc")
+    implementation("org.springframework.data:spring-data-relational")
+    implementation("org.springframework.data:spring-data-commons")
 }

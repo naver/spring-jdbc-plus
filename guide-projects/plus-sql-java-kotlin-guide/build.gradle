@@ -39,9 +39,9 @@ dependencies {
     implementation("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
 
-    implementation("org.springframework.data:spring-data-jdbc:${springDataVersion}")
-    implementation("org.springframework.data:spring-data-relational:${springDataVersion}")
-    implementation("org.springframework.data:spring-data-commons:${springDataCommonsVersion}")
+    implementation("org.springframework.data:spring-data-jdbc")
+    implementation("org.springframework.data:spring-data-relational")
+    implementation("org.springframework.data:spring-data-commons")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.projectlombok:lombok")
