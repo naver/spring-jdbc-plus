@@ -22,8 +22,6 @@ repositories {
 }
 
 dependencies {
-    val springDataVersion: String by rootProject.extra
-    val springDataCommonsVersion: String by rootProject.extra
 
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation(project(":spring-boot-starter-data-jdbc-plus-sql"))
@@ -32,9 +30,9 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("com.h2database:h2")
 
-    implementation("org.springframework.data:spring-data-jdbc:$springDataVersion")
-    implementation("org.springframework.data:spring-data-relational:$springDataVersion")
-    implementation("org.springframework.data:spring-data-commons:$springDataCommonsVersion")
+    implementation("org.springframework.data:spring-data-jdbc")
+    implementation("org.springframework.data:spring-data-relational")
+    implementation("org.springframework.data:spring-data-commons")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
 }
