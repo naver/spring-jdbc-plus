@@ -44,7 +44,11 @@ subprojects {
 
     dependencyManagement {
         imports {
-            mavenBom SpringBootPlugin.BOM_COORDINATES
+            mavenBom("${SpringBootPlugin.BOM_COORDINATES}") {
+                bomProperties([
+                        'spring-data-bom.version': "${springDataBomVersion}"
+                ])
+            }
         }
     }
 
