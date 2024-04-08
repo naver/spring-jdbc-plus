@@ -5,9 +5,9 @@ import java.util.Set;
 import org.springframework.data.relational.core.sql.SqlIdentifier;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 
-public interface AppendableSqlIdentifierParameterSource extends SqlParameterSource {
+public interface MutableSqlIdentifierParameterSource extends SqlParameterSource {
 
-	static AppendableSqlIdentifierParameterSource create() {
+	static MutableSqlIdentifierParameterSource create() {
 		return new SqlIdentifierParameterSource();
 	}
 
@@ -17,5 +17,5 @@ public interface AppendableSqlIdentifierParameterSource extends SqlParameterSour
 
 	void addValue(SqlIdentifier identifier, Object value, int sqlType);
 
-	void addAll(AppendableSqlIdentifierParameterSource others);
+	void addAll(MutableSqlIdentifierParameterSource others);
 }

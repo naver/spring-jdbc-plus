@@ -23,7 +23,7 @@ import java.util.Set;
 
 import org.springframework.data.relational.core.sql.SqlIdentifier;
 
-import com.navercorp.spring.data.jdbc.plus.support.parametersource.AppendableSqlIdentifierParameterSource;
+import com.navercorp.spring.data.jdbc.plus.support.parametersource.MutableSqlIdentifierParameterSource;
 import com.navercorp.spring.jdbc.plus.support.parametersource.converter.IterableExpandPadding;
 import com.navercorp.spring.jdbc.plus.support.parametersource.converter.JdbcParameterSourceConverter;
 import com.navercorp.spring.jdbc.plus.support.parametersource.fallback.FallbackParameterSource;
@@ -33,8 +33,8 @@ import com.navercorp.spring.jdbc.plus.support.parametersource.fallback.FallbackP
  *
  * @author Myeonghyeon Lee
  */
-class ConvertibleSqlIdentifierParameterSource implements AppendableSqlIdentifierParameterSource {
-	private final AppendableSqlIdentifierParameterSource delegate;
+class ConvertibleSqlIdentifierParameterSource implements MutableSqlIdentifierParameterSource {
+	private final MutableSqlIdentifierParameterSource delegate;
 	private final JdbcParameterSourceConverter converter;
 	private final FallbackParameterSource fallbackParameterSource;
 
@@ -52,7 +52,7 @@ class ConvertibleSqlIdentifierParameterSource implements AppendableSqlIdentifier
 		JdbcParameterSourceConverter converter,
 		FallbackParameterSource fallbackParameterSource
 	) {
-		this.delegate = AppendableSqlIdentifierParameterSource.create();
+		this.delegate = MutableSqlIdentifierParameterSource.create();
 		this.converter = Objects.requireNonNull(converter, "Converter must not be null.");
 		this.fallbackParameterSource = fallbackParameterSource;
 	}
@@ -100,7 +100,7 @@ class ConvertibleSqlIdentifierParameterSource implements AppendableSqlIdentifier
 	}
 
 	@Override
-	public void addAll(AppendableSqlIdentifierParameterSource others) {
+	public void addAll(MutableSqlIdentifierParameterSource others) {
 		delegate.addAll(others);
 	}
 

@@ -39,7 +39,7 @@ import org.springframework.jdbc.core.namedparam.AbstractSqlParameterSource;
  */
 class SqlIdentifierParameterSource
 	extends AbstractSqlParameterSource
-	implements AppendableSqlIdentifierParameterSource {
+	implements MutableSqlIdentifierParameterSource {
 	private final Set<SqlIdentifier> identifiers = new HashSet<>();
 	private final Map<String, Object> namesToValues = new HashMap<>();
 
@@ -78,7 +78,7 @@ class SqlIdentifierParameterSource
 	}
 
 	@Override
-	public void addAll(AppendableSqlIdentifierParameterSource others) {
+	public void addAll(MutableSqlIdentifierParameterSource others) {
 
 		for (SqlIdentifier identifier : others.getIdentifiers()) {
 
