@@ -60,6 +60,8 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
+import com.navercorp.spring.data.jdbc.plus.support.convert.PropertyPathUtils;
+
 /**
  * The type Aggregate result jdbc converter.
  *

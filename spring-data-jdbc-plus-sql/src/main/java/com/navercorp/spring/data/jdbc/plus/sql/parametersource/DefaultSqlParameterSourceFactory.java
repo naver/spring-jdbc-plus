@@ -27,6 +27,8 @@ import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 
+import com.navercorp.spring.data.jdbc.plus.support.parametersource.MutableSqlIdentifierParameterSource;
+
 /**
  * The type Default sql parameter source factory.
  *
@@ -62,7 +64,7 @@ public class DefaultSqlParameterSourceFactory implements SqlParameterSourceFacto
 
 	@Override
 	public SqlParameterSource entityParameterSource(Object entity) {
-		SqlIdentifierParameterSource parameterSource = new SqlIdentifierParameterSource();
+		MutableSqlIdentifierParameterSource parameterSource = MutableSqlIdentifierParameterSource.create();
 		RelationalPersistentEntity<?> persistentEntity =
 			this.mappingContext.getRequiredPersistentEntity(entity.getClass());
 		this.parameterSourceApplier.addParameterSource(parameterSource, entity, persistentEntity, "");

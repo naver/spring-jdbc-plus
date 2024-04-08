@@ -27,7 +27,7 @@ import org.springframework.data.relational.core.mapping.Table;
 import lombok.Builder;
 import lombok.Getter;
 
-import com.navercorp.spring.data.jdbc.plus.sql.annotation.SqlFunction;
+import com.navercorp.spring.jdbc.plus.commons.annotations.SqlFunction;
 
 /**
  * @author Myeonghyeon Lee

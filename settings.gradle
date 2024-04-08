@@ -1,6 +1,8 @@
 rootProject.name = "spring-jdbc-plus"
 
+include "spring-jdbc-plus-commons"
 include "spring-jdbc-plus-support"
+include "spring-data-jdbc-plus-support"
 include "spring-data-jdbc-plus-sql"
 include "spring-data-jdbc-plus-repository"
 include "spring-boot-autoconfigure-data-jdbc-plus"

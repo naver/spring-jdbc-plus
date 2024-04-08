@@ -18,7 +18,7 @@
 
 package com.navercorp.spring.data.jdbc.plus.sql.support;
 
-import com.navercorp.spring.data.jdbc.plus.sql.convert.SqlProvider;
+import com.navercorp.spring.data.jdbc.plus.support.convert.SqlProvider;
 
 /**
  * The interface Sql aware.

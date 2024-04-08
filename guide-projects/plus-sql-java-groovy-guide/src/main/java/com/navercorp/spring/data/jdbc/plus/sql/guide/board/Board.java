@@ -37,7 +37,7 @@ import lombok.Getter;
 import lombok.Value;
 import lombok.With;
 
-import com.navercorp.spring.data.jdbc.plus.sql.annotation.SqlTableAlias;
+import com.navercorp.spring.jdbc.plus.commons.annotations.SqlTableAlias;
 
 /**
  * @author Myeonghyeon Lee

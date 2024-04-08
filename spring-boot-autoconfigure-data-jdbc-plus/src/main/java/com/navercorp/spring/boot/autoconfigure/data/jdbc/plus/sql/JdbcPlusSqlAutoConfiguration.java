@@ -42,7 +42,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 import reactor.core.publisher.Flux;
 
 import com.navercorp.spring.data.jdbc.plus.sql.config.JdbcPlusSqlConfiguration;
-import com.navercorp.spring.data.jdbc.plus.sql.convert.SqlProvider;
+import com.navercorp.spring.data.jdbc.plus.support.convert.SqlProvider;
 import com.navercorp.spring.data.jdbc.plus.sql.parametersource.SqlParameterSourceFactory;
 import com.navercorp.spring.data.jdbc.plus.sql.provider.EntityJdbcProvider;
 import com.navercorp.spring.data.jdbc.plus.sql.support.template.JdbcReactiveTemplate;

@@ -55,10 +55,10 @@ import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 
-import com.navercorp.spring.data.jdbc.plus.sql.annotation.SqlFunction;
 import com.navercorp.spring.data.plus.sql.gen.annotation.GeneratedTable;
 import com.navercorp.spring.data.plus.sql.gen.column.TbColumn;
 import com.navercorp.spring.data.plus.sql.gen.column.TbInfo;
+import com.navercorp.spring.jdbc.plus.commons.annotations.SqlFunction;
 
 /**
  * The type Spring data table generator.
