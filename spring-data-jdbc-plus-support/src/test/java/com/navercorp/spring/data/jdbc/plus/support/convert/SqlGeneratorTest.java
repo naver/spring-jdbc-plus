@@ -30,6 +30,7 @@ import org.springframework.data.relational.core.dialect.PostgresDialect;
 import org.springframework.data.relational.core.dialect.SqlServerDialect;
 import org.springframework.data.relational.core.mapping.AggregatePath;
 import org.springframework.data.relational.core.mapping.Column;
+import org.springframework.data.relational.core.mapping.DefaultNamingStrategy;
 import org.springframework.data.relational.core.mapping.NamingStrategy;
 import org.springframework.data.relational.core.mapping.RelationalMappingContext;
 import org.springframework.data.relational.core.mapping.RelationalPersistentEntity;
@@ -818,6 +819,52 @@ class SqlGeneratorTest {
 	}
 
 	@Test
+	public void softDeleteAll() {
+
+		String sql = createSqlGenerator(SoftDeleteArticle.class, NonQuotingDialect.INSTANCE)
+			.createSoftDeleteAllSql(null);
+
+		assertThat(sql).isEqualTo("UPDATE article SET x_deleted = :x_deleted");
+	}
+
+	@Test
+	public void cascadingSoftDeleteAllFirstLevel() {
+
+		String sql = createSqlGenerator(SoftDeleteArticle.class, NonQuotingDialect.INSTANCE)
+			.createSoftDeleteAllSql(getPath("ref", SoftDeleteArticle.class));
+
+		assertThat(sql).isEqualTo(
+			"UPDATE referenced_article "
+				+ "SET x_reference_deleted = :x_reference_deleted "
+				+ "WHERE referenced_article.article IS NOT NULL");
+	}
+
+	@Test
+	public void cascadingSoftDeleteAllSecondLevel() {
+
+		String sql = createSqlGenerator(SoftDeleteArticle.class, NonQuotingDialect.INSTANCE)
+			.createSoftDeleteAllSql(getPath("ref.further", SoftDeleteArticle.class));
+
+		assertThat(sql).isEqualTo(
+			"UPDATE second_referenced_article "
+				+ "SET x_second_reference_deleted = :x_second_reference_deleted "
+				+ "WHERE second_referenced_article.referenced_article IN ("
+				+ "SELECT referenced_article.x_id FROM referenced_article "
+				+ "WHERE referenced_article.article IS NOT NULL)");
+	}
+
+	@Test
+	public void softDeleteAllMap() {
+
+		String sql = createSqlGenerator(SoftDeleteArticle.class, NonQuotingDialect.INSTANCE)
+			.createSoftDeleteAllSql(getPath("mappedElements", SoftDeleteArticle.class));
+
+		assertThat(sql).isEqualTo("UPDATE soft_delete_element "
+			+ "SET x_element_deleted = :x_element_deleted "
+			+ "WHERE soft_delete_element.article IS NOT NULL");
+	}
+
+	@Test
 	void softDeleteByIdAndVersionWithBoolean() {
 		assertThat(createSqlGenerator(BooleanValueSoftDeleteArticle.class, NonQuotingDialect.INSTANCE).getSoftDeleteByIdAndVersion())
 			.isEqualTo(
@@ -940,11 +987,11 @@ class SqlGeneratorTest {
 		String name;
 	}
 
-	private static class PrefixingNamingStrategy implements NamingStrategy {
+	private static class PrefixingNamingStrategy extends DefaultNamingStrategy {
 
 		@Override
 		public String getColumnName(RelationalPersistentProperty property) {
-			return "x_" + NamingStrategy.super.getColumnName(property);
+			return "x_" + super.getColumnName(property);
 		}
 
 	}
@@ -1101,5 +1148,43 @@ class SqlGeneratorTest {
 
 		@Version
 		Integer version;
+
+		ReferencedSoftDeleteArticle ref;
+
+		Map<Integer, SoftDeleteElement> mappedElements;
+	}
+
+	@Table("referenced_article")
+	static class ReferencedSoftDeleteArticle {
+
+		@Id
+		Long id;
+
+		String contents;
+
+		@SoftDeleteColumn(type = ValueType.BOOLEAN, valueAsDeleted = "true")
+		boolean reference_deleted;
+
+		SecondReferencedSoftDeleteArticle further;
+	}
+
+	@Table("second_referenced_article")
+	static class SecondReferencedSoftDeleteArticle {
+
+		@Id
+		Long id;
+
+		String contents;
+
+		@SoftDeleteColumn(type = ValueType.BOOLEAN, valueAsDeleted = "true")
+		boolean second_reference_deleted;
+	}
+
+	@Table("soft_delete_element")
+	static class SoftDeleteElement {
+		@Id
+		Long id;
+		@SoftDeleteColumn(type = ValueType.BOOLEAN, valueAsDeleted = "true")
+		boolean element_deleted;
 	}
 }

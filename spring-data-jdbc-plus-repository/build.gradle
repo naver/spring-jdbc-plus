@@ -1,6 +1,9 @@
 compileJava.dependsOn(processResources)
 
 dependencies {
+    api(project(":spring-jdbc-plus-commons"))
+    api(project(":spring-data-jdbc-plus-support"))
+
     api("org.springframework.data:spring-data-jdbc")
     api("org.springframework.data:spring-data-relational")
     api("org.springframework.data:spring-data-commons")

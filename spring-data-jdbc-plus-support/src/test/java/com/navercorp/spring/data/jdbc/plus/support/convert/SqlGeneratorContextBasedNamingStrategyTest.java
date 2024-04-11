@@ -26,6 +26,7 @@ import java.util.function.Consumer;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Version;
 import org.springframework.data.jdbc.core.convert.JdbcConverter;
 import org.springframework.data.jdbc.core.convert.MappingJdbcConverter;
 import org.springframework.data.jdbc.core.mapping.JdbcMappingContext;
@@ -34,6 +35,10 @@ import org.springframework.data.relational.core.mapping.NamingStrategy;
 import org.springframework.data.relational.core.mapping.RelationalMappingContext;
 import org.springframework.data.relational.core.mapping.RelationalPersistentEntity;
 import org.springframework.data.relational.core.mapping.RelationalPersistentProperty;
+import org.springframework.data.relational.core.mapping.Table;
+
+import com.navercorp.spring.jdbc.plus.commons.annotations.SoftDeleteColumn;
+import com.navercorp.spring.jdbc.plus.commons.annotations.SoftDeleteColumn.ValueType;
 
 /**
  * Unit tests to verify a contextual {@link NamingStrategy} implementation that customizes using a user-centric
@@ -161,9 +166,62 @@ public class SqlGeneratorContextBasedNamingStrategyTest {
 		});
 	}
 
+	@Test
+	public void softDeleteAll() {
+
+		testAgainstMultipleUsers(user -> {
+
+			SqlGenerator sqlGenerator = configureSoftDeleteSqlGenerator(contextualNamingStrategy);
+
+			String sql = sqlGenerator.createSoftDeleteAllSql(null);
+
+			assertThat(sql).isEqualTo("UPDATE " + user + ".article SET deleted = :deleted");
+		});
+	}
+
+	@Test
+	public void cascadingSoftDeleteAllFirstLevel() {
+
+		testAgainstMultipleUsers(user -> {
+
+			SqlGenerator sqlGenerator = configureSoftDeleteSqlGenerator(contextualNamingStrategy);
+
+			String sql = sqlGenerator.createSoftDeleteAllSql(getSoftDeletePath("ref"));
+
+			assertThat(sql).isEqualTo(
+				"UPDATE " + user + ".referenced_article "
+					+ "SET reference_deleted = :reference_deleted "
+					+ "WHERE " + user + ".referenced_article.article IS NOT NULL");
+		});
+	}
+
+	@Test
+	public void cascadingSoftDeleteSecondLevel() {
+
+		testAgainstMultipleUsers(user -> {
+
+			SqlGenerator sqlGenerator = configureSoftDeleteSqlGenerator(contextualNamingStrategy);
+
+			String sql = sqlGenerator.createSoftDeleteAllSql(getSoftDeletePath("ref.further"));
+
+			assertThat(sql).isEqualTo(
+				"UPDATE " + user + ".second_referenced_article "
+					+ "SET second_reference_deleted = :second_reference_deleted "
+					+ "WHERE " + user + ".second_referenced_article.referenced_article IN ("
+					+ "SELECT "  + user +".referenced_article.id "
+					+ "FROM " + user + ".referenced_article "
+					+ "WHERE " + user + ".referenced_article.article IS NOT NULL)");
+		});
+	}
+
 	private PersistentPropertyPath<RelationalPersistentProperty> getPath(String path) {
 		return PersistentPropertyPathTestUtils.getPath(this.context, path, DummyEntity.class);
 	}
+
+	private PersistentPropertyPath<RelationalPersistentProperty> getSoftDeletePath(String path) {
+		return PersistentPropertyPathTestUtils.getPath(this.context, path, SoftDeleteArticle.class);
+	}
+
 
 	/**
 	 * Take a set of user-based assertions and run them against multiple users, in different threads.
@@ -228,6 +286,17 @@ public class SqlGeneratorContextBasedNamingStrategyTest {
 		return new SqlGenerator(context, converter, persistentEntity, NonQuotingDialect.INSTANCE);
 	}
 
+	private SqlGenerator configureSoftDeleteSqlGenerator(NamingStrategy namingStrategy) {
+
+		RelationalMappingContext context = new JdbcMappingContext(namingStrategy);
+		JdbcConverter converter = new MappingJdbcConverter(context, (identifier, path) -> {
+			throw new UnsupportedOperationException();
+		});
+		RelationalPersistentEntity<?> persistentEntity = context.getRequiredPersistentEntity(SoftDeleteArticle.class);
+
+		return new SqlGenerator(context, converter, persistentEntity, NonQuotingDialect.INSTANCE);
+	}
+
 	@SuppressWarnings("unused")
 	static class DummyEntity {
 
@@ -252,5 +321,48 @@ public class SqlGeneratorContextBasedNamingStrategyTest {
 		@Id
 		Long l2id;
 		String something;
+	}
+
+	@Table("article")
+	static class SoftDeleteArticle {
+
+		@Id
+		Long id;
+
+		String contents;
+
+		@SoftDeleteColumn(type = ValueType.BOOLEAN, valueAsDeleted = "true")
+		boolean deleted;
+
+		@Version
+		Integer version;
+
+		ReferencedSoftDeleteArticle ref;
+	}
+
+	@Table("referenced_article")
+	static class ReferencedSoftDeleteArticle {
+
+		@Id
+		Long id;
+
+		String contents;
+
+		@SoftDeleteColumn(type = ValueType.BOOLEAN, valueAsDeleted = "true")
+		boolean reference_deleted;
+
+		SecondReferencedSoftDeleteArticle further;
+	}
+
+	@Table("second_referenced_article")
+	static class SecondReferencedSoftDeleteArticle {
+
+		@Id
+		Long id;
+
+		String contents;
+
+		@SoftDeleteColumn(type = ValueType.BOOLEAN, valueAsDeleted = "true")
+		boolean second_reference_deleted;
 	}
 }

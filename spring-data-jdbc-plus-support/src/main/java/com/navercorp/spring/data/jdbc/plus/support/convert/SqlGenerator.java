@@ -1092,11 +1092,72 @@ class SqlGenerator {
 	}
 
 	private String createSoftDeleteByIdAndVersionSql() {
-		Update update = createBaseSoftDeleteById(getDmlTable())
+		Update update = createBaseSoftDeleteWithVersionById(getDmlTable())
 			.and(getDmlVersionColumn().isEqualTo(getBindMarker(VERSION_SQL_PARAMETER)))
 			.build();
 
 		return render(update);
+	}
+
+	String createSoftDeleteAllSql(@Nullable PersistentPropertyPath<RelationalPersistentProperty> path) {
+
+		Table table = getDmlTable();
+
+		List<AssignValue> assignments = List.of(
+			Assignments.value(
+				table.column(softDeleteProperty.getColumnName()),
+				getBindMarker(softDeleteProperty.getColumnName())
+			)
+		);
+
+		UpdateBuilder.UpdateWhere softDeleteAll = Update.builder()
+			.table(table)
+			.set(assignments);
+
+		if (path == null) {
+			return render(softDeleteAll.build());
+		}
+
+		return createSoftDeleteByPathAndCriteria(mappingContext.getAggregatePath(path), Column::isNotNull);
+	}
+
+	private String createSoftDeleteByPathAndCriteria(
+		AggregatePath path,
+		Function<Column, Condition> rootCondition
+	) {
+
+		Table table = Table.create(path.getTableInfo().qualifiedTableName());
+
+		SoftDeleteProperty property = SoftDeleteProperty.from(
+			path.getLeafEntity()
+		);
+
+		List<AssignValue> assignments = List.of(
+			Assignments.value(
+				table.column(property.getColumnName()),
+				getBindMarker(property.getColumnName())
+			)
+		);
+
+		UpdateBuilder.UpdateWhere builder = Update.builder()
+			.table(table)
+			.set(assignments);
+		Update softDelete;
+
+		Column filterColumn = table.column(path.getTableInfo().reverseColumnInfo().name());
+
+		if (isFirstNonRoot(path)) {
+
+			softDelete = builder
+				.where(rootCondition.apply(filterColumn))
+				.build();
+		} else {
+
+			Condition condition = getSubselectCondition(path, rootCondition, filterColumn);
+			softDelete = builder.where(condition).build();
+		}
+
+		return render(softDelete);
 	}
 
 	private UpdateBuilder.UpdateWhereAndOr createBaseSoftDeleteById(Table table) {
@@ -1108,6 +1169,28 @@ class SqlGenerator {
 			Assignments.value(
 				table.column(softDeleteProperty.getColumnName()),
 				getBindMarker(softDeleteProperty.getColumnName())
+			)
+		);
+
+		return Update.builder()
+			.table(table)
+			.set(assignments)
+			.where(getDmlIdColumn().isEqualTo(getBindMarker(ID_SQL_PARAMETER)));
+	}
+
+	private UpdateBuilder.UpdateWhereAndOr createBaseSoftDeleteWithVersionById(Table table) {
+		if (!supportsSoftDelete()) {
+			throw new IllegalStateException("SoftDeleteProperty should exist");
+		}
+
+		List<AssignValue> assignments = List.of(
+			Assignments.value(
+				table.column(softDeleteProperty.getColumnName()),
+				getBindMarker(softDeleteProperty.getColumnName())
+			),
+			Assignments.value(
+				getDmlVersionColumn(),
+				getBindMarker(getDmlVersionColumn().getName())
 			)
 		);
 
@@ -1313,6 +1396,10 @@ class SqlGenerator {
 			.build();
 
 		return render(select);
+	}
+
+	SoftDeleteProperty getSoftDeleteProperty() {
+		return this.softDeleteProperty;
 	}
 
 	/**

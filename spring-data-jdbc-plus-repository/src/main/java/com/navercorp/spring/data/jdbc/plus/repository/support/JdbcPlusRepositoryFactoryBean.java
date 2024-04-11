@@ -42,6 +42,9 @@ import org.springframework.data.repository.core.support.TransactionalRepositoryF
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
 import org.springframework.util.Assert;
 
+import com.navercorp.spring.data.jdbc.plus.support.convert.JdbcPlusDataAccessStrategyFactory;
+import com.navercorp.spring.data.jdbc.plus.support.parametersource.SoftDeleteSqlParametersFactory;
+
 /**
  * Special adapter for Springs {@link org.springframework.beans.factory.FactoryBean} interface to allow easy setup of
  * repository factories via Spring configuration.
@@ -218,17 +221,30 @@ public class JdbcPlusRepositoryFactoryBean<T extends Repository<S, ID>, S, ID ex
 
 					SqlGeneratorSource sqlGeneratorSource = new SqlGeneratorSource(
 						this.mappingContext, this.converter, this.dialect);
+					com.navercorp.spring.data.jdbc.plus.support.convert.SqlGeneratorSource jdbcPlusSqlGeneratorSource =
+						new com.navercorp.spring.data.jdbc.plus.support.convert.SqlGeneratorSource(
+							this.mappingContext,
+							this.converter,
+							dialect
+						);
 					SqlParametersFactory sqlParametersFactory = new SqlParametersFactory(
 						this.mappingContext, this.converter);
 					InsertStrategyFactory insertStrategyFactory = new InsertStrategyFactory(this.operations,
 						this.dialect);
-					DataAccessStrategyFactory factory = new DataAccessStrategyFactory(
+					DataAccessStrategy delegate = buildDataAccessStrategyDelegate(
 						sqlGeneratorSource,
-						this.converter,
-						this.operations,
 						sqlParametersFactory,
 						insertStrategyFactory
 					);
+
+					JdbcPlusDataAccessStrategyFactory factory = new JdbcPlusDataAccessStrategyFactory(
+						delegate,
+						this.converter,
+						operations,
+						jdbcPlusSqlGeneratorSource,
+						new SoftDeleteSqlParametersFactory(this.mappingContext, this.converter)
+					);
+
 					return factory.create();
 				});
 		}
@@ -242,5 +258,18 @@ public class JdbcPlusRepositoryFactoryBean<T extends Repository<S, ID>, S, ID ex
 		}
 
 		super.afterPropertiesSet();
+	}
+
+	private DataAccessStrategy buildDataAccessStrategyDelegate(SqlGeneratorSource sqlGeneratorSource,
+		SqlParametersFactory sqlParametersFactory, InsertStrategyFactory insertStrategyFactory) {
+		DataAccessStrategyFactory factory = new DataAccessStrategyFactory(
+			sqlGeneratorSource,
+			this.converter,
+			this.operations,
+			sqlParametersFactory,
+			insertStrategyFactory
+		);
+		DataAccessStrategy delegate = factory.create();
+		return delegate;
 	}
 }
