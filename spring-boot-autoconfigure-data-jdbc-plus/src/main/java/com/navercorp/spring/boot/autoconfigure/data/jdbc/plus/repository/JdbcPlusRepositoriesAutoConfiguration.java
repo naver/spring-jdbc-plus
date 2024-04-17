@@ -39,7 +39,6 @@ import org.springframework.data.jdbc.core.convert.JdbcConverter;
 import org.springframework.data.jdbc.core.convert.JdbcCustomConversions;
 import org.springframework.data.jdbc.core.convert.RelationResolver;
 import org.springframework.data.jdbc.core.mapping.JdbcMappingContext;
-import org.springframework.data.jdbc.repository.config.AbstractJdbcConfiguration;
 import org.springframework.data.relational.RelationalManagedTypes;
 import org.springframework.data.relational.core.dialect.Dialect;
 import org.springframework.data.relational.core.mapping.NamingStrategy;
@@ -47,6 +46,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
 import org.springframework.transaction.PlatformTransactionManager;
 
 import com.navercorp.spring.data.jdbc.plus.repository.JdbcRepository;
+import com.navercorp.spring.data.jdbc.plus.repository.config.AbstractJdbcPlusConfiguration;
 import com.navercorp.spring.data.jdbc.plus.repository.config.JdbcPlusRepositoryConfigExtension;
 import com.navercorp.spring.data.jdbc.plus.repository.config.JdbcPlusRepositoryReactiveSupportConfigExtension;
 
@@ -57,7 +57,7 @@ import com.navercorp.spring.data.jdbc.plus.repository.config.JdbcPlusRepositoryR
  */
 @Configuration(proxyBeanMethods = false)
 @ConditionalOnBean({NamedParameterJdbcOperations.class, PlatformTransactionManager.class})
-@ConditionalOnClass({NamedParameterJdbcOperations.class, AbstractJdbcConfiguration.class, JdbcRepository.class})
+@ConditionalOnClass({NamedParameterJdbcOperations.class, AbstractJdbcPlusConfiguration.class, JdbcRepository.class})
 @ConditionalOnExpression(
 	"!${spring.data.jdbc.repositories.enabled:true} " + " && ${spring.data.jdbc.plus.repositories.enabled:true}"
 )
@@ -97,8 +97,8 @@ public class JdbcPlusRepositoriesAutoConfiguration {
 	 * The type Spring boot jdbc configuration.
 	 */
 	@Configuration
-	@ConditionalOnMissingBean(AbstractJdbcConfiguration.class)
-	static class SpringBootJdbcConfiguration extends AbstractJdbcConfiguration {
+	@ConditionalOnMissingBean(AbstractJdbcPlusConfiguration.class)
+	static class SpringBootJdbcConfiguration extends AbstractJdbcPlusConfiguration {
 		@Override
 		@Bean
 		@ConditionalOnMissingBean

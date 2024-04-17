@@ -28,3 +28,55 @@ CREATE TABLE IF NOT EXISTS n_shipping (
   receiver_address VARCHAR(255),
   memo VARCHAR(255),
   PRIMARY KEY(id));
+
+CREATE TABLE IF NOT EXISTS boolean_state_articles (
+    id BIGINT AUTO_INCREMENT,
+    writer_id VARCHAR(20),
+    contents TEXT,
+    created_at DATETIME,
+    last_modified_at DATETIME,
+    visible TINYINT,
+    PRIMARY KEY(id));
+
+CREATE TABLE IF NOT EXISTS enum_state_articles (
+    id BIGINT AUTO_INCREMENT,
+    writer_id VARCHAR(20),
+    contents TEXT,
+    created_at DATETIME,
+    last_modified_at DATETIME,
+    version INT,
+    article_state VARCHAR(2),
+    PRIMARY KEY(id));
+
+CREATE TABLE IF NOT EXISTS soft_delete_products (
+    id BIGINT AUTO_INCREMENT,
+    product_name VARCHAR(20),
+    created_at DATETIME,
+    last_modified_at DATETIME,
+    visible TINYINT,
+    PRIMARY KEY(id));
+
+CREATE TABLE IF NOT EXISTS soft_delete_reviews (
+    id BIGINT AUTO_INCREMENT,
+    product_id BIGINT,
+    contents TEXT,
+    created_at DATETIME,
+    last_modified_at DATETIME,
+    visible TINYINT,
+    PRIMARY KEY(id));
+
+CREATE TABLE IF NOT EXISTS plain_products (
+    id BIGINT AUTO_INCREMENT,
+    product_name VARCHAR(20),
+    created_at DATETIME,
+    last_modified_at DATETIME,
+    PRIMARY KEY(id));
+
+CREATE TABLE IF NOT EXISTS plain_reviews (
+    id BIGINT AUTO_INCREMENT,
+    product_id BIGINT,
+    contents TEXT,
+    created_at DATETIME,
+    last_modified_at DATETIME,
+    visible TINYINT,
+    PRIMARY KEY(id));

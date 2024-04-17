@@ -1,6 +1,7 @@
 package com.navercorp.spring.data.jdbc.plus.support.convert;
 
 import org.springframework.data.mapping.PersistentPropertyPath;
+import org.springframework.data.mapping.PersistentPropertyPaths;
 import org.springframework.data.relational.core.mapping.RelationalMappingContext;
 import org.springframework.data.relational.core.mapping.RelationalPersistentProperty;
 
@@ -14,13 +15,15 @@ public class PersistentPropertyPathTestUtils {
 	public static PersistentPropertyPath<RelationalPersistentProperty> getPath(
 		RelationalMappingContext context,
 		String path,
-		Class<?> baseType
+		Class<?> source
 	) {
-		return context.findPersistentPropertyPaths(baseType, p -> p.isEntity()) //
-			.filter(p -> p.toDotPath().equals(path)) //
-			.stream() //
-			.findFirst() //
-			.orElseThrow(() -> new IllegalArgumentException(
-				String.format("No path for %s based on %s", path, baseType)));
+		PersistentPropertyPaths<?, RelationalPersistentProperty> persistentPropertyPaths = context
+			.findPersistentPropertyPaths(source, p -> true);
+
+		return persistentPropertyPaths
+			.filter(p -> p.toDotPath().equals(path))
+			.stream()
+			.findFirst()
+			.orElse(null);
 	}
 }
