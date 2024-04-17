@@ -2,6 +2,7 @@ package com.navercorp.spring.data.jdbc.plus.support.convert;
 
 import static com.navercorp.spring.data.jdbc.plus.support.convert.SqlGenerator.IDS_SQL_PARAMETER;
 import static com.navercorp.spring.data.jdbc.plus.support.convert.SqlGenerator.ID_SQL_PARAMETER;
+import static com.navercorp.spring.data.jdbc.plus.support.convert.SqlGenerator.ROOT_ID_PARAMETER;
 import static com.navercorp.spring.data.jdbc.plus.support.convert.SqlGenerator.VERSION_SQL_PARAMETER;
 import static java.util.Objects.requireNonNull;
 
@@ -52,18 +53,19 @@ public class JdbcPlusDataAccessStrategy extends DelegatingDataAccessStrategy {
 		RelationalPersistentProperty referencingProperty = propertyPath.getLeafProperty();
 		Assert.notNull(referencingProperty, "No property found matching the PropertyPath " + propertyPath);
 
-		if (!supportsSoftDelete(rootEntity.getType())) {
+		Class<?> propertyPathType = getPropertyBaseType(propertyPath);
+		if (!supportsSoftDelete(propertyPathType)) {
 			super.delete(rootId, propertyPath);
 			return;
 		}
 
-		String softDelete = sql(rootEntity.getType()).getSoftDeleteById();
+		String softDelete = sql(rootEntity.getType()).createSoftDeleteByPath(propertyPath);
 
 		SqlParameterSource parameters = softDeleteSqlParametersFactory.forSoftDeleteById(
 			rootId,
 			rootEntity.getType(),
-			ID_SQL_PARAMETER,
-			requireNonNull(getSoftDeleteProperty(rootEntity.getType()))
+			ROOT_ID_PARAMETER,
+			requireNonNull(getSoftDeleteProperty(propertyPathType))
 		);
 		operations.update(softDelete, parameters);
 	}
@@ -75,18 +77,19 @@ public class JdbcPlusDataAccessStrategy extends DelegatingDataAccessStrategy {
 		RelationalPersistentProperty referencingProperty = propertyPath.getLeafProperty();
 		Assert.notNull(referencingProperty, "No property found matching the PropertyPath " + propertyPath);
 
-		if (!supportsSoftDelete(rootEntity.getType())) {
+		Class<?> propertyPathType = getPropertyBaseType(propertyPath);
+		if (!supportsSoftDelete(propertyPathType)) {
 			super.delete(rootIds, propertyPath);
 			return;
 		}
 
-		String softDelete = sql(rootEntity.getType()).getDeleteByIdIn();
+		String softDelete = sql(rootEntity.getType()).createSoftDeleteInByPath(propertyPath);
 
 		SqlParameterSource parameters = softDeleteSqlParametersFactory.forSoftDeleteByIds(
 			rootIds,
 			rootEntity.getType(),
 			IDS_SQL_PARAMETER,
-			requireNonNull(getSoftDeleteProperty(rootEntity.getType()))
+			requireNonNull(getSoftDeleteProperty(propertyPathType))
 		);
 		operations.update(softDelete, parameters);
 	}
@@ -170,19 +173,19 @@ public class JdbcPlusDataAccessStrategy extends DelegatingDataAccessStrategy {
 
 	@Override
 	public void deleteAll(PersistentPropertyPath<RelationalPersistentProperty> propertyPath) {
-		Class<?> domainType = getBaseType(propertyPath);
+		Class<?> propertyPathType = getPropertyBaseType(propertyPath);
 
-		if (!supportsSoftDelete(domainType)) {
-			super.deleteAll(domainType);
+		if (!supportsSoftDelete(propertyPathType)) {
+			super.deleteAll(propertyPath);
 			return;
 		}
 
 		SqlParameterSource parameterSource = softDeleteSqlParametersFactory.forSoftDeleteAll(
-			requireNonNull(getSoftDeleteProperty(domainType))
+			requireNonNull(getSoftDeleteProperty(propertyPathType))
 		);
 
 		operations.update(
-			sql(domainType).createSoftDeleteAllSql(propertyPath),
+			sql(propertyPathType).createSoftDeleteAllSql(propertyPath),
 			parameterSource
 		);
 	}
@@ -212,5 +215,14 @@ public class JdbcPlusDataAccessStrategy extends DelegatingDataAccessStrategy {
 		Assert.notNull(baseProperty, "The base property must not be null");
 
 		return baseProperty.getOwner().getType();
+	}
+
+	private Class<?> getPropertyBaseType(PersistentPropertyPath<RelationalPersistentProperty> propertyPath) {
+
+		RelationalPersistentProperty baseProperty = propertyPath.getBaseProperty();
+
+		Assert.notNull(baseProperty, "The base property must not be null");
+
+		return baseProperty.getActualType();
 	}
 }

@@ -77,9 +77,9 @@ public class EnumStateArticleRepositoryTest {
 		Iterable<EnumStateArticle> actual = this.sut.insertAll(articles);
 
 		// then
-		actual.forEach(order -> {
-			then(order.getId()).isNotNull();
-			then(order.closed()).isFalse();
+		actual.forEach(article -> {
+			then(article.getId()).isNotNull();
+			then(article.closed()).isFalse();
 		});
 	}
 

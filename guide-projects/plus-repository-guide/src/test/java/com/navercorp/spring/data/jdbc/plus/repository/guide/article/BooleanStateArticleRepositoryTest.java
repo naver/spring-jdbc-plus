@@ -72,9 +72,9 @@ public class BooleanStateArticleRepositoryTest {
 		Iterable<BooleanStateArticle> actual = this.sut.insertAll(articles);
 
 		// then
-		actual.forEach(order -> {
-			then(order.getId()).isNotNull();
-			then(order.isVisible()).isTrue();
+		actual.forEach(article -> {
+			then(article.getId()).isNotNull();
+			then(article.isVisible()).isTrue();
 		});
 	}
 

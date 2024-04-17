@@ -1099,6 +1099,30 @@ class SqlGenerator {
 		return render(update);
 	}
 
+	/**
+	 * Create a {@code DELETE} query and filter by {@link PersistentPropertyPath} using {@code WHERE} with the {@code =}
+	 * operator.
+	 * @param path must not be {@literal null}.
+	 * @return the statement as a {@link String}. Guaranteed to be not {@literal null}.
+	 */
+	String createSoftDeleteByPath(PersistentPropertyPath<RelationalPersistentProperty> path) {
+		return createSoftDeleteByPathAndCriteria(mappingContext.getAggregatePath(path),
+			filterColumn -> filterColumn.isEqualTo(getBindMarker(ROOT_ID_PARAMETER)));
+	}
+
+	/**
+	 * Create a {@code DELETE} query and filter by {@link PersistentPropertyPath} using {@code WHERE} with the {@code IN}
+	 * operator.
+	 *
+	 * @param path must not be {@literal null}.
+	 * @return the statement as a {@link String}. Guaranteed to be not {@literal null}.
+	 */
+	String createSoftDeleteInByPath(PersistentPropertyPath<RelationalPersistentProperty> path) {
+
+		return createSoftDeleteByPathAndCriteria(mappingContext.getAggregatePath(path),
+			filterColumn -> filterColumn.in(getBindMarker(IDS_SQL_PARAMETER)));
+	}
+
 	String createSoftDeleteAllSql(@Nullable PersistentPropertyPath<RelationalPersistentProperty> path) {
 
 		Table table = getDmlTable();
