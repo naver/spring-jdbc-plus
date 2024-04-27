@@ -1,0 +1,36 @@
+plugins {
+    id "java-library"
+    id "checkstyle"
+    id "idea"
+}
+
+java {
+    withJavadocJar()
+    withSourcesJar()
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
+
+tasks.withType(Javadoc).configureEach { enabled = false }
+
+tasks.withType(JavaCompile).configureEach {
+    options.compilerArgs << '-parameters'
+}
+
+test {
+    useJUnitPlatform()
+}
+
+checkstyle {
+    configFile = file("${project.rootDir}/rule/naver-checkstyle-rules.xml")
+    configProperties = ["suppressionFile": "${project.rootDir}/tool/naver-checkstyle-suppressions.xml"]
+    toolVersion = "9.1"
+    ignoreFailures = true // TODO: return to false
+    maxErrors = 0
+    maxWarnings = 0
+}
+
+dependencies {
+    compileOnly("com.google.code.findbugs:jsr305:3.0.2")
+    testCompileOnly("com.google.code.findbugs:jsr305:3.0.2")
+}

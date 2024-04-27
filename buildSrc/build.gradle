@@ -1,0 +1,16 @@
+plugins {
+   id "groovy-gradle-plugin"
+}
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+    gradlePluginPortal() // give access to gradle community plugins
+    maven {
+        url "https://repo.spring.io/milestone/"
+    }
+}
+
+dependencies {
+    implementation "io.spring.gradle:dependency-management-plugin:1.1.5"
+}
