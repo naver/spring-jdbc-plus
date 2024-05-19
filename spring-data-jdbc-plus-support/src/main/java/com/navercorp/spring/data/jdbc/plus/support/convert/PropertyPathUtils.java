@@ -19,6 +19,7 @@ package com.navercorp.spring.data.jdbc.plus.support.convert;
 import javax.annotation.Nullable;
 
 import org.springframework.data.relational.core.mapping.AggregatePath;
+import org.springframework.data.relational.core.mapping.AggregatePathTraversal;
 import org.springframework.data.relational.core.sql.SqlIdentifier;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
@@ -48,7 +49,7 @@ public class PropertyPathUtils {
 	 * @return
 	 */
 	public static SqlIdentifier getColumnAlias(AggregatePath path, SqlIdentifier columnName) {
-		AggregatePath tableOwner = getTableOwningAncestor(path);
+		AggregatePath tableOwner = AggregatePathTraversal.getTableOwningPath(path);
 		if (tableOwner.isRoot()) {
 			return columnName;
 		} else {
@@ -94,7 +95,7 @@ public class PropertyPathUtils {
 	 */
 	@Nullable
 	public static SqlIdentifier getTableAlias(AggregatePath path) {
-		AggregatePath tableOwner = getTableOwningAncestor(path);
+		AggregatePath tableOwner = AggregatePathTraversal.getTableOwningPath(path);
 		return getTableAliasFromTableOwner(tableOwner);
 	}
 
@@ -108,32 +109,28 @@ public class PropertyPathUtils {
 		return TableAliasUtils.getTableAlias(tableOwner.getLeafEntity());
 	}
 
-	private static AggregatePath getTableOwningAncestor(AggregatePath path) {
-		return path.isEntity() && !path.isEmbedded() ? path : getTableOwningAncestor(path.getParentPath());
-	}
-
 	@Nullable
 	private static SqlIdentifier assembleTableAlias(AggregatePath path) {
 
 		Assert.state(path != null, "Path is null");
-
 		if (path.isRoot()) {
 			return null;
 		}
 
 		String prefix = TableAliasUtils.getTableAliasPropertyPathPrefix(path);
+		Assert.notNull(prefix, "Prefix must not be null.");
+
 		if (path.getParentPath().isRoot()) {
-			Assert.notNull(prefix, "Prefix must not be null.");
 			return StringUtils.hasText(prefix) ? SqlIdentifier.quoted(prefix) : null;
 		}
 
 		AggregatePath parentPath = path.getParentPath();
 		SqlIdentifier sqlIdentifier = assembleTableAlias(parentPath);
-
 		if (sqlIdentifier != null) {
 			return parentPath.isEmbedded() ? sqlIdentifier.transform(name -> name.concat(prefix))
 				: sqlIdentifier.transform(name -> name + "_" + prefix);
 		}
+
 		return SqlIdentifier.quoted(prefix);
 	}
 }
