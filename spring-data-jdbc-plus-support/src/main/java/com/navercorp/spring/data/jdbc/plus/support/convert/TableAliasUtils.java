@@ -45,20 +45,16 @@ class TableAliasUtils {
 			return null;
 		}
 
-		PersistentPropertyPath<? extends RelationalPersistentProperty> propertyPath =
+		PersistentPropertyPath<RelationalPersistentProperty> propertyPath =
 			path.getRequiredPersistentPropertyPath();
 		RelationalPersistentProperty leafProperty = propertyPath.getLeafProperty();
 
-		String prefix;
 		if (path.isEmbedded()) {
-			prefix = leafProperty.getEmbeddedPrefix();
-		} else {
-			SqlTableAlias sqlTableAlias = leafProperty.findAnnotation(SqlTableAlias.class);
-			prefix = sqlTableAlias != null
-				? sqlTableAlias.value()
-				: leafProperty.getName();
+			return leafProperty.getEmbeddedPrefix();
 		}
 
-		return prefix;
+		SqlTableAlias sqlTableAlias = leafProperty.findAnnotation(SqlTableAlias.class);
+
+		return sqlTableAlias != null ? sqlTableAlias.value() : leafProperty.getName();
 	}
 }
