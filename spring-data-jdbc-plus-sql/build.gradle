@@ -5,8 +5,6 @@ dependencies {
     api(project(":spring-jdbc-plus-support"))
     api(project(":spring-data-jdbc-plus-support"))
 
-    compileOnly("org.jetbrains.kotlin:kotlin-stdlib:${kotlinVersion}")
-    compileOnly("org.jetbrains.kotlin:kotlin-reflect:${kotlinVersion}")
     compileOnly("io.projectreactor:reactor-core")
 
     testImplementation("org.junit.jupiter:junit-jupiter")
