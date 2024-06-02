@@ -10,6 +10,9 @@ import org.springframework.util.StringUtils;
 
 import com.navercorp.spring.jdbc.plus.commons.annotations.SoftDeleteColumn;
 
+/**
+ * A default implementation of {@link SoftDeleteProperty}.
+ */
 class DefaultSoftDeleteProperty implements SoftDeleteProperty {
 
 	private static final SoftDeleteProperty NOT_EXISTS = new DefaultSoftDeleteProperty(false, SqlIdentifier.EMPTY, "");

@@ -14,6 +14,12 @@ import com.navercorp.spring.data.jdbc.plus.support.parametersource.SoftDeleteSql
 
 public class AbstractJdbcPlusConfiguration extends AbstractJdbcConfiguration {
 
+	/**
+	 * Create a delegate {@link DataAccessStrategy} for supporting {@link com.navercorp.spring.jdbc.plus.commons.annotations.SoftDeleteColumn}.
+	 *
+	 * @see AbstractJdbcConfiguration#dataAccessStrategyBean
+	 * @return will never be {@literal null}.
+	 */
 	@Override
 	@Bean
 	public DataAccessStrategy dataAccessStrategyBean(
