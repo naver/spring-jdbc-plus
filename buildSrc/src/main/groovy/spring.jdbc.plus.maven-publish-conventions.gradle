@@ -1,0 +1,87 @@
+plugins {
+    id "maven-publish"
+    id "signing"
+}
+
+group = "com.navercorp.spring"
+version = "3.3.0-SNAPSHOT"
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+
+            repositories {
+                maven {
+                    def ossrhUsername = project.hasProperty("ossrhUsername") ? ossrhUsername : ""
+                    def ossrhPassword = project.hasProperty("ossrhPassword") ? ossrhPassword : ""
+
+                    credentials {
+                        username ossrhUsername
+                        password ossrhPassword
+                    }
+
+                    def releasesRepoUrl = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
+                    def snapshotsRepoUrl = "https://oss.sonatype.org/content/repositories/snapshots/"
+                    url = version.endsWith("SNAPSHOT") ? snapshotsRepoUrl : releasesRepoUrl
+                }
+            }
+
+            versionMapping {
+                usage('java-api') {
+                    fromResolutionOf('runtimeClasspath')
+                }
+                usage('java-runtime') {
+                    fromResolutionResult()
+                }
+            }
+
+            pom {
+                name = "Spring JDBC Plus"
+                description = "Spring JDBC Plus"
+                url = "http://github.com/naver/spring-jdbc-plus"
+                licenses {
+                    license {
+                        name = "The Apache License, Version 2.0"
+                        url = "http://www.apache.org/licenses/LICENSE-2.0.txt"
+                    }
+                }
+                developers {
+                    developer {
+                        id = "mhyeon-lee"
+                        name = "Myeonghyeon Lee"
+                        email = "mheyon.lee@gmail.com"
+                    }
+                    developer {
+                        id = "yd-2"
+                        name = "Youngdae Lee"
+                        email = "yd.2@navercorp.com"
+                    }
+                    developer {
+                        id = "chanhyeong"
+                        name = "Chanhyeong Cho"
+                        email = "chu7825@gmail.com"
+                    }
+                    developer {
+                        id = "wool0826"
+                        name = "Chanwool Jo"
+                        email = "chanwool94@gmail.com"
+                    }
+                }
+                scm {
+                    connection = "scm:git:git://github.com/naver/spring-jdbc-plus.git"
+                    developerConnection = "scm:git:git://github.com/naver/spring-jdbc-plus.git"
+                    url = "https://github.com/naver/spring-jdbc-plus"
+                }
+            }
+        }
+    }
+}
+
+signing {
+    sign publishing.publications.mavenJava
+}
+
+tasks.withType(Sign) {
+    onlyIf { !version.endsWith("SNAPSHOT") }
+}

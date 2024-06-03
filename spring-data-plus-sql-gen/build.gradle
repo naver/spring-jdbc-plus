@@ -1,3 +1,9 @@
+plugins {
+    id "spring.jdbc.plus.java-conventions"
+    id "spring.jdbc.plus.spring-bom-conventions"
+    id "spring.jdbc.plus.maven-publish-conventions"
+}
+
 dependencies {
     api(project(":spring-data-jdbc-plus-sql"))
 

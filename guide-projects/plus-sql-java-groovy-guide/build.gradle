@@ -1,10 +1,7 @@
 plugins {
-    id "java"
+    id "spring.jdbc.plus.java-conventions"
+    id "spring.jdbc.plus.spring-bom-conventions"
     id "groovy"
-}
-
-repositories {
-    mavenCentral()
 }
 
 compileGroovy {

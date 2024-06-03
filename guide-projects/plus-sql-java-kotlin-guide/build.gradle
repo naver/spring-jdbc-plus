@@ -1,17 +1,7 @@
-buildscript {
-    repositories {
-        mavenCentral()
-    }
-    dependencies {
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:${kotlinVersion}")
-    }
-}
-
-apply plugin: "java"
-apply plugin: "kotlin"
-
-repositories {
-    mavenCentral()
+plugins {
+    id "spring.jdbc.plus.java-conventions"
+    id "spring.jdbc.plus.spring-bom-conventions"
+    id "org.jetbrains.kotlin.jvm" version "1.9.20"
 }
 
 compileKotlin {
@@ -21,6 +11,7 @@ compileKotlin {
         jvmTarget = "17"
     }
 }
+
 compileTestKotlin {
     kotlinOptions {
         javaParameters = true

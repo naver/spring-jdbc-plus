@@ -1,0 +1,13 @@
+plugins {
+    id "io.spring.dependency-management"
+}
+
+dependencyManagement {
+    imports {
+        mavenBom("org.springframework.boot:spring-boot-dependencies:${springBootVersion}") {
+            bomProperties([
+                    "spring-data-bom.version": "${springDataBomVersion}"
+            ])
+        }
+    }
+}
