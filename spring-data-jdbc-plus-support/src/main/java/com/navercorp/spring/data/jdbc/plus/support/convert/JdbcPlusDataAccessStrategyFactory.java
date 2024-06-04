@@ -25,9 +25,8 @@ import com.navercorp.spring.data.jdbc.plus.support.parametersource.SoftDeleteSql
 
 /**
  * Factory to create a {@link DataAccessStrategy} based on the configuration of the provided components. Specifically,
- * this factory creates a {@link SingleQueryFallbackDataAccessStrategy} that falls back to
- * {@link DefaultDataAccessStrategy} if Single Query Loading is not supported. This factory encapsulates
- * {@link DataAccessStrategy} for consistent access strategy creation.
+ * this factory creates a {@link JdbcPlusDataAccessStrategy} that falls back to {@link DefaultDataAccessStrategy}.
+ * This factory encapsulates {@link DataAccessStrategy} for consistent access strategy creation.
  *
  * @since 3.3
  */

@@ -19,6 +19,11 @@ import org.springframework.util.Assert;
 
 import com.navercorp.spring.data.jdbc.plus.support.convert.SoftDeleteProperty;
 
+/**
+ * Creates the {@link SqlParameterSource} for soft delete SQL operations.
+ *
+ * @see org.springframework.data.jdbc.core.convert.SqlParametersFactory
+ */
 public class SoftDeleteSqlParametersFactory {
 
 	private final RelationalMappingContext context;

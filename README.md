@@ -208,6 +208,27 @@ static class TestEntityWithNonNullValue {
 For example, it can be utilized to define default values for certain fields, or to transform values based on specific
 conditions.
 
+### @SoftDeleteColumn
+
+```java
+@Value
+@Builder
+@Table("article")
+static class SoftDeleteArticle {
+	@Id
+	Long id;
+
+	String contents;
+
+	@SoftDeleteColumn.Boolean(valueAsDeleted = "true")
+	boolean deleted;
+}
+```
+
+`@SoftDeleteColumn` supports the soft delete, which is considered as deleted but does not delete actually. This replaces the default 'DELETE' operations to 'UPDATE' operations, by updating specific columns.
+
+You can use value types `Boolean` or `String` by Declaring `@SoftDeleteColumn.Boolean` or `@SoftDeleteColumn.String`.
+
 ## Examples
 
 * [Java + Groovy SQL Example](./guide-projects/plus-sql-java-groovy-guide)
