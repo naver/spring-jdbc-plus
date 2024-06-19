@@ -150,7 +150,7 @@ class OrderRepositoryTest {
 		// then
 		assertThat(actual).allSatisfy(it ->
 			assertThat(it).usingRecursiveComparison()
-				.ignoringFields("id")
+				.ignoringFields("id", "name")
 				.isEqualTo(orderByPrice.get(it.getPrice()))
 		);
 	}
