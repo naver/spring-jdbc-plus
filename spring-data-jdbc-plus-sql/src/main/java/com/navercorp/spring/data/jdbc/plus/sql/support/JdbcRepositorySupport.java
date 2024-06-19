@@ -30,8 +30,11 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.data.mapping.callback.EntityCallbacks;
+import org.springframework.data.relational.core.conversion.MutableAggregateChange;
 import org.springframework.data.relational.core.mapping.event.AfterConvertCallback;
 import org.springframework.data.relational.core.mapping.event.AfterConvertEvent;
+import org.springframework.data.relational.core.mapping.event.BeforeSaveCallback;
+import org.springframework.data.relational.core.mapping.event.BeforeSaveEvent;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
@@ -485,6 +488,28 @@ public abstract class JdbcRepositorySupport<T> {
 	) {
 		return this.findOne(sql, params, resultSetExtractor)
 			.orElseThrow(() -> new EmptyResultDataAccessException("RequiredOne result must be One.", 1));
+	}
+
+	protected <R> int updateOne(String sql, R aggregate) {
+		return this.getJdbcOperations().update(
+			sql,
+			beanParameterSource(triggerBeforeSave(aggregate))
+		);
+	}
+
+	protected <R> int[] updateBatch(String sql, List<R> aggregate) {
+		return this.getJdbcOperations().batchUpdate(
+			sql,
+			aggregate.stream().map(it -> beanParameterSource(triggerBeforeSave(it))).toArray(SqlParameterSource[]::new)
+		);
+	}
+
+	protected <R> R triggerBeforeSave(R aggregate) {
+		this.getApplicationEventPublisher()
+			.publishEvent(new BeforeSaveEvent<>(aggregate, MutableAggregateChange.forSave(aggregate)));
+
+		return this.getEntityCallbacks()
+			.callback(BeforeSaveCallback.class, aggregate, MutableAggregateChange.forSave(aggregate));
 	}
 
 	/**
