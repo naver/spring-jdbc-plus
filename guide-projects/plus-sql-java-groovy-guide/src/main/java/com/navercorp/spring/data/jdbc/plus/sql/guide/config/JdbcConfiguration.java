@@ -10,9 +10,12 @@ import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.convert.ReadingConverter;
 import org.springframework.data.jdbc.core.convert.JdbcConverter;
 import org.springframework.data.jdbc.core.convert.JdbcCustomConversions;
+import org.springframework.data.relational.core.conversion.MutableAggregateChange;
 import org.springframework.data.relational.core.dialect.Dialect;
 import org.springframework.data.relational.core.mapping.RelationalMappingContext;
+import org.springframework.data.relational.core.mapping.event.BeforeSaveCallback;
 
+import com.navercorp.spring.data.jdbc.plus.sql.guide.support.EmptyStringToNullTraits;
 import com.navercorp.spring.data.jdbc.plus.sql.parametersource.EntityConvertibleSqlParameterSourceFactory;
 import com.navercorp.spring.data.jdbc.plus.sql.parametersource.SqlParameterSourceFactory;
 import com.navercorp.spring.jdbc.plus.support.parametersource.ConvertibleParameterSourceFactory;
@@ -21,6 +24,11 @@ import com.navercorp.spring.jdbc.plus.support.parametersource.fallback.NoneFallb
 
 @Configuration
 public class JdbcConfiguration {
+
+	@Bean
+	public BeforeSaveCallback<EmptyStringToNullTraits> convertEmptyStringToNull() {
+		return (aggregate, aggregateChange) -> aggregate.emptyStringToNull();
+	}
 
 	@SuppressWarnings("unchecked")
 	@Bean

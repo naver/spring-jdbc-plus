@@ -32,6 +32,7 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.util.StreamUtils;
 import org.springframework.data.util.Streamable;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
@@ -51,11 +52,13 @@ class OrderRepositoryTest {
 			.price(1000L)
 			.status(OrderStatus.PLACE)
 			.purchaserNo("navercorp")
+			.name("")
 			.build(),
 		Order.builder()
 			.price(5000L)
 			.status(OrderStatus.PLACE)
 			.purchaserNo("navercorp")
+			.name("yd2")
 			.discount(Order.Discount.builder()
 				.type(new Order.DiscountType("coupon"))
 				.build())
@@ -64,6 +67,7 @@ class OrderRepositoryTest {
 			.price(3000L)
 			.status(OrderStatus.COMPLETED)
 			.purchaserNo("navercorp")
+			.name("chanwool")
 			.discount(Order.Discount.builder()
 				.amount(1000L)
 				.type(new Order.DiscountType("coupon"))
@@ -73,6 +77,7 @@ class OrderRepositoryTest {
 			.price(9000L)
 			.status(OrderStatus.COMPLETED)
 			.purchaserNo("navercorp")
+			.name("chanhyeong")
 			.discount(Order.Discount.builder()
 				.amount(1000L)
 				.build()
@@ -106,11 +111,27 @@ class OrderRepositoryTest {
 		actual.sort(comparing(Order::getPrice));
 		assertThat(actual).hasSize(4);
 		assertThat(actual.get(0).getPrice()).isEqualTo(1000L);
+		assertThat(actual.get(0).getName()).isNull();
 		assertThat(actual.get(0).getStatus()).isEqualTo(OrderStatus.PLACE);
 		assertThat(actual.get(1).getPrice()).isEqualTo(3000L);
 		assertThat(actual.get(1).getStatus()).isEqualTo(OrderStatus.COMPLETED);
 		assertThat(actual.get(2).getPrice()).isEqualTo(5000L);
 		assertThat(actual.get(2).getStatus()).isEqualTo(OrderStatus.PLACE);
+	}
+
+	@Test
+	void updateOrderNameWithBeforeSaveConverter() {
+		// given
+		List<Order> samples = StreamUtils.createStreamFromIterator(sut.saveAll(orders).iterator()).toList();
+
+		// when
+		sut.updateName(new UpdatingOrderNameDto(samples.get(2).getId(), ""));
+
+		// then
+		assertThat(samples.get(2).getName()).isNotBlank();
+		assertThat(sut.findById(samples.get(2).getId())).hasValueSatisfying(actual -> {
+			assertThat(actual.getName()).isNull();
+		});
 	}
 
 	@Test

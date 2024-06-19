@@ -70,4 +70,9 @@ public class OrderRepositoryImpl extends JdbcRepositorySupport<Order>
 				.addValue("price", price)
 		));
 	}
+
+	@Override
+	public int updateName(UpdatingOrderNameDto dto) {
+		return saveOne(this.sqls.updateName(), dto);
+	}
 }

@@ -3,6 +3,7 @@ CREATE TABLE IF NOT EXISTS n_order (
   price INT,
   status VARCHAR(20),
   purchaser_no VARCHAR(36),
+  name VARCHAR(20),
   discount_amount INT,
   discount_type VARCHAR(20),
   PRIMARY KEY(id));

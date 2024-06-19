@@ -71,4 +71,12 @@ class OrderSql extends SqlGeneratorSupport {
         WHERE purchaser_no = :purchaserNo
         """
     }
+
+    String updateName() {
+        """
+        UPDATE n_order SET
+            name = :name
+        WHERE id = :id
+        """
+    }
 }

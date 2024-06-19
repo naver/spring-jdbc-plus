@@ -31,4 +31,6 @@ public interface OrderRepositoryCustom {
 	long countByPurchaserNo(String purchaserNo);
 
 	List<Order> findByPurchaserNoAndStatusAndPrice(OrderCriteria criteria, Long price);
+
+	int updateName(UpdatingOrderNameDto name);
 }

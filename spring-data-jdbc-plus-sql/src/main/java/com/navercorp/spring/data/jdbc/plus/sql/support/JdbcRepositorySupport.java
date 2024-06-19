@@ -490,6 +490,14 @@ public abstract class JdbcRepositorySupport<T> {
 			.orElseThrow(() -> new EmptyResultDataAccessException("RequiredOne result must be One.", 1));
 	}
 
+	/**
+	 * Save one r
+	 *
+	 * @param sql the sql
+	 * @param aggregate the aggregate for save
+	 * @return affected row count
+	 * @param <R> the type parameter
+	 */
 	protected <R> int saveOne(String sql, R aggregate) {
 		return this.getJdbcOperations().update(
 			sql,
@@ -497,6 +505,14 @@ public abstract class JdbcRepositorySupport<T> {
 		);
 	}
 
+	/**
+	 * Save list
+	 *
+	 * @param sql the sql
+	 * @param aggregate the aggregate list for save
+	 * @return affected row count
+	 * @param <R> the type parameter
+	 */
 	protected <R> int[] saveBatch(String sql, List<R> aggregate) {
 		return this.getJdbcOperations().batchUpdate(
 			sql,
