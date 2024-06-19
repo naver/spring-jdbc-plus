@@ -490,14 +490,14 @@ public abstract class JdbcRepositorySupport<T> {
 			.orElseThrow(() -> new EmptyResultDataAccessException("RequiredOne result must be One.", 1));
 	}
 
-	protected <R> int updateOne(String sql, R aggregate) {
+	protected <R> int saveOne(String sql, R aggregate) {
 		return this.getJdbcOperations().update(
 			sql,
 			beanParameterSource(triggerBeforeSave(aggregate))
 		);
 	}
 
-	protected <R> int[] updateBatch(String sql, List<R> aggregate) {
+	protected <R> int[] saveBatch(String sql, List<R> aggregate) {
 		return this.getJdbcOperations().batchUpdate(
 			sql,
 			aggregate.stream().map(it -> beanParameterSource(triggerBeforeSave(it))).toArray(SqlParameterSource[]::new)
