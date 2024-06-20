@@ -226,8 +226,8 @@ static class SoftDeleteArticle {
 }
 ```
 
-`@SoftDeleteColumn` supports the soft delete, which is considered as deleted but does not delete actually. This replaces
-the default 'DELETE' operations to 'UPDATE' operations, by updating specific columns.
+`@SoftDeleteColumn` supports the soft delete, which is considered as deleted but does not delete actually.
+This replaces the default 'DELETE' operations to 'UPDATE' operations, by updating specific columns.
 
 You can use value types `Boolean` or `String` by Declaring `@SoftDeleteColumn.Boolean` or `@SoftDeleteColumn.String`.
 
