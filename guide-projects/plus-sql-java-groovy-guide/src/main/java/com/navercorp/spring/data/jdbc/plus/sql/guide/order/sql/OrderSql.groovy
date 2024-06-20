@@ -55,7 +55,7 @@ class OrderSql extends SqlGeneratorSupport {
     }
 
     String selectByPurchaserNoAndStatusAndPrice() {
-    """
+        """
     SELECT ${sql.columns(Order)} 
     FROM ${sql.tables(Order)}
     WHERE purchaser_no = :criteria.purchaserNo
@@ -69,6 +69,14 @@ class OrderSql extends SqlGeneratorSupport {
         SELECT count(*)
         FROM ${sql.tables(Order)}
         WHERE purchaser_no = :purchaserNo
+        """
+    }
+
+    String updateName() {
+        """
+        UPDATE n_order
+        SET name = :name
+        WHERE id = :id
         """
     }
 }
