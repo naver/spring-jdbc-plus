@@ -520,6 +520,13 @@ public abstract class JdbcRepositorySupport<T> {
 		);
 	}
 
+	/**
+	 * Trigger before save r
+	 *
+	 * @param aggregate the aggregate
+	 * @return the r returned by entity callbacks
+	 * @param <R> the type parameter
+	 */
 	protected <R> R triggerBeforeSave(R aggregate) {
 		this.getApplicationEventPublisher()
 			.publishEvent(new BeforeSaveEvent<>(aggregate, MutableAggregateChange.forSave(aggregate)));
