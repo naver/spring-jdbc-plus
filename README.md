@@ -34,7 +34,7 @@ may be an appropriate choice.
             }
         }
         dependencies {
-            classpath("org.springframework.boot:spring-boot-gradle-plugin:3.3.0")
+            classpath("org.springframework.boot:spring-boot-gradle-plugin:3.3.1")
         }
     }
 
@@ -50,7 +50,7 @@ may be an appropriate choice.
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.3.0</version>
+        <version>3.3.1</version>
         <relativePath/>
     </parent>
 
@@ -211,6 +211,7 @@ conditions.
 ### @SoftDeleteColumn
 
 ```java
+
 @Value
 @Builder
 @Table("article")
@@ -225,7 +226,8 @@ static class SoftDeleteArticle {
 }
 ```
 
-`@SoftDeleteColumn` supports the soft delete, which is considered as deleted but does not delete actually. This replaces the default 'DELETE' operations to 'UPDATE' operations, by updating specific columns.
+`@SoftDeleteColumn` supports the soft delete, which is considered as deleted but does not delete actually. This replaces
+the default 'DELETE' operations to 'UPDATE' operations, by updating specific columns.
 
 You can use value types `Boolean` or `String` by Declaring `@SoftDeleteColumn.Boolean` or `@SoftDeleteColumn.String`.
 
