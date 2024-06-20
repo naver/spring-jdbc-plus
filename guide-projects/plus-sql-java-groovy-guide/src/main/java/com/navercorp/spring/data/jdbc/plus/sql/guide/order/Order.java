@@ -18,15 +18,19 @@
 
 package com.navercorp.spring.data.jdbc.plus.sql.guide.order;
 
+import java.nio.charset.StandardCharsets;
+
 import javax.annotation.Nullable;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Embedded;
 import org.springframework.data.relational.core.mapping.Table;
+import org.springframework.util.ObjectUtils;
 
 import lombok.Builder;
 import lombok.Getter;
 
+import com.navercorp.spring.data.jdbc.plus.sql.guide.support.EmptyStringToNullTraits;
 import com.navercorp.spring.jdbc.plus.commons.annotations.SqlFunction;
 
 /**
@@ -34,8 +38,8 @@ import com.navercorp.spring.jdbc.plus.commons.annotations.SqlFunction;
  */
 @Table("n_order")
 @Getter
-@Builder
-public class Order {
+@Builder(toBuilder = true)
+public class Order implements EmptyStringToNullTraits {
 	@Id
 	private Long id;
 
@@ -45,6 +49,8 @@ public class Order {
 	private OrderStatus status;
 
 	private String purchaserNo;
+
+	private String name;
 
 	@Nullable
 	@Embedded.Nullable(prefix = "discount_")
@@ -68,5 +74,12 @@ public class Order {
 	public record DiscountType(
 		String type
 	) {
+	}
+
+	@Override
+	public Order emptyStringToNull() {
+		return this.toBuilder()
+				.name(ObjectUtils.isEmpty(this.name) ? null : this.name)
+				.build();
 	}
 }
