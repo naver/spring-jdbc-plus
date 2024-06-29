@@ -79,6 +79,11 @@ publishing {
 }
 
 signing {
+    def signingKey = project.hasProperty("signingKey") ? signingKey : ""
+    def signingPassphrase = project.hasProperty("signingPassphrase") ? signingKey : ""
+
+    useInMemoryPgpKeys(signingKey, signingPassphrase)
+
     sign publishing.publications.mavenJava
 }
 
