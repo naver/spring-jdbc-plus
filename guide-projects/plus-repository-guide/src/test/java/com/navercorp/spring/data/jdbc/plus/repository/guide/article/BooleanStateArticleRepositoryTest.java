@@ -122,9 +122,10 @@ public class BooleanStateArticleRepositoryTest {
 
 		// then
 		Iterable<BooleanStateArticle> markAsDeletedList = this.sut.findAllById(ids);
-		then(markAsDeletedList).hasSize(ids.size())
-			.allSatisfy(it ->
-				then(it.isVisible()).isFalse()
+		then(markAsDeletedList)
+			.hasSize(ids.size())
+			.allSatisfy(
+				it -> then(it.isVisible()).isFalse()
 			);
 	}
 
@@ -138,9 +139,10 @@ public class BooleanStateArticleRepositoryTest {
 
 		// then
 		Iterable<BooleanStateArticle> markAsDeletedList = this.sut.findAll();
-		then(markAsDeletedList).hasSize(articles.size())
-			.allSatisfy(it ->
-				then(it.isVisible()).isFalse()
+		then(markAsDeletedList)
+			.hasSize(articles.size())
+			.allSatisfy(
+				it -> then(it.isVisible()).isFalse()
 			);
 	}
 }

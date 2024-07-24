@@ -1185,7 +1185,7 @@ class SqlGeneratorTest {
 		String contents;
 
 		@SoftDeleteColumn(type = ValueType.BOOLEAN, valueAsDeleted = "true")
-		boolean reference_deleted;
+		boolean reference_deleted; // @checkstyle:ignore
 
 		SecondReferencedSoftDeleteArticle further;
 	}
@@ -1199,7 +1199,7 @@ class SqlGeneratorTest {
 		String contents;
 
 		@SoftDeleteColumn(type = ValueType.BOOLEAN, valueAsDeleted = "true")
-		boolean second_reference_deleted;
+		boolean second_reference_deleted; // @checkstyle:ignore
 	}
 
 	@Table("soft_delete_element")
@@ -1207,6 +1207,6 @@ class SqlGeneratorTest {
 		@Id
 		Long id;
 		@SoftDeleteColumn(type = ValueType.BOOLEAN, valueAsDeleted = "true")
-		boolean element_deleted;
+		boolean element_deleted; // @checkstyle:ignore
 	}
 }

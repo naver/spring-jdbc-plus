@@ -66,7 +66,7 @@ import com.navercorp.spring.jdbc.plus.commons.annotations.SqlFunction;
  * @author Myeonghyeon Lee
  */
 @SupportedAnnotationTypes(value = "org.springframework.data.relational.core.mapping.Table")
-@SupportedSourceVersion(SourceVersion.RELEASE_8)
+@SupportedSourceVersion(SourceVersion.RELEASE_17)
 public class SpringDataTableGenerator extends AbstractProcessor {
 	private static final String ENTITY_TYPE_FIELD_NAME = "ENTITY_TYPE";
 	private static final String TABLE_INFO_FIELD_NAME = "___tbInfo";

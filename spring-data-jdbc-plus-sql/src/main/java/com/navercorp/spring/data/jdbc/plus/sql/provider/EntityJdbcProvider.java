@@ -31,9 +31,9 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 
 import com.navercorp.spring.data.jdbc.plus.sql.convert.AggregateResultSetExtractor;
-import com.navercorp.spring.data.jdbc.plus.support.convert.SqlProvider;
 import com.navercorp.spring.data.jdbc.plus.sql.parametersource.EntityConvertibleSqlParameterSourceFactory;
 import com.navercorp.spring.data.jdbc.plus.sql.parametersource.SqlParameterSourceFactory;
+import com.navercorp.spring.data.jdbc.plus.support.convert.SqlProvider;
 import com.navercorp.spring.jdbc.plus.support.parametersource.CompositeSqlParameterSource;
 
 /**

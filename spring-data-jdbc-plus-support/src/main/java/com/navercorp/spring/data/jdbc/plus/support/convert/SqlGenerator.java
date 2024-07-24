@@ -203,8 +203,8 @@ class SqlGenerator {
 	 * <ol>
 	 * <li>the aggregate root.</li>
 	 * <li>a first level entity which still references the root id directly</li>
-	 * <li>and all other entities which have to use a subselect to navigate from the id of the aggregate root to something
-	 * referenced by the table in question.</li>
+	 * <li>and all other entities which have to use a subselect to navigate from the id of the aggregate root
+	 * to something referenced by the table in question.</li>
 	 * </ol>
 	 * For paths of the second kind this method returns {@literal true}.
 	 *
@@ -220,8 +220,8 @@ class SqlGenerator {
 	 * <ol>
 	 * <li>the aggregate root.</li>
 	 * <li>a first level entity which still references the root id directly</li>
-	 * <li>and all other entities which have to use a subselect to navigate from the id of the aggregate root to something
-	 * referenced by the table in question.</li>
+	 * <li>and all other entities which have to use a subselect to navigate from the id of the aggregate root
+	 * to something referenced by the table in question.</li>
 	 * </ol>
 	 * For paths of the third kind this method returns {@literal true}.
 	 *
@@ -393,8 +393,11 @@ class SqlGenerator {
 
 		Condition condition = null;
 		for (SqlIdentifier backReferenceColumn : parentIdentifier.toMap().keySet()) {
-			Assert.isTrue(!SqlIdentifier.EMPTY.equals(backReferenceColumn),
-				"An empty SqlIdentifier can't be used in condition. Make sure that all composite primary keys are defined in the query"); // @checkstyle:ignoreLength
+			Assert.isTrue(
+				!SqlIdentifier.EMPTY.equals(backReferenceColumn),
+				"An empty SqlIdentifier can't be used in condition. "
+					+ "Make sure that all composite primary keys are defined in the query"
+			);
 
 			Condition newCondition = table.column(backReferenceColumn)
 				.isEqualTo(getBindMarker(backReferenceColumn));
@@ -588,8 +591,8 @@ class SqlGenerator {
 	}
 
 	/**
-	 * Create a {@code DELETE} query and filter by {@link PersistentPropertyPath} using {@code WHERE} with the {@code IN}
-	 * operator.
+	 * Create a {@code DELETE} query and filter by {@link PersistentPropertyPath}
+	 * using {@code WHERE} with the {@code IN} operator.
 	 *
 	 * @param path must not be {@literal null}.
 	 * @return the statement as a {@link String}. Guaranteed to be not {@literal null}.
@@ -1111,8 +1114,8 @@ class SqlGenerator {
 	}
 
 	/**
-	 * Create a {@code DELETE} query and filter by {@link PersistentPropertyPath} using {@code WHERE} with the {@code IN}
-	 * operator.
+	 * Create a {@code DELETE} query and filter by {@link PersistentPropertyPath}
+	 * using {@code WHERE} with the {@code IN} operator.
 	 *
 	 * @param path must not be {@literal null}.
 	 * @return the statement as a {@link String}. Guaranteed to be not {@literal null}.
@@ -1317,9 +1320,9 @@ class SqlGenerator {
 		propertyToSortBy = persistentPropertyPath.getBaseProperty();
 
 		Assert.state(propertyToSortBy != null && propertyToSortBy.isEmbedded(), () -> String.format( //
-			"Specified sorting property '%s' is expected to " + //
-				"be the property, named '%s', of embedded entity '%s', but field '%s' is " + //
-				"not marked with @Embedded", //
+			"Specified sorting property '%s' is expected to "
+				+ "be the property, named '%s', of embedded entity '%s', but field '%s' is "
+				+ "not marked with @Embedded", //
 			order.getProperty(), //
 			extractFieldNameFromEmbeddedProperty(order), //
 			extractEmbeddedPropertyName(order), //
@@ -1329,7 +1332,7 @@ class SqlGenerator {
 		RelationalPersistentEntity<?> embeddedEntity = mappingContext
 			.getRequiredPersistentEntity(propertyToSortBy.getTypeInformation());
 		return embeddedEntity.getRequiredPersistentProperty(extractFieldNameFromEmbeddedProperty(order))
-			.getColumnName(); // @checkstyle:ignoreLength
+			.getColumnName();
 	}
 
 	public String extractEmbeddedPropertyName(Sort.Order order) {
@@ -1375,8 +1378,8 @@ class SqlGenerator {
 
 		SelectBuilder.SelectWhere selectBuilder = selectBuilder();
 
-		// first apply query and then pagination. This means possible query sorting and limiting might be overwritten by the
-		// pagination. This is desired.
+		// first apply query and then pagination. This means possible query sorting and limiting might be overwritten
+		// by the pagination. This is desired.
 		SelectBuilder.SelectOrdered selectOrdered = applyQueryOnSelect(query, parameterSource, selectBuilder);
 		selectOrdered = applyPagination(pageable, selectOrdered);
 		selectOrdered = selectOrdered.orderBy(extractOrderByFields(pageable.getSort()));
@@ -1430,8 +1433,8 @@ class SqlGenerator {
 	 * Generates a {@link org.springframework.data.relational.core.sql.SelectBuilder.SelectJoin} with a
 	 * <code>COUNT(...)</code> where the <code>countExpressions</code> are the parameters of the count.
 	 *
-	 * @return a non-null {@link org.springframework.data.relational.core.sql.SelectBuilder.SelectJoin} that joins all the
-	 *         columns and has only a count in the projection of the select.
+	 * @return a non-null {@link org.springframework.data.relational.core.sql.SelectBuilder.SelectJoin}
+	 *         that joins all the columns and has only a count in the projection of the select.
 	 */
 	private SelectBuilder.SelectJoin getExistsSelect() {
 
@@ -1461,8 +1464,8 @@ class SqlGenerator {
 	 * <code>COUNT(...)</code> where the <code>countExpressions</code> are the parameters of the count.
 	 *
 	 * @param countExpressions the expression to use as count parameter.
-	 * @return a non-null {@link org.springframework.data.relational.core.sql.SelectBuilder.SelectJoin} that joins all the
-	 *         columns and has only a count in the projection of the select.
+	 * @return a non-null {@link org.springframework.data.relational.core.sql.SelectBuilder.SelectJoin}
+	 *         that joins all the columns and has only a count in the projection of the select.
 	 */
 	private SelectBuilder.SelectJoin getSelectCountWithExpression(Expression... countExpressions) {
 
@@ -1596,11 +1599,11 @@ class SqlGenerator {
 
 		@Override
 		public String toString() {
-			return "Join{" + //
-				"joinTable=" + joinTable + //
-				", joinColumn=" + joinColumn + //
-				", parentId=" + parentId + //
-				'}';
+			return "Join{"
+				+ "joinTable=" + joinTable
+				+ ", joinColumn=" + joinColumn
+				+ ", parentId=" + parentId
+				+ '}';
 		}
 	}
 

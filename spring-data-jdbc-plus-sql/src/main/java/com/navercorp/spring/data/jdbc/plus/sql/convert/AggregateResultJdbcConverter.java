@@ -18,7 +18,8 @@
 
 package com.navercorp.spring.data.jdbc.plus.sql.convert;
 
-import static java.util.stream.Collectors.*;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -46,7 +47,6 @@ import org.springframework.data.mapping.model.ParameterValueProvider;
 import org.springframework.data.mapping.model.SpELContext;
 import org.springframework.data.mapping.model.ValueExpressionEvaluator;
 import org.springframework.data.mapping.model.ValueExpressionParameterValueProvider;
-import org.springframework.data.projection.SpelAwareProxyProjectionFactory;
 import org.springframework.data.relational.core.mapping.AggregatePath;
 import org.springframework.data.relational.core.mapping.RelationalMappingContext;
 import org.springframework.data.relational.core.mapping.RelationalPersistentEntity;
@@ -72,11 +72,8 @@ public class AggregateResultJdbcConverter extends MappingJdbcConverter {
 
 	private final ExpressionParser expressionParser = new SpelExpressionParser();
 
-	private final SpelAwareProxyProjectionFactory projectionFactory = new SpelAwareProxyProjectionFactory(
-		expressionParser);
-
-	private final CachingValueExpressionEvaluatorFactory valueExpressionEvaluatorFactory = new CachingValueExpressionEvaluatorFactory(
-		expressionParser, this, o -> spElContext.getEvaluationContext(o));
+	private final CachingValueExpressionEvaluatorFactory valueExpressionEvaluatorFactory =
+		new CachingValueExpressionEvaluatorFactory(expressionParser, this, o -> spElContext.getEvaluationContext(o));
 
 	/**
 	 * Instantiates a new Aggregate result jdbc converter.
@@ -1283,8 +1280,7 @@ public class AggregateResultJdbcConverter extends MappingJdbcConverter {
 		 */
 		private class ResultSetParameterValueProvider implements ParameterValueProvider<RelationalPersistentProperty> {
 
-			private final @Nullable
-			Object idValue;
+			private final @Nullable Object idValue;
 			private final RelationalPersistentEntity<?> entity;
 
 			public ResultSetParameterValueProvider(@Nullable Object idValue, RelationalPersistentEntity<?> entity) {
@@ -1294,7 +1290,7 @@ public class AggregateResultJdbcConverter extends MappingJdbcConverter {
 
 			/*
 			 * (non-Javadoc)
-			 * @see org.springframework.data.mapping.model.ParameterValueProvider#getParameterValue(org.springframework.data.mapping.Parameter)
+			 * @see org.springframework.data.mapping.model.ParameterValueProvider#getParameterValue()
 			 */
 			@Override
 			@Nullable

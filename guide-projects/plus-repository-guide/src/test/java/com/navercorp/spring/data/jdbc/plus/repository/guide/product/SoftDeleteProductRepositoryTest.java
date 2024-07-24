@@ -107,17 +107,20 @@ public class SoftDeleteProductRepositoryTest {
 
 		// then
 		then(actual).hasSize(products.size());
-		actual.forEach(product -> {
-			then(product.getId()).isNotNull();
-			then(product.isVisible()).isTrue();
-			then(product.getReviews()).isNotEmpty()
-				.allSatisfy(
-					review -> {
-						then(review.getId()).isNotNull();
-						then(review.isVisible()).isTrue();
-					}
-				);
-		});
+		actual.forEach(
+			product -> {
+				then(product.getId()).isNotNull();
+				then(product.isVisible()).isTrue();
+				then(product.getReviews())
+					.isNotEmpty()
+					.allSatisfy(
+						review -> {
+							then(review.getId()).isNotNull();
+							then(review.isVisible()).isTrue();
+						}
+					);
+			}
+		);
 	}
 
 	@Test
@@ -130,14 +133,16 @@ public class SoftDeleteProductRepositoryTest {
 
 		// then
 		Optional<SoftDeleteProduct> markAsDeleted = this.sut.findById(product.getId());
-		then(markAsDeleted).isNotEmpty()
-			.hasValueSatisfying(p -> {
-				then(p.isVisible()).isFalse();
-				then(p.getReviews()).isNotEmpty()
-					.allSatisfy(review ->
-						then(review.isVisible()).isFalse()
-					);
-			});
+		then(markAsDeleted)
+			.isNotEmpty()
+			.hasValueSatisfying(
+				p -> {
+					then(p.isVisible()).isFalse();
+					then(p.getReviews())
+						.isNotEmpty()
+						.allSatisfy(review -> then(review.isVisible()).isFalse());
+				}
+			);
 	}
 
 	@Test
@@ -153,13 +158,14 @@ public class SoftDeleteProductRepositoryTest {
 
 		// then
 		Iterable<SoftDeleteProduct> markAsDeletedList = this.sut.findAllById(ids);
-		then(markAsDeletedList).hasSize(ids.size())
-			.allSatisfy(product -> {
+		then(markAsDeletedList)
+			.hasSize(ids.size())
+			.allSatisfy(
+				product -> {
 					then(product.isVisible()).isFalse();
-					then(product.getReviews()).isNotEmpty()
-						.allSatisfy(review ->
-							then(review.isVisible()).isFalse()
-						);
+					then(product.getReviews())
+						.isNotEmpty()
+						.allSatisfy(review -> then(review.isVisible()).isFalse());
 				}
 			);
 	}
@@ -174,13 +180,14 @@ public class SoftDeleteProductRepositoryTest {
 
 		// then
 		Iterable<SoftDeleteProduct> markAsDeletedList = this.sut.findAll();
-		then(markAsDeletedList).hasSize(products.size())
-			.allSatisfy(product -> {
+		then(markAsDeletedList)
+			.hasSize(products.size())
+			.allSatisfy(
+				product -> {
 					then(product.isVisible()).isFalse();
-					then(product.getReviews()).isNotEmpty()
-						.allSatisfy(review ->
-							then(review.isVisible()).isFalse()
-						);
+					then(product.getReviews())
+						.isNotEmpty()
+						.allSatisfy(review -> then(review.isVisible()).isFalse());
 				}
 			);
 	}

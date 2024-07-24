@@ -110,8 +110,10 @@ public class EnumStateArticleRepositoryTest {
 
 		// then
 		Optional<EnumStateArticle> markAsDeleted = this.sut.findById(article.getId());
-		then(markAsDeleted).isNotEmpty()
-			.hasValueSatisfying(it -> {
+		then(markAsDeleted)
+			.isNotEmpty()
+			.hasValueSatisfying(
+				it -> {
 					then(it.closed()).isTrue();
 					then(it.getVersion()).isGreaterThan(1); // version property updated
 				}
@@ -128,8 +130,10 @@ public class EnumStateArticleRepositoryTest {
 
 		// then
 		Optional<EnumStateArticle> markAsDeleted = this.sut.findById(article.getId());
-		then(markAsDeleted).isNotEmpty()
-			.hasValueSatisfying(it -> {
+		then(markAsDeleted)
+			.isNotEmpty()
+			.hasValueSatisfying(
+				it -> {
 					then(it.closed()).isTrue();
 					then(it.getVersion()).isEqualTo(1); // increasing version not supported for delete by id
 				}
@@ -149,8 +153,10 @@ public class EnumStateArticleRepositoryTest {
 
 		// then
 		Iterable<EnumStateArticle> markAsDeletedList = this.sut.findAllById(ids);
-		then(markAsDeletedList).hasSize(ids.size())
-			.allSatisfy(it -> {
+		then(markAsDeletedList)
+			.hasSize(ids.size())
+			.allSatisfy(
+				it -> {
 					then(it.closed()).isTrue();
 					then(it.getVersion()).isGreaterThan(1); // version property updated
 				}
@@ -167,8 +173,10 @@ public class EnumStateArticleRepositoryTest {
 
 		// then
 		Iterable<EnumStateArticle> markAsDeletedList = this.sut.findAll();
-		then(markAsDeletedList).hasSize(articles.size())
-			.allSatisfy(it -> {
+		then(markAsDeletedList)
+			.hasSize(articles.size())
+			.allSatisfy(
+				it -> {
 					then(it.closed()).isTrue();
 					then(it.getVersion()).isEqualTo(1); // increasing version not supported for delete all
 				}
