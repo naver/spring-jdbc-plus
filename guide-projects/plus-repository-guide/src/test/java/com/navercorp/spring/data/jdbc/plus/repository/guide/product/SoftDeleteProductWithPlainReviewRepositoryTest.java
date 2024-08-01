@@ -103,16 +103,15 @@ public class SoftDeleteProductWithPlainReviewRepositoryTest {
 
 		// then
 		then(actual).hasSize(products.size());
-		actual.forEach(product -> {
-			then(product.getId()).isNotNull();
-			then(product.isVisible()).isTrue();
-			then(product.getReviews()).isNotEmpty()
-				.allSatisfy(
-					review -> {
-						then(review.getId()).isNotNull();
-					}
-				);
-		});
+		actual.forEach(
+			product -> {
+				then(product.getId()).isNotNull();
+				then(product.isVisible()).isTrue();
+				then(product.getReviews())
+					.isNotEmpty()
+					.allSatisfy(review -> then(review.getId()).isNotNull());
+			}
+		);
 	}
 
 	@Test
@@ -125,11 +124,14 @@ public class SoftDeleteProductWithPlainReviewRepositoryTest {
 
 		// then
 		Optional<SoftDeleteProductWithPlainReview> markAsDeleted = this.sut.findById(product.getId());
-		then(markAsDeleted).isNotEmpty()
-			.hasValueSatisfying(p -> {
-				then(p.isVisible()).isFalse();
-				then(p.getReviews()).isEmpty();
-			});
+		then(markAsDeleted)
+			.isNotEmpty()
+			.hasValueSatisfying(
+				p -> {
+					then(p.isVisible()).isFalse();
+					then(p.getReviews()).isEmpty();
+				}
+			);
 	}
 
 	@Test
@@ -145,8 +147,10 @@ public class SoftDeleteProductWithPlainReviewRepositoryTest {
 
 		// then
 		Iterable<SoftDeleteProductWithPlainReview> markAsDeletedList = this.sut.findAllById(ids);
-		then(markAsDeletedList).hasSize(ids.size())
-			.allSatisfy(product -> {
+		then(markAsDeletedList)
+			.hasSize(ids.size())
+			.allSatisfy(
+				product -> {
 					then(product.isVisible()).isFalse();
 					then(product.getReviews()).isEmpty();
 				}
@@ -163,8 +167,10 @@ public class SoftDeleteProductWithPlainReviewRepositoryTest {
 
 		// then
 		Iterable<SoftDeleteProductWithPlainReview> markAsDeletedList = this.sut.findAll();
-		then(markAsDeletedList).hasSize(products.size())
-			.allSatisfy(product -> {
+		then(markAsDeletedList)
+			.hasSize(products.size())
+			.allSatisfy(
+				product -> {
 					then(product.isVisible()).isFalse();
 					then(product.getReviews()).isEmpty();
 				}

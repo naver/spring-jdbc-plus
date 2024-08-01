@@ -18,7 +18,7 @@
 
 package com.navercorp.spring.jdbc.plus.support.parametersource.converter;
 
-import static java.time.ZoneId.*;
+import static java.time.ZoneId.systemDefault;
 
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -44,7 +44,8 @@ public abstract class Jsr310TimestampBasedConverters {
 	/**
 	 * Returns the converters to be registered.
 	 *
-	 * Note that the {@link LocalDateTimeToTimestampConverter} is not included, since many database don't need that conversion.
+	 * Note that the {@link LocalDateTimeToTimestampConverter} is not included,
+	 * since many database don't need that conversion.
 	 * Databases that do need it, should include it in the conversions offered by their respective dialect.
 	 *
 	 * @return the converters to register

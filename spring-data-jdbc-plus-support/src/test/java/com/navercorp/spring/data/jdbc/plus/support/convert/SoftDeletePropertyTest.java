@@ -65,7 +65,8 @@ class SoftDeletePropertyTest {
 	@Test
 	void throwsWhenInvalidBooleanUpdateValue() {
 		// given
-		RelationalPersistentEntity<?> entity = createRelationalPersistentEntity(InvalidBooleanValueSoftDeleteArticle.class);
+		RelationalPersistentEntity<?> entity =
+			createRelationalPersistentEntity(InvalidBooleanValueSoftDeleteArticle.class);
 
 		// when-then
 		assertThatThrownBy(() -> SoftDeleteProperty.from(entity))

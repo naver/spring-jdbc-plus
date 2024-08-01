@@ -208,7 +208,7 @@ public class SqlGeneratorContextBasedNamingStrategyTest {
 				"UPDATE " + user + ".second_referenced_article "
 					+ "SET second_reference_deleted = :second_reference_deleted "
 					+ "WHERE " + user + ".second_referenced_article.referenced_article IN ("
-					+ "SELECT "  + user +".referenced_article.id "
+					+ "SELECT " + user + ".referenced_article.id "
 					+ "FROM " + user + ".referenced_article "
 					+ "WHERE " + user + ".referenced_article.article IS NOT NULL)");
 		});
@@ -221,7 +221,6 @@ public class SqlGeneratorContextBasedNamingStrategyTest {
 	private PersistentPropertyPath<RelationalPersistentProperty> getSoftDeletePath(String path) {
 		return PersistentPropertyPathTestUtils.getPath(this.context, path, SoftDeleteArticle.class);
 	}
-
 
 	/**
 	 * Take a set of user-based assertions and run them against multiple users, in different threads.
@@ -349,7 +348,7 @@ public class SqlGeneratorContextBasedNamingStrategyTest {
 		String contents;
 
 		@SoftDeleteColumn(type = ValueType.BOOLEAN, valueAsDeleted = "true")
-		boolean reference_deleted;
+		boolean reference_deleted; // @checkstyle:ignore
 
 		SecondReferencedSoftDeleteArticle further;
 	}
@@ -363,6 +362,6 @@ public class SqlGeneratorContextBasedNamingStrategyTest {
 		String contents;
 
 		@SoftDeleteColumn(type = ValueType.BOOLEAN, valueAsDeleted = "true")
-		boolean second_reference_deleted;
+		boolean second_reference_deleted; // @checkstyle:ignore
 	}
 }

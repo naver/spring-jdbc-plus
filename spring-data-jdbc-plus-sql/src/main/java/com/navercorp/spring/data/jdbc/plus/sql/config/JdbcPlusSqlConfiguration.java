@@ -33,11 +33,11 @@ import org.springframework.data.relational.core.dialect.Dialect;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
 
 import com.navercorp.spring.data.jdbc.plus.sql.convert.AggregateResultJdbcConverter;
-import com.navercorp.spring.data.jdbc.plus.support.convert.SqlProvider;
 import com.navercorp.spring.data.jdbc.plus.sql.parametersource.DefaultSqlParameterSourceFactory;
 import com.navercorp.spring.data.jdbc.plus.sql.parametersource.SqlParameterSourceFactory;
 import com.navercorp.spring.data.jdbc.plus.sql.provider.EntityJdbcProvider;
 import com.navercorp.spring.data.jdbc.plus.sql.provider.EntityQueryMappingConfiguration;
+import com.navercorp.spring.data.jdbc.plus.support.convert.SqlProvider;
 
 /**
  * The type Jdbc plus sql configuration.

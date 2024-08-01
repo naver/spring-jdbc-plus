@@ -108,16 +108,19 @@ public class PlainProductWithSoftDeleteReviewRepositoryTest {
 
 		// then
 		then(actual).hasSize(products.size());
-		actual.forEach(product -> {
-			then(product.getId()).isNotNull();
-			then(product.getReviews()).isNotEmpty()
-				.allSatisfy(
-					review -> {
-						then(review.getId()).isNotNull();
-						then(review.isVisible()).isTrue();
-					}
-				);
-		});
+		actual.forEach(
+			product -> {
+				then(product.getId()).isNotNull();
+				then(product.getReviews())
+					.isNotEmpty()
+					.allSatisfy(
+						review -> {
+							then(review.getId()).isNotNull();
+							then(review.isVisible()).isTrue();
+						}
+					);
+			}
+		);
 	}
 
 	@Test
@@ -134,9 +137,10 @@ public class PlainProductWithSoftDeleteReviewRepositoryTest {
 
 		List<SoftDeleteReview> reviewResult =
 			this.softDeleteReviewRepository.findAllByProductIdIn(List.of(product.getId()));
-		then(reviewResult).isNotEmpty()
-			.allSatisfy(review ->
-				then(review.isVisible()).isFalse()
+		then(reviewResult)
+			.isNotEmpty()
+			.allSatisfy(
+				review -> then(review.isVisible()).isFalse()
 			);
 	}
 
@@ -160,7 +164,8 @@ public class PlainProductWithSoftDeleteReviewRepositoryTest {
 		then(productResult).isEmpty();
 
 		Iterable<SoftDeleteReview> reviewResult = softDeleteReviewRepository.findAllByProductIdIn(ids);
-		then(reviewResult).hasSize(reviewsSize)
+		then(reviewResult)
+			.hasSize(reviewsSize)
 			.allSatisfy(review ->
 				then(review.isVisible()).isFalse()
 			);
@@ -179,9 +184,10 @@ public class PlainProductWithSoftDeleteReviewRepositoryTest {
 		then(productResult).isEmpty();
 
 		Iterable<SoftDeleteReview> reviewResult = softDeleteReviewRepository.findAll();
-		then(reviewResult).isNotEmpty()
-			.allSatisfy(review ->
-				then(review.isVisible()).isFalse()
+		then(reviewResult)
+			.isNotEmpty()
+			.allSatisfy(
+				review -> then(review.isVisible()).isFalse()
 			);
 	}
 }

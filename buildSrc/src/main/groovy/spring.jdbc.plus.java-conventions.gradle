@@ -23,9 +23,9 @@ test {
 
 checkstyle {
     configFile = file("${project.rootDir}/rule/naver-checkstyle-rules.xml")
-    configProperties = ["suppressionFile": "${project.rootDir}/tool/naver-checkstyle-suppressions.xml"]
-    toolVersion = "9.1"
-    ignoreFailures = true // TODO: return to false
+    configProperties = ["suppressionFile": "${project.rootDir}/rule/naver-checkstyle-suppressions.xml"]
+    toolVersion = "10.16.0"
+    ignoreFailures = false
     maxErrors = 0
     maxWarnings = 0
 }

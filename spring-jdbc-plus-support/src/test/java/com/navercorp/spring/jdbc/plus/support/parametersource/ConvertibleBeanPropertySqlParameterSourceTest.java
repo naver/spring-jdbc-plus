@@ -18,7 +18,8 @@
 
 package com.navercorp.spring.jdbc.plus.support.parametersource;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -32,8 +33,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 
 import com.navercorp.spring.jdbc.plus.support.parametersource.converter.DefaultJdbcParameterSourceConverter;
-import com.navercorp.spring.jdbc.plus.support.parametersource.converter.Jsr310TimestampBasedConverters.InstantToTimestampConverter;
 import com.navercorp.spring.jdbc.plus.support.parametersource.converter.JdbcParameterSourceConverter;
+import com.navercorp.spring.jdbc.plus.support.parametersource.converter.Jsr310TimestampBasedConverters.InstantToTimestampConverter;
 import com.navercorp.spring.jdbc.plus.support.parametersource.fallback.FallbackParameterSource;
 
 /**

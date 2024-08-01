@@ -267,8 +267,8 @@ public abstract class JdbcDaoSupport {
 	protected <R> List<R> select(
 		String sql,
 		SqlParameterSource params,
-		ResultSetExtractor<List<R>> resultSetExtractor)
-	{
+		ResultSetExtractor<List<R>> resultSetExtractor
+	) {
 		return this.getJdbcOperations().query(sql, params, resultSetExtractor);
 	}
 

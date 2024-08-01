@@ -42,6 +42,7 @@ The following rules in the Naver coding convention cannot be checked by this con
     </module>
 
     <!-- [line-length-120] -->
+    <property name="tabWidth" value="4"/>
     <module name="LineLength">
         <property name="max" value="120"/>
         <property name="ignorePattern" value="^ *\* *[^ ]+$|^package.*|^import.*|a href|href|http://|https://|ftp://"/>
@@ -425,7 +426,7 @@ The following rules in the Naver coding convention cannot be checked by this con
 
     <!--- Suppression -->
     <module name="SuppressionFilter">
-        <property name="file" value="${config_loc}/naver-checkstyle-suppressions.xml"/>
+        <property name="file" value="${suppressionFile}" default="naver-checkstyle-suppressions.xml"/>
         <property name="optional" value="true"/>
     </module>
 

@@ -82,8 +82,8 @@ public class JdbcReactiveTemplate {
 	}
 
 	@SuppressWarnings("unchecked")
-	private static <R> FluxItem<R> errorItem(Exception e) {
-		return FluxItem.errorInstance(e);
+	private static <R> FluxItem<R> errorItem(Exception ex) {
+		return FluxItem.errorInstance(ex);
 	}
 
 	/**
@@ -218,14 +218,14 @@ public class JdbcReactiveTemplate {
 	}
 
 	/**
-	 * @param e the exception
+	 * @param ex the exception
 	 * @throws Exception will be propagated to flux.
 	 */
-	protected void handleError(Exception e) throws Exception {
-		if (e == null) {
+	protected void handleError(Exception ex) throws Exception {
+		if (ex == null) {
 			return;
 		}
-		logger.error("Exception occured while reading flux", e);
+		logger.error("Exception occured while reading flux", ex);
 	}
 
 	private <R> void insertToBlockingQueue(
@@ -338,8 +338,8 @@ public class JdbcReactiveTemplate {
 		}
 
 		@SuppressWarnings("rawtypes")
-		private static FluxItem errorInstance(Exception e) {
-			return new ErrorFluxItem(e);
+		private static FluxItem errorInstance(Exception ex) {
+			return new ErrorFluxItem(ex);
 		}
 	}
 

@@ -110,8 +110,8 @@ public class CompositeSqlParameterSource implements SqlParameterSource {
 
 	@Override
 	public String toString() {
-		return "CompositeSqlParameterSource{" +
-			"sqlParameterSources=" + sqlParameterSources +
-			'}';
+		return "CompositeSqlParameterSource{"
+			+ "sqlParameterSources=" + sqlParameterSources
+			+ '}';
 	}
 }
