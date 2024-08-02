@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: "Target tag of publish"
+        description: "Specify the tag, branch, or commit to target for the publish action"
         required: true
         default: 'default'
         type: string
