@@ -34,15 +34,13 @@ import org.junit.jupiter.params.ParameterizedTest;
 
 import com.navercorp.spring.jdbc.plus.support.parametersource.converter.DefaultJdbcParameterSourceConverter;
 import com.navercorp.spring.jdbc.plus.support.parametersource.converter.JdbcParameterSourceConverter;
-import com.navercorp.spring.jdbc.plus.support.parametersource.converter.Jsr310TimestampBasedConverters.InstantToTimestampConverter;
 import com.navercorp.spring.jdbc.plus.support.parametersource.fallback.FallbackParameterSource;
 
 /**
  * @author Myeonghyeon Lee
  */
 class ConvertibleMapSqlParameterSourceTest {
-	private final JdbcParameterSourceConverter converter = new DefaultJdbcParameterSourceConverter(
-		Collections.singletonList(InstantToTimestampConverter.INSTANCE));
+	private final JdbcParameterSourceConverter converter = new DefaultJdbcParameterSourceConverter(List.of());
 
 	@Test
 	@DisplayName("생성자에 Converter 로 null 을 넘기면 NullPointerException 이 발생합니다.")
@@ -67,8 +65,7 @@ class ConvertibleMapSqlParameterSourceTest {
 		// then
 		assertThat(actual).isNotNull();
 		assertThat(actual).isExactlyInstanceOf(Timestamp.class);
-		assertThat(actual).isEqualTo(
-			InstantToTimestampConverter.INSTANCE.convert(value));
+		assertThat(actual).isEqualTo(Timestamp.from(value));
 	}
 
 	@DisplayName("value 타입의 Converter 가 등록되지 않았다면, 그대로 반환합니다.")
@@ -151,12 +148,9 @@ class ConvertibleMapSqlParameterSourceTest {
 		assertThat(actual).isInstanceOf(List.class);
 		List<Timestamp> list = (List<Timestamp>)actual;
 		assertThat(list).hasSize(8);
-		assertThat(list.get(0)).isEqualTo(
-			InstantToTimestampConverter.INSTANCE.convert(value.get(0)));
-		assertThat(list.get(4)).isEqualTo(
-			InstantToTimestampConverter.INSTANCE.convert(value.get(4)));
-		assertThat(list.get(7)).isEqualTo(
-			InstantToTimestampConverter.INSTANCE.convert(value.get(4)));
+		assertThat(list.get(0)).isEqualTo(Timestamp.from(value.get(0)));
+		assertThat(list.get(4)).isEqualTo(Timestamp.from(value.get(4)));
+		assertThat(list.get(7)).isEqualTo(Timestamp.from(value.get(4)));
 	}
 
 	static class TestFallbackParamSource implements FallbackParameterSource {

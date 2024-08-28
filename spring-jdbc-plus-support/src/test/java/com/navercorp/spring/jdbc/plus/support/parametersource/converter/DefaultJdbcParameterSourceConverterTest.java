@@ -91,8 +91,7 @@ class DefaultJdbcParameterSourceConverterTest {
 	@DisplayName("converter 에 null 을 넣으면, null 을 반환한다. ")
 	void convertNullValue() {
 		// given
-		DefaultJdbcParameterSourceConverter sut = new DefaultJdbcParameterSourceConverter(
-			Jsr310TimestampBasedConverters.getConvertersToRegister());
+		DefaultJdbcParameterSourceConverter sut = new DefaultJdbcParameterSourceConverter(List.of());
 		String paramName = "name";
 		Instant value = null;
 
@@ -107,8 +106,7 @@ class DefaultJdbcParameterSourceConverterTest {
 	@DisplayName("converter 에 등록되지 않은 타입을 넣으면, 값을 그대로 반환한다.")
 	void convertUnregisteredTypeValue() {
 		// given
-		DefaultJdbcParameterSourceConverter sut = new DefaultJdbcParameterSourceConverter(
-			Jsr310TimestampBasedConverters.getConvertersToRegister());
+		DefaultJdbcParameterSourceConverter sut = new DefaultJdbcParameterSourceConverter(List.of());
 		String paramName = "name";
 		String value = "sample";
 
