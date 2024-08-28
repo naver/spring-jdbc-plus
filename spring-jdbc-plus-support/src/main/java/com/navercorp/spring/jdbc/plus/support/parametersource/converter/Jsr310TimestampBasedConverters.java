@@ -18,15 +18,13 @@
 
 package com.navercorp.spring.jdbc.plus.support.parametersource.converter;
 
-import static java.time.ZoneId.systemDefault;
-
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.ZonedDateTime;
-import java.util.Arrays;
+import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.springframework.core.convert.converter.Converter;
@@ -34,83 +32,70 @@ import org.springframework.lang.NonNull;
 
 /**
  * The type JSR 310 Timestamp based converters.
+ * <p>
+ * COPY {@link org.springframework.data.jdbc.core.convert.Jsr310TimestampBasedConverters}
+ * except TimestampToLocal** converters, because of backward compatibility.
  *
  * @author Myeonghyeon Lee
- * @deprecated use {@link org.springframework.data.jdbc.core.convert.Jsr310TimestampBasedConverters} instead
  */
-@Deprecated
-public abstract class Jsr310TimestampBasedConverters {
+abstract class Jsr310TimestampBasedConverters {
 
-	/**
-	 * Returns the converters to be registered.
-	 *
-	 * Note that the {@link LocalDateTimeToTimestampConverter} is not included,
-	 * since many database don't need that conversion.
-	 * Databases that do need it, should include it in the conversions offered by their respective dialect.
-	 *
-	 * @return the converters to register
-	 */
-	public static List<Converter<?, ?>> getConvertersToRegister() {
-		return Arrays.asList(
-			LocalDateToTimestampConverter.INSTANCE,
-			LocalTimeToTimestampConverter.INSTANCE,
-			InstantToTimestampConverter.INSTANCE,
-			ZonedDateTimeToTimestampConverter.INSTANCE
-		);
+	static Collection<Converter<?, ?>> getConvertersToRegister() {
+		List<Converter<?, ?>> converters = new ArrayList(8);
+
+		converters.add(LocalDateToTimestampConverter.INSTANCE);
+		converters.add(LocalTimeToTimestampConverter.INSTANCE);
+		converters.add(TimestampToInstantConverter.INSTANCE);
+		converters.add(InstantToTimestampConverter.INSTANCE);
+
+		return converters;
 	}
 
-	public enum LocalDateTimeToTimestampConverter implements Converter<LocalDateTime, Timestamp> {
-
+	enum LocalDateToTimestampConverter implements Converter<LocalDate, Timestamp> {
 		INSTANCE;
 
-		@NonNull
-		@Override
-		public Timestamp convert(LocalDateTime source) {
-			return Timestamp.from(source.atZone(systemDefault()).toInstant());
+		private LocalDateToTimestampConverter() {
 		}
-	}
-
-	public enum LocalDateToTimestampConverter implements Converter<LocalDate, Timestamp> {
-
-		INSTANCE;
 
 		@NonNull
-		@Override
 		public Timestamp convert(LocalDate source) {
-			return Timestamp.from(source.atStartOfDay(systemDefault()).toInstant());
+			return Timestamp.from(source.atStartOfDay(ZoneId.systemDefault()).toInstant());
 		}
 	}
 
-	public enum LocalTimeToTimestampConverter implements Converter<LocalTime, Timestamp> {
-
+	enum LocalTimeToTimestampConverter implements Converter<LocalTime, Timestamp> {
 		INSTANCE;
 
+		private LocalTimeToTimestampConverter() {
+		}
+
 		@NonNull
-		@Override
 		public Timestamp convert(LocalTime source) {
-			return Timestamp.from(source.atDate(LocalDate.now()).atZone(systemDefault()).toInstant());
+			return Timestamp.from(source.atDate(LocalDate.now()).atZone(ZoneId.systemDefault()).toInstant());
 		}
 	}
 
-	public enum InstantToTimestampConverter implements Converter<Instant, Timestamp> {
-
+	enum TimestampToInstantConverter implements Converter<Timestamp, Instant> {
 		INSTANCE;
 
+		private TimestampToInstantConverter() {
+		}
+
 		@NonNull
-		@Override
+		public Instant convert(Timestamp source) {
+			return source.toInstant();
+		}
+	}
+
+	enum InstantToTimestampConverter implements Converter<Instant, Timestamp> {
+		INSTANCE;
+
+		private InstantToTimestampConverter() {
+		}
+
+		@NonNull
 		public Timestamp convert(Instant source) {
 			return Timestamp.from(source);
-		}
-	}
-
-	public enum ZonedDateTimeToTimestampConverter implements Converter<ZonedDateTime, Timestamp> {
-
-		INSTANCE;
-
-		@NonNull
-		@Override
-		public Timestamp convert(ZonedDateTime source) {
-			return Timestamp.from(source.toInstant());
 		}
 	}
 }
