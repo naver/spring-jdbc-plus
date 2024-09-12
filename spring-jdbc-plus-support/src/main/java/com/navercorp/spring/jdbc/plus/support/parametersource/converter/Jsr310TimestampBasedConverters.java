@@ -23,6 +23,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -41,12 +42,12 @@ import org.springframework.lang.NonNull;
 abstract class Jsr310TimestampBasedConverters {
 
 	static Collection<Converter<?, ?>> getConvertersToRegister() {
-		List<Converter<?, ?>> converters = new ArrayList(8);
+		List<Converter<?, ?>> converters = new ArrayList<>(4);
 
 		converters.add(LocalDateToTimestampConverter.INSTANCE);
 		converters.add(LocalTimeToTimestampConverter.INSTANCE);
-		converters.add(TimestampToInstantConverter.INSTANCE);
 		converters.add(InstantToTimestampConverter.INSTANCE);
+		converters.add(ZonedDateTimeToTimestampConverter.INSTANCE);
 
 		return converters;
 	}
@@ -54,7 +55,7 @@ abstract class Jsr310TimestampBasedConverters {
 	enum LocalDateToTimestampConverter implements Converter<LocalDate, Timestamp> {
 		INSTANCE;
 
-		private LocalDateToTimestampConverter() {
+		LocalDateToTimestampConverter() {
 		}
 
 		@NonNull
@@ -66,7 +67,7 @@ abstract class Jsr310TimestampBasedConverters {
 	enum LocalTimeToTimestampConverter implements Converter<LocalTime, Timestamp> {
 		INSTANCE;
 
-		private LocalTimeToTimestampConverter() {
+		LocalTimeToTimestampConverter() {
 		}
 
 		@NonNull
@@ -75,27 +76,27 @@ abstract class Jsr310TimestampBasedConverters {
 		}
 	}
 
-	enum TimestampToInstantConverter implements Converter<Timestamp, Instant> {
-		INSTANCE;
-
-		private TimestampToInstantConverter() {
-		}
-
-		@NonNull
-		public Instant convert(Timestamp source) {
-			return source.toInstant();
-		}
-	}
-
 	enum InstantToTimestampConverter implements Converter<Instant, Timestamp> {
 		INSTANCE;
 
-		private InstantToTimestampConverter() {
+		InstantToTimestampConverter() {
 		}
 
 		@NonNull
 		public Timestamp convert(Instant source) {
 			return Timestamp.from(source);
+		}
+	}
+
+	enum ZonedDateTimeToTimestampConverter implements Converter<ZonedDateTime, Timestamp> {
+		INSTANCE;
+
+		ZonedDateTimeToTimestampConverter() {
+		}
+
+		@NonNull
+		public Timestamp convert(ZonedDateTime source) {
+			return Timestamp.from(source.toInstant());
 		}
 	}
 }
