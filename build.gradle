@@ -80,8 +80,8 @@ subprojects {
 
                 repositories {
                     maven {
-                        def ossrhUsername = project.hasProperty("ossrhUsername") ? ossrhUsername : ""
-                        def ossrhPassword = project.hasProperty("ossrhPassword") ? ossrhPassword : ""
+                        def ossrhUsername = System.getenv("OSSRH_USERNAME")
+                        def ossrhPassword = System.getenv("OSSRH_PASSWORD")
 
                         credentials {
                             username ossrhUsername
@@ -147,6 +147,11 @@ subprojects {
 
 
     signing {
+        def signingKey = findProperty("signingKey")
+        def signingPassword = findProperty("signingPassword")
+
+        useInMemoryPgpKeys(signingKey, signingPassword)
+
         sign publishing.publications.mavenJava
     }
 
