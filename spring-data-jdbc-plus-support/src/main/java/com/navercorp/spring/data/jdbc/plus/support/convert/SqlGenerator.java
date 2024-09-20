@@ -650,7 +650,7 @@ class SqlGenerator {
 
 		Table table = getTable();
 
-		List<Expression> columnExpressions = new ArrayList<>();
+		Set<Expression> columnExpressions = new LinkedHashSet<>();
 
 		List<Join> joinTables = new ArrayList<>();
 		for (PersistentPropertyPath<RelationalPersistentProperty> path : mappingContext
