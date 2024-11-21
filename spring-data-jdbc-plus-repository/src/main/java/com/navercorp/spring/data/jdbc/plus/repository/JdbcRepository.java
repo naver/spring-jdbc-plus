@@ -18,6 +18,8 @@
 
 package com.navercorp.spring.data.jdbc.plus.repository;
 
+import java.util.List;
+
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.NoRepositoryBean;
 import org.springframework.data.repository.PagingAndSortingRepository;
@@ -69,5 +71,5 @@ public interface JdbcRepository<T, ID>
 	 * @param entities the entities
 	 * @return the iterable
 	 */
-	<S extends T> Iterable<S> updateAll(Iterable<S> entities);
+	<S extends T> List<S> updateAll(Iterable<S> entities);
 }
