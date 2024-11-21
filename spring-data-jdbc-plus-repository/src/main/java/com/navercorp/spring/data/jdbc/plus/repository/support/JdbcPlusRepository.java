@@ -18,6 +18,8 @@
 
 package com.navercorp.spring.data.jdbc.plus.repository.support;
 
+import java.util.List;
+
 import org.springframework.data.jdbc.core.JdbcAggregateOperations;
 import org.springframework.data.jdbc.core.convert.JdbcConverter;
 import org.springframework.data.jdbc.repository.support.SimpleJdbcRepository;
@@ -73,7 +75,7 @@ public class JdbcPlusRepository<T, ID> extends SimpleJdbcRepository<T, ID> imple
 
 	@Transactional
 	@Override
-	public <S extends T> Iterable<S> updateAll(Iterable<S> entities) {
+	public <S extends T> List<S> updateAll(Iterable<S> entities) {
 		return entityOperations.updateAll(entities);
 	}
 }
