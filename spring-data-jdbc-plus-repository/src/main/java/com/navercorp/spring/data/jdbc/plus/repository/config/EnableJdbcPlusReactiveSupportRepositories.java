@@ -131,7 +131,8 @@ public @interface EnableJdbcPlusReactiveSupportRepositories {
 
 	/**
 	 * Configure a specific {@link BeanNameGenerator} to be used when creating the repository beans.
-	 * @return the {@link BeanNameGenerator} to be used or the base {@link BeanNameGenerator} interface to indicate context default.
+	 * @return the {@link BeanNameGenerator} to be used
+	 * or the base {@link BeanNameGenerator} interface to indicate context default.
 	 * @since 3.4
 	 */
 	Class<? extends BeanNameGenerator> nameGenerator() default BeanNameGenerator.class;
