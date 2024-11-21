@@ -107,17 +107,6 @@ public class ConvertibleMapSqlParameterSource extends MapSqlParameterSource {
 	}
 
 	/**
-	 * Sets pad array.
-	 *
-	 * @param padArray the pad array y/n
-	 * @deprecated No plan to replacement
-	 */
-	@Deprecated
-	public void setPadArray(boolean padArray) {
-		this.padArray = padArray;
-	}
-
-	/**
 	 * Sets padding iterable param.
 	 *
 	 * @param padding the padding

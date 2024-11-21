@@ -29,6 +29,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Function;
 
 import org.springframework.context.ApplicationContext;
 import org.springframework.data.convert.CustomConversions;
@@ -47,6 +48,7 @@ import org.springframework.data.mapping.model.ParameterValueProvider;
 import org.springframework.data.mapping.model.SpELContext;
 import org.springframework.data.mapping.model.ValueExpressionEvaluator;
 import org.springframework.data.mapping.model.ValueExpressionParameterValueProvider;
+import org.springframework.data.relational.core.conversion.MappingRelationalConverter;
 import org.springframework.data.relational.core.mapping.AggregatePath;
 import org.springframework.data.relational.core.mapping.RelationalMappingContext;
 import org.springframework.data.relational.core.mapping.RelationalPersistentEntity;
@@ -1266,7 +1268,8 @@ public class AggregateResultJdbcConverter extends MappingJdbcConverter {
 				provider = NoOpParameterValueProvider.INSTANCE;
 			}
 
-			T instance = createInstance(entity, provider::getParameterValue);
+			T instance = getEntityInstantiators().getInstantiatorFor(entity)
+				.createInstance(entity, new ConvertingParameterValueProvider<>(provider::getParameterValue));
 
 			return entity.requiresPropertyPopulation() ? populateProperties(instance, idValue) : instance;
 		}
@@ -1314,6 +1317,23 @@ public class AggregateResultJdbcConverter extends MappingJdbcConverter {
 		@Override
 		public <T> T getParameterValue(Parameter<T, RelationalPersistentProperty> parameter) {
 			return null;
+		}
+	}
+
+	/**
+	 * COPY OF {@link MappingRelationalConverter.ConvertingParameterValueProvider}
+	 */
+	class ConvertingParameterValueProvider<P extends PersistentProperty<P>> implements ParameterValueProvider<P> {
+		private final Function<Parameter<?, P>, Object> delegate;
+
+		ConvertingParameterValueProvider(Function<Parameter<?, P>, Object> delegate) {
+			Assert.notNull(delegate, "Delegate must not be null");
+			this.delegate = delegate;
+		}
+
+		@SuppressWarnings("unchecked")
+		public <T> T getParameterValue(Parameter<T, P> parameter) {
+			return (T) AggregateResultJdbcConverter.this.readValue(this.delegate.apply(parameter), parameter.getType());
 		}
 	}
 }

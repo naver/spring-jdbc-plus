@@ -142,16 +142,6 @@ class ConvertibleSqlIdentifierParameterSource implements MutableSqlIdentifierPar
 		this.paddingIterableParams = padding;
 	}
 
-	/**
-	 * Sets pad array.
-	 *
-	 * @param padArray the pad array y/n
-	 */
-	@Deprecated(forRemoval = true, since = "3.2")
-	public void setPadArray(boolean padArray) {
-		this.padArray = padArray;
-	}
-
 	private boolean isFallback(String paramName) {
 		return this.fallbackParameterSource != null && this.fallbackParameterSource.isFallback(paramName);
 	}
