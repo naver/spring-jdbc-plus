@@ -19,12 +19,13 @@ package com.navercorp.spring.data.jdbc.plus.sql.convert;
 import org.springframework.data.mapping.model.PropertyValueProvider;
 import org.springframework.data.relational.core.mapping.AggregatePath;
 import org.springframework.data.relational.core.mapping.RelationalPersistentProperty;
+import org.springframework.data.relational.domain.RowDocument;
 
 import com.navercorp.spring.data.jdbc.plus.support.convert.PropertyPathUtils;
 
 /**
- * {@link PropertyValueProvider} obtaining values from a ResultSetAccessor. For a given id property it provides
- * the value in the resultset under which other entities refer back to it.
+ * {@link PropertyValueProvider} obtaining values from a RowDocument. For a given id property it provides
+ * the value in the rowdocument under which other entities refer back to it.
  *
  * @author Jens Schauder
  * @author Myeonghyeon Lee
@@ -35,26 +36,26 @@ import com.navercorp.spring.data.jdbc.plus.support.convert.PropertyPathUtils;
  */
 class JdbcBackReferencePropertyValueProvider implements PropertyValueProvider<RelationalPersistentProperty> {
 	private final AggregatePath basePath;
-	private final ResultSetAccessor resultSet;
+	private final RowDocument rowDocument;
 
 	/**
 	 * @param basePath path from the aggregate root relative to which all properties get resolved.
-	 * @param resultSet the ResultSetAccessor from which to obtain the actual values.
+	 * @param rowDocument the rowDocument from which to obtain the actual values.
 	 */
-	JdbcBackReferencePropertyValueProvider(AggregatePath basePath, ResultSetAccessor resultSet) {
+	JdbcBackReferencePropertyValueProvider(AggregatePath basePath, RowDocument rowDocument) {
 
-		this.resultSet = resultSet;
+		this.rowDocument = rowDocument;
 		this.basePath = basePath;
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
 	public <T> T getPropertyValue(RelationalPersistentProperty property) {
-		return (T)resultSet.getObject(PropertyPathUtils.getReverseColumnAlias(basePath.append(property))
+		return (T)rowDocument.get(PropertyPathUtils.getReverseColumnAlias(basePath.append(property))
 			.getReference());
 	}
 
 	public JdbcBackReferencePropertyValueProvider extendBy(RelationalPersistentProperty property) {
-		return new JdbcBackReferencePropertyValueProvider(basePath.append(property), resultSet);
+		return new JdbcBackReferencePropertyValueProvider(basePath.append(property), rowDocument);
 	}
 }

@@ -19,11 +19,12 @@ package com.navercorp.spring.data.jdbc.plus.sql.convert;
 import org.springframework.data.mapping.model.PropertyValueProvider;
 import org.springframework.data.relational.core.mapping.AggregatePath;
 import org.springframework.data.relational.core.mapping.RelationalPersistentProperty;
+import org.springframework.data.relational.domain.RowDocument;
 
 import com.navercorp.spring.data.jdbc.plus.support.convert.PropertyPathUtils;
 
 /**
- * {@link PropertyValueProvider} obtaining values from a ResultSetAccessor.
+ * {@link PropertyValueProvider} obtaining values from a RowDocument.
  *
  * @author Jens Schauder
  * @author Myeonghyeon Lee
@@ -34,22 +35,22 @@ import com.navercorp.spring.data.jdbc.plus.support.convert.PropertyPathUtils;
  */
 class JdbcPropertyValueProvider implements PropertyValueProvider<RelationalPersistentProperty> {
 	private final AggregatePath basePath;
-	private final ResultSetAccessor resultSet;
+	private final RowDocument rowDocument;
 
 	/**
 	 * @param basePath path from the aggregate root relative to which all properties get resolved.
-	 * @param resultSet the ResultSetAccessor from which to obtain the actual values.
+	 * @param rowDocument the RowDocument from which to obtain the actual values.
 	 */
-	JdbcPropertyValueProvider(AggregatePath basePath, ResultSetAccessor resultSet) {
+	JdbcPropertyValueProvider(AggregatePath basePath, RowDocument rowDocument) {
 
-		this.resultSet = resultSet;
+		this.rowDocument = rowDocument;
 		this.basePath = basePath;
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
 	public <T> T getPropertyValue(RelationalPersistentProperty property) {
-		return (T)resultSet.getObject(getColumnName(property));
+		return (T)rowDocument.get(getColumnName(property));
 	}
 
 	/**
@@ -60,7 +61,7 @@ class JdbcPropertyValueProvider implements PropertyValueProvider<RelationalPersi
 	 * @return
 	 */
 	public boolean hasProperty(RelationalPersistentProperty property) {
-		return resultSet.hasValue(getColumnName(property));
+		return rowDocument.containsKey(getColumnName(property));
 	}
 
 	private String getColumnName(RelationalPersistentProperty property) {
@@ -69,6 +70,6 @@ class JdbcPropertyValueProvider implements PropertyValueProvider<RelationalPersi
 	}
 
 	public JdbcPropertyValueProvider extendBy(RelationalPersistentProperty property) {
-		return new JdbcPropertyValueProvider(basePath.append(property), resultSet);
+		return new JdbcPropertyValueProvider(basePath.append(property), rowDocument);
 	}
 }
