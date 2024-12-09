@@ -21,7 +21,9 @@ package com.navercorp.spring.data.jdbc.plus.sql.convert;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 
+import java.sql.Array;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -31,6 +33,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.data.convert.CustomConversions;
 import org.springframework.data.jdbc.core.convert.Identifier;
@@ -53,9 +57,11 @@ import org.springframework.data.relational.core.mapping.AggregatePath;
 import org.springframework.data.relational.core.mapping.RelationalMappingContext;
 import org.springframework.data.relational.core.mapping.RelationalPersistentEntity;
 import org.springframework.data.relational.core.mapping.RelationalPersistentProperty;
+import org.springframework.data.relational.domain.RowDocument;
 import org.springframework.data.util.Streamable;
 import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
+import org.springframework.jdbc.support.JdbcUtils;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
@@ -70,6 +76,14 @@ import com.navercorp.spring.data.jdbc.plus.support.convert.PropertyPathUtils;
  * @author Myeonghyeon Lee
  */
 public class AggregateResultJdbcConverter extends MappingJdbcConverter {
+	private static final Logger LOG = LoggerFactory.getLogger(AggregateResultJdbcConverter.class);
+
+	/**
+	 * {@link org.springframework.data.jdbc.core.convert.RowDocumentResultSetExtractor#DUPLICATE_COLUMN_WARNING}
+	 */
+	private static final String DUPLICATE_COLUMN_WARNING =
+		"ResultSet contains column \"{}\" multiple times. Later column index is {}";
+
 	private SpELContext spElContext;
 
 	private final ExpressionParser expressionParser = new SpelExpressionParser();
@@ -125,9 +139,8 @@ public class AggregateResultJdbcConverter extends MappingJdbcConverter {
 	 */
 	public final <T> List<T> mapAggregate(RelationalPersistentEntity<T> entity, ResultSet resultSet) {
 		try {
-			ResultSetHolder resultSetHolder = new ResultSetHolder(resultSet);
 			EntityPathRelations entityPathRelations = this.getEntityPathRelations(entity);
-			List<Map<String, Object>> aggregateMapList = this.extractData(resultSetHolder, entityPathRelations);
+			List<Map<String, Object>> aggregateMapList = this.extractData(resultSet, entityPathRelations);
 
 			List<T> result = new ArrayList<>();
 			for (Map<String, Object> aggregateMap : aggregateMapList) {
@@ -142,37 +155,37 @@ public class AggregateResultJdbcConverter extends MappingJdbcConverter {
 	}
 
 	/**
-	 * Single Table ResultSet to Map
+	 * Single Table {@link RowDocument} to Map
 	 *
 	 * @param entity    the entity
-	 * @param resultSet the result set
+	 * @param rowDocument the {@link RowDocument}
 	 * @return the map
 	 */
-	protected Map<String, Object> mapSingleTableRow(RelationalPersistentEntity<?> entity, ResultSet resultSet) {
+	protected Map<String, Object> mapSingleTableRow(RelationalPersistentEntity<?> entity, RowDocument rowDocument) {
 		return new SingleTableMapReadingContext(
 			getMappingContext().getAggregatePath(entity),
-			new ResultSetAccessor(resultSet),
+			rowDocument,
 			Identifier.empty(),
 			null
 		).mapRow();
 	}
 
 	/**
-	 * Single Table ResultSet to Map
+	 * Single Table {@link RowDocument} to Map
 	 *
-	 * @param path       the path
-	 * @param resultSet  the result set
-	 * @param identifier the identifier
+	 * @param path        the path
+	 * @param rowDocument the row document
+	 * @param identifier  the identifier
 	 * @return the map
 	 */
 	protected Map<String, Object> mapSingleTableRow(
 		AggregatePath path,
-		ResultSet resultSet,
+		RowDocument rowDocument,
 		Identifier identifier
 	) {
 		return new SingleTableMapReadingContext(
 			path.getLeafEntity(),
-			new ResultSetAccessor(resultSet),
+			rowDocument,
 			path.getParentPath(),
 			path,
 			identifier,
@@ -181,23 +194,23 @@ public class AggregateResultJdbcConverter extends MappingJdbcConverter {
 	}
 
 	/**
-	 * Single Table ResultSet to Key, Map(Value)
+	 * Single Table {@link RowDocument} to Key, Map(Value)
 	 *
-	 * @param path       the path
-	 * @param resultSet  the result set
-	 * @param identifier the identifier
-	 * @param key        the key
-	 * @return the map . entry
+	 * @param path        the path
+	 * @param rowDocument the row document
+	 * @param identifier  the identifier
+	 * @param key         the key
+	 * @return the map    entry
 	 */
 	protected Map.Entry<Object, Map<String, Object>> mapSingleTableMapRow(
 		AggregatePath path,
-		ResultSet resultSet,
+		RowDocument rowDocument,
 		Identifier identifier,
 		Object key
 	) {
 		Map<String, Object> mapValue = new SingleTableMapReadingContext(
 			path.getLeafEntity(),
-			new ResultSetAccessor(resultSet),
+			rowDocument,
 			path.getParentPath(),
 			path,
 			identifier,
@@ -227,7 +240,7 @@ public class AggregateResultJdbcConverter extends MappingJdbcConverter {
 	}
 
 	private List<Map<String, Object>> extractData(
-		ResultSetHolder resultSetHolder,
+		ResultSet resultSet,
 		EntityPathRelations entityPathRelations
 	) throws SQLException {
 
@@ -236,19 +249,18 @@ public class AggregateResultJdbcConverter extends MappingJdbcConverter {
 
 		Map<Object, ExtractedRow> extractedRows = new LinkedHashMap<>();
 
-		while (!resultSetHolder.isDone() && resultSetHolder.next()) {
-			Map<String, Object> entityMap = this.mapSingleTableRow(
-				persistentEntity, resultSetHolder.getResultSet());
+		while (resultSet.next()) {
+			RowDocument document = toRowDocument(resultSet);
+			Map<String, Object> entityMap = this.mapSingleTableRow(persistentEntity, document);
 
-			Object rootId = this.getRootId(resultSetHolder, persistentEntity);
+			Object rootId = this.getRootId(document, persistentEntity);
 			ExtractedRow rootRow = extractedRows.get(rootId);
 			if (rootRow == null) {
 				rootRow = new ExtractedRow(
 					null, persistentEntity, entityMap, rootId, null, new LinkedMultiValueMap<>());
 				extractedRows.put(rootId, rootRow);
 			}
-			this.appendExtractRelationRows(
-				resultSetHolder, rootRow, entityPathRelations.getRelations());
+			this.appendExtractRelationRows(document, rootRow, entityPathRelations.getRelations());
 		}
 
 		List<Map<String, Object>> result = new ArrayList<>(extractedRows.size());
@@ -264,8 +276,30 @@ public class AggregateResultJdbcConverter extends MappingJdbcConverter {
 		return result;
 	}
 
+	/**
+	 * {@link org.springframework.data.jdbc.core.convert.RowDocumentResultSetExtractor#toRowDocument(ResultSet)}
+	 */
+	private RowDocument toRowDocument(ResultSet resultSet) throws SQLException {
+
+		ResultSetMetaData md = resultSet.getMetaData();
+		int columnCount = md.getColumnCount();
+		RowDocument document = new RowDocument(columnCount);
+
+		for (int i = 0; i < columnCount; i++) {
+
+			Object rsv = JdbcUtils.getResultSetValue(resultSet, i + 1);
+			String columnName = JdbcUtils.lookupColumnName(md, i + 1);
+			Object old = document.putIfAbsent(columnName, rsv instanceof Array a ? a.getArray() : rsv);
+			if (old != null) {
+				LOG.warn(DUPLICATE_COLUMN_WARNING, columnName, i);
+			}
+		}
+
+		return document;
+	}
+
 	private void appendExtractRelationRows(
-		ResultSetHolder resultSetHolder,
+		RowDocument rowDocument,
 		ExtractedRow rootRow,
 		Map<AggregatePath, EntityPathRelations> relationEntityPaths
 	) throws SQLException {
@@ -280,7 +314,7 @@ public class AggregateResultJdbcConverter extends MappingJdbcConverter {
 
 			// extract relation entity Id
 			String idColumnAlias = this.getIdColumnAlias(relationEntityPath.getKey());
-			Object relationEntityId = resultSetHolder.getResultSet().getObject(idColumnAlias);
+			Object relationEntityId = rowDocument.get(idColumnAlias);
 
 			if (relationEntityId == null) {
 				continue;
@@ -292,7 +326,7 @@ public class AggregateResultJdbcConverter extends MappingJdbcConverter {
 			if (CollectionUtils.isEmpty(relationRows)) {
 				// First relation extract
 				ExtractedRow extractedRow = this.extractRelationRow(
-					resultSetHolder,
+					rowDocument,
 					rootRow.getRootId(),
 					relationPath,
 					identifier,
@@ -318,13 +352,13 @@ public class AggregateResultJdbcConverter extends MappingJdbcConverter {
 			if (existRow != null) {
 				// extract relation rows
 				this.appendExtractRelationRows(
-					resultSetHolder,
+					rowDocument,
 					existRow,
 					relationEntityPath.getValue().getRelations());
 			} else {
 				// extract new relation rows
 				ExtractedRow relationExtractedRows = this.extractRelationRow(
-					resultSetHolder,
+					rowDocument,
 					rootRow.getRootId(),
 					relationPath,
 					identifier,
@@ -336,7 +370,7 @@ public class AggregateResultJdbcConverter extends MappingJdbcConverter {
 	}
 
 	private ExtractedRow extractRelationRow(
-		ResultSetHolder resultSetHolder,
+		RowDocument rowDocument,
 		Object rootId,
 		AggregatePath relationPath,
 		Identifier identifier,
@@ -348,13 +382,13 @@ public class AggregateResultJdbcConverter extends MappingJdbcConverter {
 		Object key = null;
 		if (relationPath.isMap()) {
 			String keyColumn = this.getQualifierColumnAlias(relationPath);
-			key = resultSetHolder.getResultSet().getObject(keyColumn);
+			key = rowDocument.get(keyColumn);
 			Map.Entry<Object, Map<String, Object>> relationMapEntry = this.mapSingleTableMapRow(
-				relationPath, resultSetHolder.getResultSet(), identifier, key);
+				relationPath, rowDocument, identifier, key);
 			relationValue = relationMapEntry.getValue();
 		} else {
 			relationValue = this.mapSingleTableRow(
-				relationPath, resultSetHolder.getResultSet(), identifier);
+				relationPath, rowDocument, identifier);
 		}
 
 		ExtractedRow extractedRow = new ExtractedRow(
@@ -364,7 +398,7 @@ public class AggregateResultJdbcConverter extends MappingJdbcConverter {
 			relationEntityId,
 			key,
 			new LinkedMultiValueMap<>());
-		this.appendExtractRelationRows(resultSetHolder, extractedRow, nestedRelations);
+		this.appendExtractRelationRows(rowDocument, extractedRow, nestedRelations);
 		return extractedRow;
 	}
 
@@ -445,11 +479,8 @@ public class AggregateResultJdbcConverter extends MappingJdbcConverter {
 		}
 	}
 
-	private Object getRootId(
-		ResultSetHolder resultSet,
-		RelationalPersistentEntity<?> entity
-	) throws SQLException {
-		return resultSet.getResultSet().getObject(entity.getIdColumn().getReference());
+	private Object getRootId(RowDocument rowDocument, RelationalPersistentEntity<?> entity) {
+		return rowDocument.get(entity.getIdColumn().getReference());
 	}
 
 	private Identifier getRelationEntityIdentifier(
@@ -516,7 +547,9 @@ public class AggregateResultJdbcConverter extends MappingJdbcConverter {
 	 * The interface Map parameter value provider.
 	 *
 	 * @param <P> the type parameter
+	 * @deprecated no usage in spring-jdbc-plus, to be removed.
 	 */
+	@Deprecated(since = "3.4.1", forRemoval = true)
 	protected interface MapParameterValueProvider<P extends PersistentProperty<P>> {
 		/**
 		 * Gets parameter value.
@@ -526,65 +559,6 @@ public class AggregateResultJdbcConverter extends MappingJdbcConverter {
 		 */
 		@Nullable
 		Object getParameterValue(Parameter<?, P> parameter);
-	}
-
-	private static class ResultSetHolder {
-		private ResultSet resultSet;
-		private int currentRowNum;
-		private boolean done;
-
-		/**
-		 * Instantiates a new Result set holder.
-		 *
-		 * @param resultSet the result set
-		 */
-		public ResultSetHolder(ResultSet resultSet) {
-			this.resultSet = resultSet;
-			this.currentRowNum = -1;
-			this.done = false;
-		}
-
-		/**
-		 * Next boolean.
-		 *
-		 * @return the boolean
-		 * @throws SQLException the sql exception
-		 */
-		public boolean next() throws SQLException {
-			boolean next = this.resultSet.next();
-			this.currentRowNum++;
-			if (!next) {
-				this.done = true;
-			}
-			return next;
-		}
-
-		/**
-		 * Is done boolean.
-		 *
-		 * @return the boolean
-		 */
-		public boolean isDone() {
-			return this.done;
-		}
-
-		/**
-		 * Gets result set.
-		 *
-		 * @return the result set
-		 */
-		public ResultSet getResultSet() {
-			return this.resultSet;
-		}
-
-		/**
-		 * Gets current row num.
-		 *
-		 * @return the current row num
-		 */
-		public int getCurrentRowNum() {
-			return this.currentRowNum;
-		}
 	}
 
 	private static class EntityPathRelations {
@@ -816,11 +790,11 @@ public class AggregateResultJdbcConverter extends MappingJdbcConverter {
 
 		private final JdbcPropertyValueProvider propertyValueProvider;
 		private final JdbcBackReferencePropertyValueProvider backReferencePropertyValueProvider;
-		private final ResultSetAccessor accessor;
+		private final RowDocument rowDocument;
 
 		private SingleTableMapReadingContext(
 			AggregatePath rootPath,
-			ResultSetAccessor accessor,
+			RowDocument rowDocument,
 			Identifier identifier,
 			Object key
 		) {
@@ -833,14 +807,14 @@ public class AggregateResultJdbcConverter extends MappingJdbcConverter {
 			this.path = getMappingContext().getAggregatePath(this.entity);
 			this.identifier = identifier;
 			this.key = key;
-			this.propertyValueProvider = new JdbcPropertyValueProvider(path, accessor);
-			this.backReferencePropertyValueProvider = new JdbcBackReferencePropertyValueProvider(path, accessor);
-			this.accessor = accessor;
+			this.propertyValueProvider = new JdbcPropertyValueProvider(path, rowDocument);
+			this.backReferencePropertyValueProvider = new JdbcBackReferencePropertyValueProvider(path, rowDocument);
+			this.rowDocument = rowDocument;
 		}
 
 		private SingleTableMapReadingContext(
 			RelationalPersistentEntity<?> entity,
-			ResultSetAccessor accessor,
+			RowDocument rowDocument,
 			AggregatePath rootPath,
 			AggregatePath path,
 			Identifier identifier,
@@ -851,9 +825,9 @@ public class AggregateResultJdbcConverter extends MappingJdbcConverter {
 			this.path = path;
 			this.identifier = identifier;
 			this.key = key;
-			this.propertyValueProvider = new JdbcPropertyValueProvider(path, accessor);
-			this.backReferencePropertyValueProvider = new JdbcBackReferencePropertyValueProvider(path, accessor);
-			this.accessor = accessor;
+			this.propertyValueProvider = new JdbcPropertyValueProvider(path, rowDocument);
+			this.backReferencePropertyValueProvider = new JdbcBackReferencePropertyValueProvider(path, rowDocument);
+			this.rowDocument = rowDocument;
 		}
 
 		private SingleTableMapReadingContext(
@@ -864,7 +838,7 @@ public class AggregateResultJdbcConverter extends MappingJdbcConverter {
 			Object key,
 			JdbcPropertyValueProvider propertyValueProvider,
 			JdbcBackReferencePropertyValueProvider backReferencePropertyValueProvider,
-			ResultSetAccessor accessor
+			RowDocument rowDocument
 		) {
 			this.entity = entity;
 			this.rootPath = rootPath;
@@ -874,7 +848,7 @@ public class AggregateResultJdbcConverter extends MappingJdbcConverter {
 
 			this.propertyValueProvider = propertyValueProvider;
 			this.backReferencePropertyValueProvider = backReferencePropertyValueProvider;
-			this.accessor = accessor;
+			this.rowDocument = rowDocument;
 		}
 
 		private SingleTableMapReadingContext extendBy(RelationalPersistentProperty property) {
@@ -882,7 +856,9 @@ public class AggregateResultJdbcConverter extends MappingJdbcConverter {
 				getMappingContext().getRequiredPersistentEntity(property.getActualType()),
 				/* rootPath.extendBy(property)*/ rootPath, path.append(property), identifier, key,
 				propertyValueProvider.extendBy(property),
-				backReferencePropertyValueProvider.extendBy(property), accessor);
+				backReferencePropertyValueProvider.extendBy(property),
+				rowDocument
+			);
 		}
 
 		/**
@@ -1333,7 +1309,7 @@ public class AggregateResultJdbcConverter extends MappingJdbcConverter {
 
 		@SuppressWarnings("unchecked")
 		public <T> T getParameterValue(Parameter<T, P> parameter) {
-			return (T) AggregateResultJdbcConverter.this.readValue(this.delegate.apply(parameter), parameter.getType());
+			return (T)AggregateResultJdbcConverter.this.readValue(this.delegate.apply(parameter), parameter.getType());
 		}
 	}
 }
