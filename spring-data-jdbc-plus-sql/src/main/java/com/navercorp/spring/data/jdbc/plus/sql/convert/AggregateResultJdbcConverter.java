@@ -549,7 +549,7 @@ public class AggregateResultJdbcConverter extends MappingJdbcConverter {
 	 * @param <P> the type parameter
 	 * @deprecated no usage in spring-jdbc-plus, to be removed.
 	 */
-	@Deprecated(since = "3.4.1", forRemoval = true)
+	@Deprecated(since = "3.5.0", forRemoval = true)
 	protected interface MapParameterValueProvider<P extends PersistentProperty<P>> {
 		/**
 		 * Gets parameter value.
