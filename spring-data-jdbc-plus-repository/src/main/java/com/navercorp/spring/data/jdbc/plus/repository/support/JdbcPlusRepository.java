@@ -19,11 +19,14 @@
 package com.navercorp.spring.data.jdbc.plus.repository.support;
 
 import java.util.List;
+import java.util.stream.Stream;
 
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jdbc.core.JdbcAggregateOperations;
 import org.springframework.data.jdbc.core.convert.JdbcConverter;
 import org.springframework.data.jdbc.repository.support.SimpleJdbcRepository;
 import org.springframework.data.mapping.PersistentEntity;
+import org.springframework.data.relational.core.query.Query;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.navercorp.spring.data.jdbc.plus.repository.JdbcRepository;
@@ -41,6 +44,7 @@ import com.navercorp.spring.data.jdbc.plus.repository.JdbcRepository;
  */
 public class JdbcPlusRepository<T, ID> extends SimpleJdbcRepository<T, ID> implements JdbcRepository<T, ID> {
 	private final JdbcAggregateOperations entityOperations;
+	private final PersistentEntity<T, ?> entity;
 
 	/**
 	 * Instantiates a new Jdbc plus repository.
@@ -52,6 +56,8 @@ public class JdbcPlusRepository<T, ID> extends SimpleJdbcRepository<T, ID> imple
 		JdbcAggregateOperations entityOperations, PersistentEntity<T, ?> entity, JdbcConverter converter) {
 
 		super(entityOperations, entity, converter);
+
+		this.entity = entity;
 		this.entityOperations = entityOperations;
 	}
 
@@ -77,5 +83,25 @@ public class JdbcPlusRepository<T, ID> extends SimpleJdbcRepository<T, ID> imple
 	@Override
 	public <S extends T> List<S> updateAll(Iterable<S> entities) {
 		return entityOperations.updateAll(entities);
+	}
+
+	@Override
+	public Stream<T> streamAll() {
+		return entityOperations.streamAll(entity.getType());
+	}
+
+	@Override
+	public Stream<T> streamAll(Sort sort) {
+		return entityOperations.streamAll(entity.getType(), sort);
+	}
+
+	@Override
+	public Stream<T> streamAll(Query query) {
+		return entityOperations.streamAll(query, entity.getType());
+	}
+
+	@Override
+	public Stream<T> streamAllByIds(Iterable<ID> ids) {
+		return entityOperations.streamAllByIds(ids, entity.getType());
 	}
 }
