@@ -19,7 +19,10 @@
 package com.navercorp.spring.data.jdbc.plus.repository;
 
 import java.util.List;
+import java.util.stream.Stream;
 
+import org.springframework.data.domain.Sort;
+import org.springframework.data.relational.core.query.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.NoRepositoryBean;
 import org.springframework.data.repository.PagingAndSortingRepository;
@@ -72,4 +75,12 @@ public interface JdbcRepository<T, ID>
 	 * @return the iterable
 	 */
 	<S extends T> List<S> updateAll(Iterable<S> entities);
+
+	Stream<T> streamAll();
+
+	Stream<T> streamAll(Sort sort);
+
+	Stream<T> streamAll(Query query);
+
+	Stream<T> streamAllByIds(Iterable<ID> ids);
 }
