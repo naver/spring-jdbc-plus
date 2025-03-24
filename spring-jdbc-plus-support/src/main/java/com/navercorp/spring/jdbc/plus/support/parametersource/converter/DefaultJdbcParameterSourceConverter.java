@@ -214,6 +214,10 @@ public class DefaultJdbcParameterSourceConverter implements JdbcParameterSourceC
 	@SuppressWarnings("rawtypes")
 	@Nullable
 	private Unwrapper resolveUnwrapper(Object value) {
+		if (value == null) {
+			return null;
+		}
+
 		Class<?> clazz = value.getClass();
 		Unwrapper unwrapper = this.unwrappers.get(clazz);
 		if (unwrapper != null) {
