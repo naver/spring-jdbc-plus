@@ -183,13 +183,13 @@ public class DefaultJdbcParameterSourceConverter implements JdbcParameterSourceC
 
 	@SuppressWarnings({"unchecked", "rawtypes"})
 	private Object convert(Object value) {
+		if (value == null) {
+			return null;
+		}
+
 		Unwrapper unwrapper = resolveUnwrapper(value);
 		if (unwrapper != null) {
 			value = unwrapper.unwrap(value);
-		}
-
-		if (value == null) {
-			return null;
 		}
 
 		Converter converter = resolveConverter(value);
