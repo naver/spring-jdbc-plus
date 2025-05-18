@@ -5,9 +5,9 @@ name: Check
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, 3.4.x, 3.3.x ]
   pull_request:
-    branches: [ main ]
+    branches: [ main, 3.4.x, 3.3.x ]
 
 jobs:
   check:
@@ -32,6 +32,7 @@ jobs:
         if: always() # always run even if the previous step fails
         with:
           report_paths: '**/build/test-results/test/TEST-*.xml'
+          github_token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Test Summary
         uses: test-summary/action@v1
