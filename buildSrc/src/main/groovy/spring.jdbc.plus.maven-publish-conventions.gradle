@@ -1,10 +1,49 @@
 plugins {
     id "maven-publish"
     id "signing"
+    id 'org.jreleaser'
 }
 
 group = "com.navercorp.spring"
 version = "3.5.0"
+
+jreleaser {
+    release {
+        github {
+            skipRelease = true
+        }
+    }
+    gitRootSearch = true
+    signing {
+        active = 'ALWAYS'
+        armored = true
+        verify = true
+    }
+    deploy {
+        maven {
+            mavenCentral {
+                'release-deploy' {
+                    active = 'RELEASE'
+                    url = 'https://central.sonatype.com/api/v1/publisher'
+                    sign = true
+                    stagingRepository('build/staging-deploy')
+                }
+            }
+            // The following configuration is applied when the version matches the "*-SNAPSHOT" pattern.
+            nexus2 {
+                'snapshot-deploy' {
+                    active = 'SNAPSHOT'
+                    snapshotUrl = 'https://central.sonatype.com/repository/maven-snapshots/'
+                    applyMavenCentralRules = true
+                    snapshotSupported = true
+                    closeRepository = true
+                    releaseRepository = false
+                    stagingRepository('build/staging-deploy')
+                }
+            }
+        }
+    }
+}
 
 publishing {
     publications {
@@ -13,17 +52,7 @@ publishing {
 
             repositories {
                 maven {
-                    def ossrhUsername = System.getenv("OSSRH_USERNAME")
-                    def ossrhPassword = System.getenv("OSSRH_PASSWORD")
-
-                    credentials {
-                        username ossrhUsername
-                        password ossrhPassword
-                    }
-
-                    def releasesRepoUrl = "https://ossrh-staging-api.central.sonatype.com/service/local/staging/deploy/maven2/"
-                    def snapshotsRepoUrl = "https://central.sonatype.com/repository/maven-snapshots/"
-                    url = version.endsWith("SNAPSHOT") ? snapshotsRepoUrl : releasesRepoUrl
+                    url = layout.buildDirectory.dir("staging-deploy")
                 }
             }
 
@@ -76,17 +105,4 @@ publishing {
             }
         }
     }
-}
-
-signing {
-    def signingKey = findProperty("signingKey")
-    def signingPassword = findProperty("signingPassword")
-
-    useInMemoryPgpKeys(signingKey, signingPassword)
-
-    sign publishing.publications.mavenJava
-}
-
-tasks.withType(Sign) {
-    onlyIf { !version.endsWith("SNAPSHOT") }
 }

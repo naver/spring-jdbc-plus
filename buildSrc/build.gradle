@@ -13,4 +13,5 @@ repositories {
 
 dependencies {
     implementation "io.spring.gradle:dependency-management-plugin:1.1.5"
+    implementation "org.jreleaser:org.jreleaser.gradle.plugin:1.19.0"
 }
