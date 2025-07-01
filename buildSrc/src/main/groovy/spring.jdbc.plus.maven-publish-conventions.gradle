@@ -1,5 +1,6 @@
 plugins {
     id "maven-publish"
+    id "signing"
 }
 
 group = "com.navercorp.spring"
@@ -75,4 +76,17 @@ publishing {
             }
         }
     }
+}
+
+signing {
+    def signingKey = findProperty("signingKey")
+    def signingPassword = findProperty("signingPassword")
+
+    useInMemoryPgpKeys(signingKey, signingPassword)
+
+    sign publishing.publications.mavenJava
+}
+
+tasks.withType(Sign) {
+    onlyIf { !version.endsWith("SNAPSHOT") }
 }
