@@ -9,10 +9,10 @@
 ### Using a Local Machine
 
 1. Set the following environment variables before publishing:
-    - `JRELEASER_MAVENCENTRAL_USERNAME`: Your OSSRH username using the generated [Access User Token](https://central.sonatype.com/account).
-    - `JRELEASER_MAVENCENTRAL_PASSWORD`: Your OSSRH password using the generated [Access User Token](https://central.sonatype.com/account).
-    - `JRELEASER_NEXUS2_USERNAME`: Your OSSRH username using the generated [Access User Token](https://central.sonatype.com/account).
-    - `JRELEASER_NEXUS2_PASSWORD`: Your OSSRH password using the generated [Access User Token](https://central.sonatype.com/account).
+    - `JRELEASER_MAVENCENTRAL_USERNAME`: Your Sonatype username token. using the generated [Access User Token](https://central.sonatype.com/account).
+    - `JRELEASER_MAVENCENTRAL_PASSWORD`: Your Sonatype password token. using the generated [Access User Token](https://central.sonatype.com/account).
+    - `JRELEASER_NEXUS2_USERNAME` (for snapshots): same as JRELEASER_MAVENCENTRAL_USERNAME
+    - `JRELEASER_NEXUS2_PASSWORD` (for snapshots): same as JRELEASER_MAVENCENTRAL_PASSWORD
     - `JRELEASER_GPG_PASSPHRASE`: Your GPG key passphrase.
     - `JRELEASER_GPG_PUBLIC_KEY`: Your GPG public key, Base64 encoded. (`gpg --export ${your_key_id} | base64`)
     - `JRELEASER_GPG_SECRET_KEY`: Your GPG secret key, Base64 encoded. (`gpg --export-secret-keys ${your_key_id} | base64`)
