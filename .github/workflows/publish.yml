@@ -30,9 +30,13 @@ jobs:
         run: ./gradlew clean build
 
       - name: Publish artifacts
-        run: ./gradlew publish
+        run: ./gradlew jreleaserConfig publish jreleaserDeploy
         env:
-          OSSRH_USERNAME: ${{ secrets.OSSRH_USER_NAME }}
-          OSSRH_PASSWORD: ${{ secrets.OSSRH_USER_PASSWORD }}
-          ORG_GRADLE_PROJECT_signingKey: ${{ secrets.SIGNING_KEY }}
-          ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.SIGNING_PASSWORD }}
+          JRELEASER_GPG_PUBLIC_KEY: ${{ secrets.JRELEASER_GPG_PUBLIC_KEY }}
+          JRELEASER_GPG_SECRET_KEY: ${{ secrets.JRELEASER_GPG_SECRET_KEY }}
+          JRELEASER_GPG_PASSPHRASE: ${{ secrets.JRELEASER_GPG_PASSPHRASE }}
+          JRELEASER_NEXUS2_USERNAME: ${{ secrets.JRELEASER_CENTRAL_USERNAME }}
+          JRELEASER_NEXUS2_PASSWORD: ${{ secrets.JRELEASER_CENTRAL_USERNAME }}
+          JRELEASER_MAVENCENTRAL_USERNAME: ${{ secrets.JRELEASER_CENTRAL_USERNAME }}
+          JRELEASER_MAVENCENTRAL_PASSWORD: ${{ secrets.JRELEASER_CENTRAL_USERNAME }}
+          JRELEASER_GITHUB_TOKEN: ${{ secrets.JRELEASER_GITHUB_TOKEN }}
