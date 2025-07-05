@@ -1,6 +1,7 @@
 plugins {
     id "maven-publish"
-    id 'org.jreleaser'
+    id "org.jreleaser"
+    id "signing"
 }
 
 group = "com.navercorp.spring"
