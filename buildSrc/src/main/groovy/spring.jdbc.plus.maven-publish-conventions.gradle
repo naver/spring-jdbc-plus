@@ -22,7 +22,7 @@ jreleaser {
         maven {
             mavenCentral {
                 'release-deploy' {
-                    active = 'RELEASE'
+                    active = 'ALWAYS'
                     url = 'https://central.sonatype.com/api/v1/publisher'
                     sign = true
                     stagingRepository('build/staging-deploy')
