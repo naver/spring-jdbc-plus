@@ -1,7 +1,7 @@
 plugins {
     id "spring.jdbc.plus.java-conventions"
     id "spring.jdbc.plus.spring-bom-conventions"
-    id "org.jetbrains.kotlin.jvm" version "1.9.20"
+    id "org.jetbrains.kotlin.jvm"
 }
 
 compileKotlin {

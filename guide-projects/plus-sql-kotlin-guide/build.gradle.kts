@@ -3,7 +3,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     id("spring.jdbc.plus.spring-bom-conventions")
     id("org.jlleitschuh.gradle.ktlint") version "10.2.0"
-    kotlin("jvm") version "1.9.20"
+    kotlin("jvm")
     kotlin("plugin.spring") version "1.9.20"
 }
 
