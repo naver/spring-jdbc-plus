@@ -36,9 +36,11 @@ import org.springframework.data.relational.core.mapping.RelationalMappingContext
 import org.springframework.data.relational.core.mapping.RelationalPersistentEntity;
 import org.springframework.data.relational.core.mapping.RelationalPersistentProperty;
 import org.springframework.data.relational.core.mapping.Table;
+import org.springframework.data.relational.core.query.Query;
 import org.springframework.data.relational.core.sql.Aliased;
 import org.springframework.data.relational.core.sql.SqlIdentifier;
 import org.springframework.data.relational.core.sql.TableLike;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 
 import com.navercorp.spring.jdbc.plus.commons.annotations.SoftDeleteColumn;
 import com.navercorp.spring.jdbc.plus.commons.annotations.SoftDeleteColumn.ValueType;
@@ -272,6 +274,45 @@ class SqlGeneratorTest {
 			"ORDER BY dummy_entity.x_name ASC", //
 			"OFFSET 30", //
 			"LIMIT 10");
+	}
+
+	@Test // DATAJDBC-1803
+	void selectByQueryWithColumnLimit() {
+
+		Query query = Query.empty().columns("id", "alpha", "beta", "gamma");
+
+		String sql = sqlGenerator.selectByQuery(query, new MapSqlParameterSource());
+
+		assertThat(sql).contains( //
+			"SELECT dummy_entity.id1 AS id1, dummy_entity.alpha, dummy_entity.beta, dummy_entity.gamma", //
+			"FROM dummy_entity" //
+		);
+	}
+
+	@Test // DATAJDBC-1803
+	void selectingSetContentSelectsAllColumns() {
+
+		Query query = Query.empty().columns("elements.content");
+
+		String sql = sqlGenerator.selectByQuery(query, new MapSqlParameterSource());
+
+		assertThat(sql).contains( //
+			"SELECT dummy_entity.id1 AS id1, dummy_entity.x_name AS x_name"//
+		);
+	}
+
+	@Test // DATAJDBC-1803
+	void selectByQueryWithMappedColumnPathsRendersCorrectSelection() {
+
+		Query query = Query.empty().columns("ref.content");
+
+		String sql = sqlGenerator.selectByQuery(query, new MapSqlParameterSource());
+
+		assertThat(sql).contains( //
+			"SELECT", //
+			"ref.id1 AS id1, ref.content AS x_content", //
+			"FROM dummy_entity", //
+			"LEFT OUTER JOIN referenced_entity ref ON ref.dummy_entity = dummy_entity.id1");
 	}
 
 	@Test // DATAJDBC-131, DATAJDBC-111
