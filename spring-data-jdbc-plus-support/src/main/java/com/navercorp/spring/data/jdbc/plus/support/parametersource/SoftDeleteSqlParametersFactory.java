@@ -116,7 +116,7 @@ public class SoftDeleteSqlParametersFactory {
 
 				Object[] tupleList = new Object[columns.size()];
 
-				int i = 0;
+				int i = 0; // @checkstyle:ignore
 				for (AggregatePath path : columns.paths()) {
 					tupleList[i++] = valueExtractor.apply(id, path);
 				}

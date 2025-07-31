@@ -128,8 +128,7 @@ class SqlGeneratorTest {
 			"DELETE FROM referenced_entity WHERE referenced_entity.dummy_entity = :id1");
 	}
 
-	@Test
-		// GH-537
+	@Test // GH-537
 	void cascadingDeleteInByPathFirstLevel() {
 
 		String sql = sqlGenerator.createDeleteInByPath(getPath("ref", DummyEntity.class));
@@ -305,8 +304,7 @@ class SqlGeneratorTest {
 			"LIMIT 10");
 	}
 
-	@Test
-		// DATAJDBC-1803
+	@Test // DATAJDBC-1803
 	void selectByQueryWithColumnLimit() {
 
 		Query query = Query.empty().columns("id", "alpha", "beta", "gamma");
@@ -319,8 +317,7 @@ class SqlGeneratorTest {
 		);
 	}
 
-	@Test
-		// DATAJDBC-1803
+	@Test // DATAJDBC-1803
 	void selectingSetContentSelectsAllColumns() {
 
 		Query query = Query.empty().columns("elements.content");
@@ -332,8 +329,7 @@ class SqlGeneratorTest {
 		);
 	}
 
-	@Test
-		// DATAJDBC-1803
+	@Test // DATAJDBC-1803
 	void selectByQueryWithMappedColumnPathsRendersCorrectSelection() {
 
 		Query query = Query.empty().columns("ref.content");
@@ -1091,7 +1087,9 @@ class SqlGeneratorTest {
 	}
 
 	static class EntityWithQuotedColumnName {
-		// these column names behave like single double quote in the name // since the get quoted and then doubling the double // quote escapes it.
+		// these column names behave like single double quote in the name
+		// since the get quoted and then doubling the double
+		// quote escapes it.
 		@Id
 		@Column("test\"\"_@id")
 		Long id;

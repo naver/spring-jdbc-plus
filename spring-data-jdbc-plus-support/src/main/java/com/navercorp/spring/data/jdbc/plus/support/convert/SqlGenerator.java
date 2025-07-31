@@ -241,8 +241,8 @@ public class SqlGenerator {
 	}
 
 	/**
-	 * Construct an IN-condition based on a {@link Select Sub-Select} which selects the ids (or stand-ins for ids) of the
-	 * given {@literal path} to those that reference the root entities specified by the {@literal rootCondition}.
+	 * Construct an IN-condition based on a {@link Select Sub-Select} which selects the ids (or stand-ins for ids) of
+	 * the given {@literal path} to those that reference the root entities specified by the {@literal rootCondition}.
 	 *
 	 * @param path specifies the table and id to select
 	 * @param conditionFunction a function for construction a where clause
@@ -604,8 +604,8 @@ public class SqlGenerator {
 	}
 
 	/**
-	 * Create a {@code DELETE} query and filter by {@link PersistentPropertyPath} using {@code WHERE} with the {@code IN}
-	 * operator.
+	 * Create a {@code DELETE} query and filter by {@link PersistentPropertyPath} using {@code WHERE}
+	 * with the {@code IN} operator.
 	 *
 	 * @param path must not be {@literal null}.
 	 * @return the statement as a {@link String}. Guaranteed to be not {@literal null}.

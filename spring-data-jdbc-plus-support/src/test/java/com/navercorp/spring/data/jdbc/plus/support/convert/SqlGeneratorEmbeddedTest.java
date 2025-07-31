@@ -67,8 +67,7 @@ class SqlGeneratorEmbeddedTest {
 			.doesNotContain("JOIN").doesNotContain("embeddable"); //
 	}
 
-	@Test
-		// GH-574
+	@Test // GH-574
 	void findOneWrappedId() {
 
 		SqlGenerator sqlGenerator = createSqlGenerator(WithWrappedId.class);
@@ -81,8 +80,7 @@ class SqlGeneratorEmbeddedTest {
 			.contains("WHERE with_wrapped_id.id = :id");
 	}
 
-	@Test
-		// GH-574
+	@Test // GH-574
 	void findOneEmbeddedId() {
 
 		SqlGenerator sqlGenerator = createSqlGenerator(WithEmbeddedId.class);
@@ -98,8 +96,7 @@ class SqlGeneratorEmbeddedTest {
 			.contains("with_embedded_id.two = :two");
 	}
 
-	@Test
-		// GH-574
+	@Test // GH-574
 	void deleteByIdEmbeddedId() {
 
 		SqlGenerator sqlGenerator = createSqlGenerator(WithEmbeddedId.class);
@@ -112,8 +109,7 @@ class SqlGeneratorEmbeddedTest {
 			.contains("with_embedded_id.two = :two");
 	}
 
-	@Test
-		// GH-574
+	@Test // GH-574
 	void deleteByIdInEmbeddedId() {
 
 		SqlGenerator sqlGenerator = createSqlGenerator(WithEmbeddedId.class);
@@ -125,8 +121,7 @@ class SqlGeneratorEmbeddedTest {
 			.contains("(with_embedded_id.one, with_embedded_id.two) IN (:ids)");
 	}
 
-	@Test
-		// GH-574
+	@Test // GH-574
 	void deleteByPathEmbeddedId() {
 
 		SqlGenerator sqlGenerator = createSqlGenerator(WithEmbeddedId.class);
@@ -140,8 +135,7 @@ class SqlGeneratorEmbeddedTest {
 			.contains("other_entity.with_embedded_id_and_reference_two = :two");
 	}
 
-	@Test
-		// GH-574
+	@Test // GH-574
 	void deleteInByPathEmbeddedId() {
 
 		SqlGenerator sqlGenerator = createSqlGenerator(WithEmbeddedId.class);
@@ -153,11 +147,11 @@ class SqlGeneratorEmbeddedTest {
 		assertThat(sql).startsWith("DELETE FROM other_entity WHERE") //
 			.contains(" WHERE ") //
 			.contains(
-				"(other_entity.with_embedded_id_and_reference_one, other_entity.with_embedded_id_and_reference_two) IN (:ids)");
+				"(other_entity.with_embedded_id_and_reference_one, other_entity.with_embedded_id_and_reference_two) "
+					+ "IN (:ids)");
 	}
 
-	@Test
-		// GH-574
+	@Test // GH-574
 	void updateWithEmbeddedId() {
 
 		SqlGenerator sqlGenerator = createSqlGenerator(WithEmbeddedId.class);
@@ -170,8 +164,7 @@ class SqlGeneratorEmbeddedTest {
 			.contains("with_embedded_id.two = :two");
 	}
 
-	@Test
-		// GH-574
+	@Test // GH-574
 	void existsByIdEmbeddedId() {
 
 		SqlGenerator sqlGenerator = createSqlGenerator(WithEmbeddedId.class);
@@ -226,8 +219,7 @@ class SqlGeneratorEmbeddedTest {
 			.doesNotContain("embeddable");
 	}
 
-	@Test
-		// GH-574
+	@Test // GH-574
 	void findAllInListEmbeddedId() {
 
 		SqlGenerator sqlGenerator = createSqlGenerator(WithEmbeddedId.class);
@@ -241,8 +233,7 @@ class SqlGeneratorEmbeddedTest {
 			.contains(" WHERE (with_embedded_id.one, with_embedded_id.two) IN (:ids)");
 	}
 
-	@Test
-		// GH-574
+	@Test // GH-574
 	void findOneWithReference() {
 
 		SqlGenerator sqlGenerator = createSqlGenerator(WithEmbeddedIdAndReference.class);
