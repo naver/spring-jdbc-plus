@@ -57,7 +57,7 @@ class SqlGeneratorTest {
 
 	SqlGenerator sqlGenerator;
 	NamingStrategy namingStrategy = new PrefixingNamingStrategy();
-	RelationalMappingContext context = new JdbcMappingContext(namingStrategy);
+	RelationalMappingContext context = JdbcMappingContext.forQuotedIdentifiers(namingStrategy);
 	JdbcConverter converter = new MappingJdbcConverter(context, (identifier, path) -> {
 		throw new UnsupportedOperationException();
 	});

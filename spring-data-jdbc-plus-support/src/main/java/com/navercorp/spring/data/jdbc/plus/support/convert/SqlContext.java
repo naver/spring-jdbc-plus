@@ -16,6 +16,7 @@
 package com.navercorp.spring.data.jdbc.plus.support.convert;
 
 import org.springframework.data.relational.core.mapping.AggregatePath;
+import org.springframework.data.relational.core.mapping.AggregatePath.ColumnInfo;
 import org.springframework.data.relational.core.mapping.RelationalPersistentEntity;
 import org.springframework.data.relational.core.sql.Aliased;
 import org.springframework.data.relational.core.sql.Column;
@@ -89,7 +90,7 @@ class SqlContext implements SqlContexts {
 	public Column getColumn(AggregatePath path) {
 		SqlIdentifier columnName = path.getColumnInfo().name();
 		SqlIdentifier columnAlias = PropertyPathUtils.getColumnAlias(path, columnName);
-		return getTable(path).column(columnName).as(columnAlias);
+		return getAliasedColumn(path, path.getColumnInfo(), columnAlias);
 	}
 
 	@Override
@@ -103,6 +104,14 @@ class SqlContext implements SqlContexts {
 	public Column getAnyReverseColumn(AggregatePath path) {
 		AggregatePath.ColumnInfo columnInfo = path.getTableInfo().backReferenceColumnInfos().any();
 		SqlIdentifier reverseColumnAlias = PropertyPathUtils.getReverseColumnAlias(path, columnInfo.name());
-		return getTable(path).column(columnInfo.name()).as(reverseColumnAlias);
+		return getAliasedColumn(path, columnInfo, reverseColumnAlias);
+	}
+
+	/**
+	 * DIFF: additional 'columnAlias' argument
+	 * for {@link com.navercorp.spring.jdbc.plus.commons.annotations.SqlTableAlias}
+	 */
+	private Column getAliasedColumn(AggregatePath path, ColumnInfo columnInfo, SqlIdentifier columnAlias) {
+		return getTable(path).column(columnInfo.name()).as(columnAlias);
 	}
 }

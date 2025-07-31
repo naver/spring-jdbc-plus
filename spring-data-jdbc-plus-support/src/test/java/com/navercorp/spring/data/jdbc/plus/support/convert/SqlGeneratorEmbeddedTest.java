@@ -30,7 +30,7 @@ import org.springframework.data.relational.core.sql.SqlIdentifier;
  */
 @SuppressWarnings("checkstyle:linelength")
 class SqlGeneratorEmbeddedTest {
-	private RelationalMappingContext context = new JdbcMappingContext();
+	private RelationalMappingContext context = JdbcMappingContext.forQuotedIdentifiers();
 	JdbcConverter converter = new MappingJdbcConverter(context, (identifier, path) -> {
 		throw new UnsupportedOperationException();
 	});

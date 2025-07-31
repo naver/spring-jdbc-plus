@@ -15,7 +15,8 @@
  */
 package com.navercorp.spring.data.jdbc.plus.support.convert;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -49,7 +50,7 @@ import com.navercorp.spring.jdbc.plus.commons.annotations.SoftDeleteColumn.Value
  */
 public class SqlGeneratorContextBasedNamingStrategyTest {
 
-	RelationalMappingContext context = new JdbcMappingContext();
+	RelationalMappingContext context = JdbcMappingContext.forQuotedIdentifiers();
 	ThreadLocal<String> userHandler = new ThreadLocal<>();
 
 	/**
@@ -275,7 +276,7 @@ public class SqlGeneratorContextBasedNamingStrategyTest {
 	 */
 	private SqlGenerator configureSqlGenerator(NamingStrategy namingStrategy) {
 
-		RelationalMappingContext context = new JdbcMappingContext(namingStrategy);
+		RelationalMappingContext context = JdbcMappingContext.forQuotedIdentifiers(namingStrategy);
 		JdbcConverter converter = new MappingJdbcConverter(context, (identifier, path) -> {
 			throw new UnsupportedOperationException();
 		});
@@ -286,7 +287,7 @@ public class SqlGeneratorContextBasedNamingStrategyTest {
 
 	private SqlGenerator configureSoftDeleteSqlGenerator(NamingStrategy namingStrategy) {
 
-		RelationalMappingContext context = new JdbcMappingContext(namingStrategy);
+		RelationalMappingContext context = JdbcMappingContext.forQuotedIdentifiers(namingStrategy);
 		JdbcConverter converter = new MappingJdbcConverter(context, (identifier, path) -> {
 			throw new UnsupportedOperationException();
 		});
