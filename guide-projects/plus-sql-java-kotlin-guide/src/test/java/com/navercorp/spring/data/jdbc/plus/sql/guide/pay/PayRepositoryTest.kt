@@ -16,7 +16,7 @@ class PayRepositoryTest {
     @Test
     fun saveAll() {
         val insertedId = this.sut.saveAll((1..5).map { sample() })
-            .map { it.id }
+            .mapNotNull { it.id }
 
         val actual = this.sut.findAllById(insertedId)
 

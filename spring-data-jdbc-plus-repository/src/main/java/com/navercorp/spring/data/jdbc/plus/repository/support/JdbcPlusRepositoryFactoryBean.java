@@ -29,9 +29,9 @@ import org.springframework.data.jdbc.core.convert.DataAccessStrategy;
 import org.springframework.data.jdbc.core.convert.DataAccessStrategyFactory;
 import org.springframework.data.jdbc.core.convert.InsertStrategyFactory;
 import org.springframework.data.jdbc.core.convert.JdbcConverter;
+import org.springframework.data.jdbc.core.convert.QueryMappingConfiguration;
 import org.springframework.data.jdbc.core.convert.SqlGeneratorSource;
 import org.springframework.data.jdbc.core.convert.SqlParametersFactory;
-import org.springframework.data.jdbc.repository.QueryMappingConfiguration;
 import org.springframework.data.jdbc.repository.support.JdbcRepositoryFactory;
 import org.springframework.data.mapping.callback.EntityCallbacks;
 import org.springframework.data.relational.core.dialect.Dialect;
@@ -267,7 +267,8 @@ public class JdbcPlusRepositoryFactoryBean<T extends Repository<S, ID>, S, ID ex
 			this.converter,
 			this.operations,
 			sqlParametersFactory,
-			insertStrategyFactory
+			insertStrategyFactory,
+			this.queryMappingConfiguration
 		);
 		DataAccessStrategy delegate = factory.create();
 		return delegate;

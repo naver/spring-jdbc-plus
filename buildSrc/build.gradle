@@ -1,5 +1,5 @@
 plugins {
-   id "groovy-gradle-plugin"
+    id "groovy-gradle-plugin"
 }
 
 repositories {
@@ -12,7 +12,7 @@ repositories {
 }
 
 dependencies {
-    implementation "org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.20"
+    implementation "org.jetbrains.kotlin:kotlin-gradle-plugin:2.2.0"
     implementation "io.spring.gradle:dependency-management-plugin:1.1.5"
     implementation "org.jreleaser:org.jreleaser.gradle.plugin:1.19.0"
 }

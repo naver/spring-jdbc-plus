@@ -21,7 +21,7 @@ package com.navercorp.spring.data.jdbc.plus.sql.provider;
 import java.util.Map;
 
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.data.jdbc.repository.QueryMappingConfiguration;
+import org.springframework.data.jdbc.core.convert.QueryMappingConfiguration;
 import org.springframework.data.mapping.MappingException;
 import org.springframework.data.mapping.callback.EntityCallbacks;
 import org.springframework.jdbc.core.RowMapper;
