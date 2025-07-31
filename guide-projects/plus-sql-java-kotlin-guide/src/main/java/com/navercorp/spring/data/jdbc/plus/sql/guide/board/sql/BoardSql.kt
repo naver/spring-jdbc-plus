@@ -26,7 +26,6 @@ import com.navercorp.spring.data.jdbc.plus.sql.support.SqlGeneratorSupport
  * @author Myeonghyeon Lee
  */
 class BoardSql : SqlGeneratorSupport() {
-
     fun selectGraphById(): String = """
         SELECT ${sql.aggregateColumns(Board::class.java)}
 

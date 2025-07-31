@@ -33,5 +33,6 @@ data class Order(
 )
 
 enum class OrderStatus {
-    PLACE, COMPLETED
+    PLACE,
+    COMPLETED
 }

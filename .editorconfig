@@ -2,8 +2,17 @@
 root = true
 
 [*.{kt, kts}]
-disabled_rules = import-ordering, indent
-# disable indent rule until https://github.com/pinterest/ktlint/issues/764 is fixed.
+disabled_rules = import-ordering
+ktlint_standard_trailing-comma-on-call-site = disabled
+ktlint_standard_trailing-comma-on-declaration-site = disabled
+ktlint_standard_wrapping = disabled
+ktlint_standard_no-blank-line-in-list = disabled
+ktlint_standard_function-signature = disabled
+ktlint_standard_class-signature = disabled
+ktlint_standard_multiline-expression-wrapping = disabled
+ktlint_standard_chain-method-continuation = disabled
+ktlint_standard_binary-expression-wrapping = disabled
+ktlint_standard_argument-list-wrapping = disabled
 
 [*]
 # [encoding-utf8]
