@@ -38,6 +38,7 @@ import org.springframework.data.relational.core.mapping.RelationalPersistentProp
 import org.springframework.data.relational.core.mapping.Table;
 import org.springframework.data.relational.core.query.Query;
 import org.springframework.data.relational.core.sql.Aliased;
+import org.springframework.data.relational.core.sql.Comparison;
 import org.springframework.data.relational.core.sql.SqlIdentifier;
 import org.springframework.data.relational.core.sql.TableLike;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -60,6 +61,26 @@ class SqlGeneratorTest {
 	JdbcConverter converter = new MappingJdbcConverter(context, (identifier, path) -> {
 		throw new UnsupportedOperationException();
 	});
+
+	static Comparison equalsCondition(org.springframework.data.relational.core.sql.Table parentTable,
+		SqlIdentifier parentId, org.springframework.data.relational.core.sql.Table joinedTable,
+		SqlIdentifier joinedColumn) {
+		return org.springframework.data.relational.core.sql.Column.create(joinedColumn, joinedTable)
+			.isEqualTo(org.springframework.data.relational.core.sql.Column.create(parentId, parentTable));
+	}
+
+	static Comparison equalsCondition(SqlIdentifier parentTable, SqlIdentifier parentId,
+		org.springframework.data.relational.core.sql.Table joinedTable,
+		SqlIdentifier joinedColumn) {
+		return equalsCondition(org.springframework.data.relational.core.sql.Table.create(parentTable), parentId,
+			joinedTable, joinedColumn);
+	}
+
+	static Comparison equalsCondition(String parentTable, String parentId,
+		org.springframework.data.relational.core.sql.Table joinedTable, String joinedColumn) {
+		return equalsCondition(SqlIdentifier.unquoted(parentTable), SqlIdentifier.unquoted(parentId), joinedTable,
+			SqlIdentifier.unquoted(joinedColumn));
+	}
 
 	@BeforeEach
 	public void setUp() {
@@ -104,8 +125,16 @@ class SqlGeneratorTest {
 		String sql = sqlGenerator.createDeleteByPath(getPath("ref", DummyEntity.class));
 
 		assertThat(sql).isEqualTo(
-			"DELETE FROM referenced_entity "
-				+ "WHERE referenced_entity.dummy_entity = :rootId");
+			"DELETE FROM referenced_entity WHERE referenced_entity.dummy_entity = :id1");
+	}
+
+	@Test
+		// GH-537
+	void cascadingDeleteInByPathFirstLevel() {
+
+		String sql = sqlGenerator.createDeleteInByPath(getPath("ref", DummyEntity.class));
+
+		assertThat(sql).isEqualTo("DELETE FROM referenced_entity WHERE referenced_entity.dummy_entity IN (:ids)");
 	}
 
 	@Test // DATAJDBC-112
@@ -117,7 +146,7 @@ class SqlGeneratorTest {
 			"DELETE FROM second_level_referenced_entity "
 				+ "WHERE second_level_referenced_entity.referenced_entity IN ("
 				+ "SELECT referenced_entity.x_l1id FROM referenced_entity "
-				+ "WHERE referenced_entity.dummy_entity = :rootId)");
+				+ "WHERE referenced_entity.dummy_entity = :id1)");
 	}
 
 	@Test // DATAJDBC-112
@@ -166,7 +195,7 @@ class SqlGeneratorTest {
 		String sql = sqlGenerator.createDeleteByPath(
 			getPath("mappedElements", DummyEntity.class));
 
-		assertThat(sql).isEqualTo("DELETE FROM element WHERE element.dummy_entity = :rootId");
+		assertThat(sql).isEqualTo("DELETE FROM element WHERE element.dummy_entity = :id1");
 	}
 
 	@Test // DATAJDBC-101
@@ -276,7 +305,8 @@ class SqlGeneratorTest {
 			"LIMIT 10");
 	}
 
-	@Test // DATAJDBC-1803
+	@Test
+		// DATAJDBC-1803
 	void selectByQueryWithColumnLimit() {
 
 		Query query = Query.empty().columns("id", "alpha", "beta", "gamma");
@@ -289,7 +319,8 @@ class SqlGeneratorTest {
 		);
 	}
 
-	@Test // DATAJDBC-1803
+	@Test
+		// DATAJDBC-1803
 	void selectingSetContentSelectsAllColumns() {
 
 		Query query = Query.empty().columns("elements.content");
@@ -301,7 +332,8 @@ class SqlGeneratorTest {
 		);
 	}
 
-	@Test // DATAJDBC-1803
+	@Test
+		// DATAJDBC-1803
 	void selectByQueryWithMappedColumnPathsRendersCorrectSelection() {
 
 		Query query = Query.empty().columns("ref.content");
@@ -310,14 +342,13 @@ class SqlGeneratorTest {
 
 		assertThat(sql).contains( //
 			"SELECT", //
-			"ref.id1 AS id1, ref.content AS x_content", //
+			"ref.x_content AS ref_x_content", //
 			"FROM dummy_entity", //
 			"LEFT OUTER JOIN referenced_entity ref ON ref.dummy_entity = dummy_entity.id1");
 	}
 
 	@Test // DATAJDBC-131, DATAJDBC-111
 	public void findAllByProperty() {
-
 		// this would get called when ListParent is the element type of a Set
 		String sql = sqlGenerator.getFindAllByProperty(BACKREF, null, false);
 
@@ -339,7 +370,6 @@ class SqlGeneratorTest {
 
 	@Test // DATAJDBC-223
 	public void findAllByPropertyWithMultipartIdentifier() {
-
 		// this would get called when ListParent is the element type of a Set
 		Identifier parentIdentifier = Identifier.of(unquoted("backref"), "some-value", String.class) //
 			.withPart(unquoted("backref_key"), "key-value", Object.class);
@@ -363,7 +393,6 @@ class SqlGeneratorTest {
 
 	@Test // DATAJDBC-131, DATAJDBC-111
 	public void findAllByPropertyWithKey() {
-
 		// this would get called when ListParent is th element type of a Map
 		String sql = sqlGenerator.getFindAllByProperty(
 			BACKREF, new AggregatePath.ColumnInfo(unquoted("key-column"), unquoted("key-column")), false);
@@ -391,7 +420,6 @@ class SqlGeneratorTest {
 
 	@Test // DATAJDBC-131, DATAJDBC-111
 	public void findAllByPropertyWithKeyOrdered() {
-
 		// this would get called when ListParent is th element type of a Map
 		String sql = sqlGenerator.getFindAllByProperty(BACKREF,
 			new AggregatePath.ColumnInfo(unquoted("key-column"), unquoted("key-column")), true);
@@ -622,7 +650,7 @@ class SqlGeneratorTest {
 				+ "entity_with_read_only_property.x_name AS x_name, " //
 				+ "entity_with_read_only_property.x_read_only_value AS x_read_only_value " //
 				+ "FROM entity_with_read_only_property " //
-				+ "WHERE entity_with_read_only_property.x_id = :id" //
+				+ "WHERE entity_with_read_only_property.x_id = :x_id" //
 		);
 	}
 
@@ -642,7 +670,7 @@ class SqlGeneratorTest {
 				+ "WHERE chain2.chain3 IN (" //
 				+ "SELECT chain3.x_three " //
 				+ "FROM chain3 " //
-				+ "WHERE chain3.chain4 = :rootId" //
+				+ "WHERE chain3.chain4 = :x_four" //
 				+ ")))");
 	}
 
@@ -651,7 +679,7 @@ class SqlGeneratorTest {
 
 		assertThat(createSqlGenerator(NoIdChain4.class)
 			.createDeleteByPath(getPath("chain3.chain2.chain1.chain0", NoIdChain4.class))) //
-			.isEqualTo("DELETE FROM no_id_chain0 WHERE no_id_chain0.no_id_chain4 = :rootId");
+			.isEqualTo("DELETE FROM no_id_chain0 WHERE no_id_chain0.no_id_chain4 = :x_four");
 	}
 
 	@Test // DATAJDBC-359
@@ -668,7 +696,7 @@ class SqlGeneratorTest {
 					+ "WHERE no_id_chain4.id_no_id_chain IN (" //
 					+ "SELECT id_no_id_chain.x_id " //
 					+ "FROM id_no_id_chain " //
-					+ "WHERE id_no_id_chain.id_id_no_id_chain = :rootId" //
+					+ "WHERE id_no_id_chain.id_id_no_id_chain = :x_id" //
 					+ "))");
 	}
 
@@ -684,16 +712,9 @@ class SqlGeneratorTest {
 
 		SoftAssertions.assertSoftly(softly -> {
 
-			softly.assertThat(join.getJoinTable().getName())
-				.isEqualTo(quoted("REFERENCED_ENTITY"));
-			softly.assertThat(join.getJoinColumn().getTable())
-				.isEqualTo(join.getJoinTable());
-			softly.assertThat(join.getJoinColumn().getName())
-				.isEqualTo(quoted("DUMMY_ENTITY"));
-			softly.assertThat(join.getParentId().getName())
-				.isEqualTo(quoted("id1"));
-			softly.assertThat(join.getParentId().getTable().getName())
-				.isEqualTo(quoted("DUMMY_ENTITY"));
+			softly.assertThat(join.joinTable().getName()).isEqualTo(SqlIdentifier.quoted("REFERENCED_ENTITY"));
+			softly.assertThat(join.condition()).isEqualTo(equalsCondition(SqlIdentifier.quoted("DUMMY_ENTITY"),
+				SqlIdentifier.quoted("id1"), join.joinTable(), SqlIdentifier.quoted("DUMMY_ENTITY")));
 		});
 	}
 
@@ -721,15 +742,13 @@ class SqlGeneratorTest {
 
 		SoftAssertions.assertSoftly(softly -> {
 
-			softly.assertThat(join.getJoinTable().getName())
-				.isEqualTo(quoted("SECOND_LEVEL_REFERENCED_ENTITY"));
-			softly.assertThat(join.getJoinColumn().getTable()).isEqualTo(join.getJoinTable());
-			softly.assertThat(join.getJoinColumn().getName())
-				.isEqualTo(quoted("REFERENCED_ENTITY"));
-			softly.assertThat(join.getParentId().getName())
-				.isEqualTo(quoted("X_L1ID"));
-			softly.assertThat(join.getParentId().getTable().getName())
-				.isEqualTo(quoted("REFERENCED_ENTITY"));
+			softly.assertThat(join.joinTable().getName())
+				.isEqualTo(SqlIdentifier.quoted("SECOND_LEVEL_REFERENCED_ENTITY"));
+			softly.assertThat(join.condition())
+				.isEqualTo(equalsCondition(
+					org.springframework.data.relational.core.sql.Table.create("REFERENCED_ENTITY")
+						.as(SqlIdentifier.quoted("ref")),
+					SqlIdentifier.quoted("X_L1ID"), join.joinTable(), SqlIdentifier.quoted("REFERENCED_ENTITY")));
 		});
 	}
 
@@ -737,19 +756,15 @@ class SqlGeneratorTest {
 	public void joinForOneToOneWithoutId() {
 
 		SqlGenerator.Join join = generateJoin("child", ParentOfNoIdChild.class);
-		TableLike joinTable = join.getJoinTable();
+		TableLike joinTable = join.joinTable();
 
 		SoftAssertions.assertSoftly(softly -> {
 
-			softly.assertThat(joinTable.getName()).isEqualTo(quoted("NO_ID_CHILD"));
+			softly.assertThat(joinTable.getName()).isEqualTo(SqlIdentifier.quoted("NO_ID_CHILD"));
 			softly.assertThat(joinTable).isInstanceOf(Aliased.class);
-			softly.assertThat(((Aliased)joinTable).getAlias()).isEqualTo(quoted("child"));
-			softly.assertThat(join.getJoinColumn().getTable()).isEqualTo(joinTable);
-			softly.assertThat(join.getJoinColumn().getName())
-				.isEqualTo(quoted("PARENT_OF_NO_ID_CHILD"));
-			softly.assertThat(join.getParentId().getName()).isEqualTo(quoted("X_ID"));
-			softly.assertThat(join.getParentId().getTable().getName())
-				.isEqualTo(quoted("PARENT_OF_NO_ID_CHILD"));
+			softly.assertThat(((Aliased)joinTable).getAlias()).isEqualTo(SqlIdentifier.quoted("child"));
+			softly.assertThat(join.condition()).isEqualTo(equalsCondition(SqlIdentifier.quoted("PARENT_OF_NO_ID_CHILD"),
+				SqlIdentifier.quoted("X_ID"), join.joinTable(), SqlIdentifier.quoted("PARENT_OF_NO_ID_CHILD")));
 
 		});
 	}
@@ -826,7 +841,7 @@ class SqlGeneratorTest {
 	@Test
 	void deleteVersionWithAlias() {
 		assertThat(createSqlGenerator(VersionedAliasEntity.class, NonQuotingDialect.INSTANCE).getDeleteByIdAndVersion())
-			.contains("versioned_entity.id1 = :id AND versioned_entity.x_version = :___old");
+			.contains("versioned_entity.id1 = :id1 AND versioned_entity.x_version = :___old");
 	}
 
 	@Test
@@ -834,14 +849,14 @@ class SqlGeneratorTest {
 		assertThat(
 			createSqlGenerator(BooleanValueSoftDeleteArticle.class, NonQuotingDialect.INSTANCE).getSoftDeleteById()
 		).isEqualTo(
-			"UPDATE boolean_value_article SET x_deleted = :x_deleted WHERE boolean_value_article.x_id = :id"
+			"UPDATE boolean_value_article SET x_deleted = :x_deleted WHERE boolean_value_article.x_id = :x_id"
 		);
 	}
 
 	@Test
 	void softDeleteByIdWithPlainBoolean() {
 		assertThat(createSqlGenerator(SoftDeleteArticle.class, NonQuotingDialect.INSTANCE).getSoftDeleteById())
-			.isEqualTo("UPDATE article SET x_deleted = :x_deleted WHERE article.x_id = :id");
+			.isEqualTo("UPDATE article SET x_deleted = :x_deleted WHERE article.x_id = :x_id");
 	}
 
 	@Test
@@ -849,7 +864,7 @@ class SqlGeneratorTest {
 		assertThat(
 			createSqlGenerator(StringValueSoftDeleteArticle.class, NonQuotingDialect.INSTANCE).getSoftDeleteById()
 		).isEqualTo(
-			"UPDATE string_value_article SET x_state = :x_state WHERE string_value_article.x_id = :id"
+			"UPDATE string_value_article SET x_state = :x_state WHERE string_value_article.x_id = :x_id"
 		);
 	}
 
@@ -928,7 +943,7 @@ class SqlGeneratorTest {
 			"UPDATE boolean_value_article "
 				+ "SET x_deleted = :x_deleted, "
 				+ "x_version = :x_version "
-				+ "WHERE boolean_value_article.x_id = :id "
+				+ "WHERE boolean_value_article.x_id = :x_id "
 				+ "AND boolean_value_article.x_version = :___oldOptimisticLockingVersion"
 		);
 	}
@@ -944,7 +959,7 @@ class SqlGeneratorTest {
 			"UPDATE string_value_article "
 				+ "SET x_state = :x_state, "
 				+ "x_version = :x_version "
-				+ "WHERE string_value_article.x_id = :id "
+				+ "WHERE string_value_article.x_id = :x_id "
 				+ "AND string_value_article.x_version = :___oldOptimisticLockingVersion"
 		);
 	}
@@ -1076,10 +1091,7 @@ class SqlGeneratorTest {
 	}
 
 	static class EntityWithQuotedColumnName {
-
-		// these column names behave like single double quote in the name
-		// since the get quoted and then doubling the double
-		// quote escapes it.
+		// these column names behave like single double quote in the name // since the get quoted and then doubling the double // quote escapes it.
 		@Id
 		@Column("test\"\"_@id")
 		Long id;
