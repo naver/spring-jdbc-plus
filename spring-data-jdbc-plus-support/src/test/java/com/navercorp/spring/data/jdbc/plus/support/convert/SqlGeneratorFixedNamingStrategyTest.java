@@ -1,6 +1,6 @@
 package com.navercorp.spring.data.jdbc.plus.support.convert;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.Test;
@@ -53,7 +53,7 @@ public class SqlGeneratorFixedNamingStrategyTest {
 		}
 	};
 
-	private RelationalMappingContext context = new JdbcMappingContext();
+	private RelationalMappingContext context = JdbcMappingContext.forQuotedIdentifiers();
 
 	@Test // DATAJDBC-107
 	public void findOneWithOverriddenFixedTableName() {
@@ -220,7 +220,7 @@ public class SqlGeneratorFixedNamingStrategyTest {
 	 */
 	private SqlGenerator configureSqlGenerator(NamingStrategy namingStrategy) {
 
-		RelationalMappingContext context = new JdbcMappingContext(namingStrategy);
+		RelationalMappingContext context = JdbcMappingContext.forQuotedIdentifiers(namingStrategy);
 		JdbcConverter converter = new MappingJdbcConverter(context, (identifier, path) -> {
 			throw new UnsupportedOperationException();
 		});
