@@ -1,6 +1,6 @@
 package com.navercorp.spring.data.jdbc.plus.support.convert;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.*;
 
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.Test;
@@ -90,7 +90,7 @@ public class SqlGeneratorFixedNamingStrategyTest {
 					+ "ON \"ref_further\".\"FIXEDCUSTOMTABLEPREFIX_REFERENCEDENTITY\" "
 					+ "= \"ref\".\"FIXEDCUSTOMPROPERTYPREFIX_L1ID\" "
 					+ "WHERE \"FIXEDCUSTOMSCHEMA\".\"FIXEDCUSTOMTABLEPREFIX_DUMMYENTITY\""
-					+ ".\"FIXEDCUSTOMPROPERTYPREFIX_ID\" = :id");
+					+ ".\"FIXEDCUSTOMPROPERTYPREFIX_ID\" = :FixedCustomPropertyPrefix_id");
 		softAssertions.assertAll();
 	}
 
@@ -127,7 +127,7 @@ public class SqlGeneratorFixedNamingStrategyTest {
 		assertThat(sql).isEqualTo(
 			"DELETE FROM \"FIXEDCUSTOMSCHEMA\".\"FIXEDCUSTOMTABLEPREFIX_REFERENCEDENTITY\" "
 				+ "WHERE \"FIXEDCUSTOMSCHEMA\".\"FIXEDCUSTOMTABLEPREFIX_REFERENCEDENTITY\""
-				+ ".\"DUMMY_ENTITY\" = :rootId");
+				+ ".\"DUMMY_ENTITY\" = :FixedCustomPropertyPrefix_id");
 	}
 
 	@Test // DATAJDBC-107
@@ -149,7 +149,7 @@ public class SqlGeneratorFixedNamingStrategyTest {
 					+ "FROM \"FIXEDCUSTOMSCHEMA\".\"FIXEDCUSTOMTABLEPREFIX_REFERENCEDENTITY\" "
 					+ "WHERE \"FIXEDCUSTOMSCHEMA\".\"FIXEDCUSTOMTABLEPREFIX_REFERENCEDENTITY\""
 					+ ".\"DUMMY_ENTITY\" "
-					+ "= :rootId)");
+					+ "= :FixedCustomPropertyPrefix_id)");
 	}
 
 	@Test // DATAJDBC-107

@@ -15,8 +15,7 @@
  */
 package com.navercorp.spring.data.jdbc.plus.support.convert;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.fail;
+import static org.assertj.core.api.Assertions.*;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -97,7 +96,7 @@ public class SqlGeneratorContextBasedNamingStrategyTest {
 			assertThat(sql).isEqualTo( //
 				"DELETE FROM " //
 					+ user + ".referenced_entity WHERE " //
-					+ user + ".referenced_entity.dummy_entity = :rootId" //
+					+ user + ".referenced_entity.dummy_entity = :id" //
 			);
 		});
 	}
@@ -116,7 +115,7 @@ public class SqlGeneratorContextBasedNamingStrategyTest {
 					+ "WHERE " + user + ".second_level_referenced_entity.referenced_entity IN " //
 					+ "(SELECT " + user + ".referenced_entity.l1id "
 					+ "FROM " + user + ".referenced_entity " //
-					+ "WHERE " + user + ".referenced_entity.dummy_entity = :rootId)");
+					+ "WHERE " + user + ".referenced_entity.dummy_entity = :id)");
 		});
 	}
 
