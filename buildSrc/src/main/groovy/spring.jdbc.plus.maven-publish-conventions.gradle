@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "com.navercorp.spring"
-version = "3.4.7-SNAPSHOT"
+version = "3.4.7"
 
 jreleaser {
     release {
