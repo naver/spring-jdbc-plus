@@ -28,5 +28,6 @@ data class OrderCriteria(
 )
 
 enum class OrderSort {
-    ID, PRICE
+    ID,
+    PRICE
 }

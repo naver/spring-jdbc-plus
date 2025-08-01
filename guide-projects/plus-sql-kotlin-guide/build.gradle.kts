@@ -2,7 +2,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     id("spring.jdbc.plus.spring-bom-conventions")
-    id("org.jlleitschuh.gradle.ktlint") version "10.2.0"
+    id("org.jlleitschuh.gradle.ktlint") version "13.0.0"
     kotlin("jvm")
     kotlin("plugin.spring") version "1.9.20"
 }
@@ -10,6 +10,10 @@ plugins {
 tasks.withType<KotlinCompile> {
     kotlinOptions.jvmTarget = "17"
     kotlinOptions.javaParameters = true
+}
+
+ktlint {
+    outputToConsole.set(true)
 }
 
 dependencies {

@@ -24,7 +24,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.transaction.annotation.Transactional
-import java.util.Comparator
 import java.util.stream.Collectors
 
 /**
@@ -76,9 +75,12 @@ class BoardRepositoryTest {
                         )
                     ),
                     configMap = mapOf(
-                        "board1 post1 config-key" to Config(configKey = "board1 post1 config-key", configValue = "board1 post1 config-value"),
-                        "board1 post1 config-key2" to Config(configKey = "board1 post1 config-key2", configValue = "board1 post1 config-value2"),
-                        "board1 post1 config-key3" to Config(configKey = "board1 post1 config-key3", configValue = "board1 post1 config-value3")
+                        "board1 post1 config-key" to
+                            Config(configKey = "board1 post1 config-key", configValue = "board1 post1 config-value"),
+                        "board1 post1 config-key2" to
+                            Config(configKey = "board1 post1 config-key2", configValue = "board1 post1 config-value2"),
+                        "board1 post1 config-key3" to
+                            Config(configKey = "board1 post1 config-key3", configValue = "board1 post1 config-value3")
                     ),
                     audit = Audit(
                         name = "naver1",
@@ -435,7 +437,7 @@ class BoardRepositoryTest {
         }
         val actualLabels: List<Label> =
             actual.labels.stream().sorted(Comparator.comparingLong { obj: Label -> obj.id!! }).collect(Collectors.toList())
-        val boardLabels: List<Label> = actual.labels.stream().sorted(Comparator.comparingLong { obj: Label -> obj.id!! }).collect(Collectors.toList())
+        val boardLabels: List<Label> = actual.labels.sortedBy { it.id }
         assertLabelsEquals(actualLabels, boardLabels)
         val actualPosts: List<Post> = actual.posts
         val boardPosts: List<Post> = target.posts
@@ -482,8 +484,8 @@ class BoardRepositoryTest {
                 assertThat(actualPost.audit!!.secret!!.secret).isEqualTo(targetPost.audit!!.secret!!.secret)
             }
         }
-        val actualTags: List<Tag> = actualPost.tags.stream().sorted(Comparator.comparingLong { obj: Tag -> obj.id!! }).collect(Collectors.toList())
-        val postTags: List<Tag> = targetPost.tags.stream().sorted(Comparator.comparingLong { obj: Tag -> obj.id!! }).collect(Collectors.toList())
+        val actualTags: List<Tag> = actualPost.tags.sortedBy { it.id }
+        val postTags: List<Tag> = targetPost.tags.sortedBy { it.id }
         assertThat(actualTags.size).isEqualTo(postTags.size)
         for (i in actualTags.indices) {
             assertThat(actualTags[i].id).isEqualTo(postTags[i].id)
