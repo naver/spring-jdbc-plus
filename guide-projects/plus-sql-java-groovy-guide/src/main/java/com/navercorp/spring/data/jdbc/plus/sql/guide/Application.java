@@ -24,6 +24,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.jdbc.core.dialect.JdbcMySqlDialect;
 import org.springframework.data.relational.core.dialect.Dialect;
+import org.springframework.data.relational.core.sql.IdentifierProcessing;
 
 /**
  * @author Myeonghyeon Lee
@@ -37,6 +38,11 @@ public class Application {
 	@Bean
 	@Primary
 	public Dialect mysqlDialect() {
-		return JdbcMySqlDialect.INSTANCE;
+		return new JdbcMySqlDialect(
+			IdentifierProcessing.create(
+				new IdentifierProcessing.Quoting("`"),
+				IdentifierProcessing.LetterCasing.LOWER_CASE
+			)
+		);
 	}
 }

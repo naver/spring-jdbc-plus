@@ -59,7 +59,7 @@ public class SqlGeneratorSource {
 	 * DIFF
 	 * Additional instantiate for internal extension.
 	 */
-	SqlGenerator getSqlGenerator(Class<?> domainType) {
+	public SqlGenerator getSqlGenerator(Class<?> domainType) {
 		return cache.computeIfAbsent(domainType, t -> {
 			RelationalPersistentEntity<?> persistentEntity =
 				context.getRequiredPersistentEntity(domainType);

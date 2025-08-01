@@ -19,7 +19,7 @@ import com.navercorp.spring.jdbc.plus.commons.annotations.SoftDeleteColumn;
 
 class SoftDeletePropertyTest {
 
-	RelationalMappingContext context = new JdbcMappingContext();
+	RelationalMappingContext context = JdbcMappingContext.forQuotedIdentifiers();
 
 	@Test
 	void createBooleanValueSoftDeleteProperty() {

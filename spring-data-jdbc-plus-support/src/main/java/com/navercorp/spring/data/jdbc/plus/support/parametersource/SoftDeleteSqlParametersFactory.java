@@ -3,21 +3,24 @@ package com.navercorp.spring.data.jdbc.plus.support.parametersource;
 import java.sql.JDBCType;
 import java.sql.SQLType;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.function.BiFunction;
 
 import org.springframework.data.jdbc.core.convert.JdbcConverter;
 import org.springframework.data.jdbc.core.mapping.JdbcValue;
+import org.springframework.data.mapping.PersistentPropertyAccessor;
+import org.springframework.data.relational.core.mapping.AggregatePath;
 import org.springframework.data.relational.core.mapping.RelationalMappingContext;
 import org.springframework.data.relational.core.mapping.RelationalPersistentEntity;
 import org.springframework.data.relational.core.mapping.RelationalPersistentProperty;
 import org.springframework.data.relational.core.sql.SqlIdentifier;
 import org.springframework.data.util.TypeInformation;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
-import org.springframework.jdbc.support.JdbcUtils;
 import org.springframework.lang.Nullable;
-import org.springframework.util.Assert;
 
 import com.navercorp.spring.data.jdbc.plus.support.convert.SoftDeleteProperty;
+import com.navercorp.spring.data.jdbc.plus.support.convert.SqlGenerator;
 
 /**
  * Creates the {@link SqlParameterSource} for soft delete SQL operations.
@@ -40,46 +43,52 @@ public class SoftDeleteSqlParametersFactory {
 	public <T> SqlParameterSource forSoftDeleteById(
 		Object id,
 		Class<T> domainType,
-		SqlIdentifier name,
 		SoftDeleteProperty softDeleteProperty
 	) {
-		SqlIdentifierParameterSource parameterSource = new SqlIdentifierParameterSource();
+		return doWithIdentifiers(domainType, (columns, idProperty, complexId) -> {
 
-		addConvertedPropertyValue(
-			parameterSource,
-			getRequiredPersistentEntity(domainType).getRequiredIdProperty(),
-			id,
-			name
-		);
+			SqlIdentifierParameterSource parameterSource = new SqlIdentifierParameterSource();
+			BiFunction<Object, AggregatePath, Object> valueExtractor = getIdMapper(complexId);
 
-		addSoftDeletePropertyValue(softDeleteProperty, parameterSource);
+			columns.forEach((ap, ci) -> addConvertedPropertyValue( //
+				parameterSource, //
+				ap.getRequiredLeafProperty(), //
+				valueExtractor.apply(id, ap), //
+				ci.name() //
+			));
 
-		return parameterSource;
+			addSoftDeletePropertyValue(softDeleteProperty, parameterSource);
+
+			return parameterSource;
+		});
 	}
 
 	public <T> SqlParameterSource forSoftDeleteByIdWithVersion(
 		Object id,
 		Class<T> domainType,
-		SqlIdentifier name,
 		SoftDeleteProperty softDeleteProperty,
 		SqlIdentifier versionPropertyName,
 		Number previousVersion
 	) {
-		SqlIdentifierParameterSource parameterSource = new SqlIdentifierParameterSource();
+		return doWithIdentifiers(domainType, (columns, idProperty, complexId) -> {
 
-		addConvertedPropertyValue(
-			parameterSource,
-			getRequiredPersistentEntity(domainType).getRequiredIdProperty(),
-			id,
-			name
-		);
+			SqlIdentifierParameterSource parameterSource = new SqlIdentifierParameterSource();
+			BiFunction<Object, AggregatePath, Object> valueExtractor = getIdMapper(complexId);
 
-		parameterSource.addValue(versionPropertyName, previousVersion);
-		addVersionToUpdatePropertyValue(domainType, previousVersion, parameterSource);
+			columns.forEach((ap, ci) -> addConvertedPropertyValue( //
+				parameterSource, //
+				ap.getRequiredLeafProperty(), //
+				valueExtractor.apply(id, ap), //
+				ci.name() //
+			));
 
-		addSoftDeletePropertyValue(softDeleteProperty, parameterSource);
+			parameterSource.addValue(versionPropertyName, previousVersion);
+			addVersionToUpdatePropertyValue(domainType, previousVersion, parameterSource);
 
-		return parameterSource;
+			addSoftDeletePropertyValue(softDeleteProperty, parameterSource);
+
+			return parameterSource;
+		});
 	}
 
 	public <T> SqlParameterSource forSoftDeleteAll(SoftDeleteProperty softDeleteProperty) {
@@ -93,22 +102,50 @@ public class SoftDeleteSqlParametersFactory {
 	public <T> SqlParameterSource forSoftDeleteByIds(
 		Iterable<?> ids,
 		Class<T> domainType,
-		SqlIdentifier idsPropertyName,
 		SoftDeleteProperty softDeleteProperty
 	) {
 
-		SqlIdentifierParameterSource parameterSource = new SqlIdentifierParameterSource();
+		return doWithIdentifiers(domainType, (columns, idProperty, complexId) -> {
 
-		addConvertedPropertyValuesAsList(
-			parameterSource,
-			getRequiredPersistentEntity(domainType).getRequiredIdProperty(),
-			ids,
-			idsPropertyName
-		);
+			SqlIdentifierParameterSource parameterSource = new SqlIdentifierParameterSource();
 
-		addSoftDeletePropertyValue(softDeleteProperty, parameterSource);
+			BiFunction<Object, AggregatePath, Object> valueExtractor = getIdMapper(complexId);
 
-		return parameterSource;
+			List<Object[]> parameterValues = new ArrayList<>(ids instanceof Collection<?> c ? c.size() : 16);
+			for (Object id : ids) {
+
+				Object[] tupleList = new Object[columns.size()];
+
+				int i = 0; // @checkstyle:ignore
+				for (AggregatePath path : columns.paths()) {
+					tupleList[i++] = valueExtractor.apply(id, path);
+				}
+
+				parameterValues.add(tupleList);
+			}
+
+			parameterSource.addValue(SqlGenerator.IDS_SQL_PARAMETER, parameterValues);
+
+			addSoftDeletePropertyValue(softDeleteProperty, parameterSource);
+
+			return parameterSource;
+		});
+	}
+
+	/**
+	 * COPY {@link org.springframework.data.jdbc.core.convert.SqlParametersFactory#getIdMapper}
+	 */
+	private BiFunction<Object, AggregatePath, Object> getIdMapper(@Nullable RelationalPersistentEntity<?> complexId) {
+
+		if (complexId == null) {
+			return (id, aggregatePath) -> id;
+		}
+
+		return (id, aggregatePath) -> {
+
+			PersistentPropertyAccessor<Object> accessor = complexId.getPropertyAccessor(id);
+			return accessor.getProperty(aggregatePath.getRequiredLeafProperty());
+		};
 	}
 
 	/**
@@ -138,35 +175,20 @@ public class SoftDeleteSqlParametersFactory {
 		);
 	}
 
-	/**
-	 * COPY {@link org.springframework.data.jdbc.core.convert.SqlParametersFactory#addConvertedPropertyValuesAsList}
-	 *
-	 * diff: additional 'idsPropertyName' parameter because of SqlGenerator's access modifier
-	 */
-	private void addConvertedPropertyValuesAsList(
-		SqlIdentifierParameterSource parameterSource,
-		RelationalPersistentProperty property,
-		Iterable<?> values,
-		SqlIdentifier idsPropertyName
-	) {
+	private <T> T doWithIdentifiers(Class<?> domainType, IdentifierCallback<T> callback) {
 
-		List<Object> convertedIds = new ArrayList<>();
-		JdbcValue jdbcValue = null;
-		for (Object id : values) {
+		RelationalPersistentEntity<?> entity = context.getRequiredPersistentEntity(domainType);
+		RelationalPersistentProperty idProperty = entity.getRequiredIdProperty();
+		RelationalPersistentEntity<?> complexId = context.getPersistentEntity(idProperty);
+		AggregatePath.ColumnInfos columns = context.getAggregatePath(entity).getTableInfo().idColumnInfos();
 
-			Class<?> columnType = converter.getColumnType(property);
-			SQLType sqlType = converter.getTargetSqlType(property);
+		return callback.doWithIdentifiers(columns, idProperty, complexId);
+	}
 
-			jdbcValue = converter.writeJdbcValue(id, columnType, sqlType);
-			convertedIds.add(jdbcValue.getValue());
-		}
+	interface IdentifierCallback<T> {
 
-		Assert.state(jdbcValue != null, "JdbcValue must be not null at this point; Please report this as a bug");
-
-		SQLType jdbcType = jdbcValue.getJdbcType();
-		int typeNumber = jdbcType == null ? JdbcUtils.TYPE_UNKNOWN : jdbcType.getVendorTypeNumber();
-
-		parameterSource.addValue(idsPropertyName, convertedIds, typeNumber);
+		T doWithIdentifiers(AggregatePath.ColumnInfos columns, RelationalPersistentProperty idProperty,
+			RelationalPersistentEntity<?> complexId);
 	}
 
 	private void addConvertedValue(
