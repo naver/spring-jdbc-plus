@@ -17,7 +17,6 @@ import org.springframework.data.relational.core.mapping.RelationalMappingContext
 import org.springframework.data.relational.core.sql.IdentifierProcessing
 import org.springframework.data.relational.core.sql.IdentifierProcessing.Quoting
 
-
 @Configuration
 class JdbcConfiguration {
     @Suppress("UNCHECKED_CAST")
@@ -44,7 +43,7 @@ class JdbcConfiguration {
     fun jdbcDialect(): Dialect =
         JdbcMySqlDialect(
             IdentifierProcessing.create(Quoting("`"), IdentifierProcessing.LetterCasing.LOWER_CASE)
-        );
+        )
 
     private fun storeConverters(): MutableList<Converter<*, *>> {
         val result = mutableListOf<Converter<*, *>>()
