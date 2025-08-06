@@ -489,7 +489,11 @@ public class AggregateResultJdbcConverter extends MappingJdbcConverter {
 		Map<String, Object> entityMap
 	) {
 		Object id = entityMap.get(entity.getRequiredIdProperty().getName());
-		return Identifier.of(relationPath.getTableInfo().reverseColumnInfo().name(), id, Object.class);
+		return Identifier.of(
+			relationPath.getTableInfo().backReferenceColumnInfos().any().name(),
+			id,
+			Object.class
+		);
 	}
 
 	protected String getIdColumnAlias(AggregatePath relationPath) {

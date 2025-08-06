@@ -12,11 +12,31 @@ import org.springframework.data.relational.core.mapping.RelationalPersistentProp
  */
 @SuppressWarnings("checkstyle:linelength")
 public class PersistentPropertyPathTestUtils {
+
+	/**
+	 * COPY org.springframework.data.jdbc.core.mapping.PersistentPropertyPathTestUtils
+	 */
 	public static PersistentPropertyPath<RelationalPersistentProperty> getPath(
 		RelationalMappingContext context,
 		String path,
 		Class<?> source
 	) {
+		PersistentPropertyPaths<?, RelationalPersistentProperty> persistentPropertyPaths = context
+			.findPersistentPropertyPaths(source, p -> true);
+
+		return persistentPropertyPaths
+			.filter(p -> p.toDotPath().equals(path))
+			.stream()
+			.findFirst()
+			.orElse(null);
+	}
+
+	/**
+	 * COPY org.springframework.data.jdbc.core.PersistentPropertyPathTestUtils
+	 */
+	public static PersistentPropertyPath<RelationalPersistentProperty> getPath(String path, Class source,
+		RelationalMappingContext context) {
+
 		PersistentPropertyPaths<?, RelationalPersistentProperty> persistentPropertyPaths = context
 			.findPersistentPropertyPaths(source, p -> true);
 
