@@ -686,6 +686,20 @@ public class SqlGenerator {
 		return aggregate;
 	}
 
+	private Condition equalityDmlIdWhereCondition() {
+
+		Condition aggregate = null;
+		for (Column column : getDmlIdColumns()) {
+
+			Comparison condition = column.isEqualTo(getBindMarker(column.getName()));
+			aggregate = aggregate == null ? condition : aggregate.and(condition);
+		}
+
+		Assert.state(aggregate != null, "We need at least one id column");
+
+		return aggregate;
+	}
+
 	private String createAcquireLockById(LockMode lockMode) {
 
 		Table table = this.getTable();
@@ -1180,7 +1194,7 @@ public class SqlGenerator {
 		return Update.builder() //
 			.table(table) //
 			.set(assignments) //
-			.where(equalityIdWhereCondition());
+			.where(equalityDmlIdWhereCondition());
 	}
 
 	private String createUpsertSql() {
@@ -1231,7 +1245,7 @@ public class SqlGenerator {
 
 	private DeleteBuilder.DeleteWhereAndOr createBaseDeleteById(Table table) {
 		return Delete.builder().from(table) //
-			.where(equalityIdWhereCondition());
+			.where(equalityDmlIdWhereCondition());
 	}
 
 	private DeleteBuilder.DeleteWhereAndOr createBaseDeleteByIdIn(Table table) {
@@ -1395,7 +1409,7 @@ public class SqlGenerator {
 		return Update.builder()
 			.table(table)
 			.set(assignments)
-			.where(equalityIdWhereCondition());
+			.where(equalityDmlIdWhereCondition());
 	}
 
 	private UpdateBuilder.UpdateWhereAndOr createBaseSoftDeleteWithVersionById(Table table) {
@@ -1417,7 +1431,7 @@ public class SqlGenerator {
 		return Update.builder()
 			.table(table)
 			.set(assignments)
-			.where(equalityIdWhereCondition());
+			.where(equalityDmlIdWhereCondition());
 	}
 
 	private UpdateBuilder.UpdateWhereAndOr createBaseSoftDeleteByIdIn(Table table) {
@@ -1478,13 +1492,21 @@ public class SqlGenerator {
 		return doGetColumn(AggregatePath.ColumnInfos::toColumnList);
 	}
 
+	private List<Column> getDmlIdColumns() {
+		return doGetDmlColumn(AggregatePath.ColumnInfos::toColumnList);
+	}
+
 	private <T> T doGetColumn(
 		BiFunction<AggregatePath.ColumnInfos, BiFunction<AggregatePath, ColumnInfo, Column>, T> columnListFunction) {
 
-		AggregatePath.TableInfo tableInfo = mappingContext.getAggregatePath(entity).getTableInfo();
-		if (tableInfo.tableAlias() != null) {
-			tableInfo.tableAlias();
-		}
+		AggregatePath.ColumnInfos columnInfos = mappingContext.getAggregatePath(entity).getTableInfo().idColumnInfos();
+
+		return columnListFunction.apply(columnInfos,
+			(aggregatePath, columnInfo) -> sqlContext.getColumn(aggregatePath));
+	}
+
+	private <T> T doGetDmlColumn(
+		BiFunction<AggregatePath.ColumnInfos, BiFunction<AggregatePath, ColumnInfo, Column>, T> columnListFunction) {
 
 		AggregatePath.ColumnInfos columnInfos = mappingContext.getAggregatePath(entity).getTableInfo().idColumnInfos();
 
