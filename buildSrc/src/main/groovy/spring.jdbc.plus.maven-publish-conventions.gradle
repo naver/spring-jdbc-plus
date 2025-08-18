@@ -50,12 +50,6 @@ publishing {
         mavenJava(MavenPublication) {
             from components.java
 
-            repositories {
-                maven {
-                    url = layout.buildDirectory.dir("staging-deploy")
-                }
-            }
-
             versionMapping {
                 usage('java-api') {
                     fromResolutionOf('runtimeClasspath')
@@ -103,6 +97,12 @@ publishing {
                     url = "https://github.com/naver/spring-jdbc-plus"
                 }
             }
+        }
+    }
+
+    repositories {
+        maven {
+            url = layout.buildDirectory.dir("staging-deploy")
         }
     }
 }
