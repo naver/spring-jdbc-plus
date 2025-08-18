@@ -206,6 +206,10 @@ public class SqlGenerator {
 		this.softDeleteProperty = SoftDeleteProperty.from(entity);
 	}
 
+	public SelectBuilder.SelectWhere createSelectBuilder(Table table, Predicate<AggregatePath> pathFilter) {
+		return createSelectBuilder(table, pathFilter, Collections.emptyList(), Query.empty());
+	}
+
 	/**
 	 * When deleting entities there is a fundamental difference between deleting
 	 * <ol>
