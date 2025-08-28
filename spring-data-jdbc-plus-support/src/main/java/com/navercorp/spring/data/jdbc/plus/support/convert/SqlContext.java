@@ -16,6 +16,7 @@
 package com.navercorp.spring.data.jdbc.plus.support.convert;
 
 import org.springframework.data.relational.core.mapping.AggregatePath;
+import org.springframework.data.relational.core.mapping.AggregatePath.ColumnInfo;
 import org.springframework.data.relational.core.mapping.RelationalPersistentEntity;
 import org.springframework.data.relational.core.sql.Aliased;
 import org.springframework.data.relational.core.sql.Column;
@@ -54,20 +55,6 @@ class SqlContext implements SqlContexts {
 	}
 
 	@Override
-	public Column getIdColumn() {
-		return table.column(entity.getIdColumn());
-	}
-
-	@Override
-	public Column getDmlIdColumn() {
-		Table dmlTable = table;
-		if (table instanceof Aliased) {
-			dmlTable = Table.create(table.getName());
-		}
-		return dmlTable.column(entity.getIdColumn());
-	}
-
-	@Override
 	public Column getVersionColumn() {
 		return table.column(entity.getRequiredVersionProperty().getColumnName());
 	}
@@ -93,17 +80,38 @@ class SqlContext implements SqlContexts {
 		return tableAlias == null ? table : table.as(tableAlias);
 	}
 
+	private Table getDmlTable(AggregatePath path) {
+		SqlIdentifier tableAlias = path.getTableInfo().tableAlias();
+		Table table = Table.create(path.getTableInfo().qualifiedTableName());
+		return tableAlias == null ? table : table.as(tableAlias);
+	}
+
 	@Override
 	public Column getColumn(AggregatePath path) {
 		SqlIdentifier columnName = path.getColumnInfo().name();
 		SqlIdentifier columnAlias = PropertyPathUtils.getColumnAlias(path, columnName);
-		return getTable(path).column(columnName).as(columnAlias);
+		return getAliasedColumn(path, path.getColumnInfo(), columnAlias);
 	}
 
 	@Override
-	public Column getReverseColumn(AggregatePath path) {
-		SqlIdentifier reverseColumnName = path.getTableInfo().reverseColumnInfo().name();
-		SqlIdentifier reverseColumnAlias = PropertyPathUtils.getReverseColumnAlias(path, reverseColumnName);
-		return getTable(path).column(reverseColumnName).as(reverseColumnAlias);
+	public Column getDmlColumn(AggregatePath path) {
+		SqlIdentifier columnName = path.getColumnInfo().name();
+		SqlIdentifier columnAlias = PropertyPathUtils.getColumnAlias(path, columnName);
+		return getDmlTable(path).column(columnName).as(columnAlias);
+	}
+
+	@Override
+	public Column getAnyReverseColumn(AggregatePath path) {
+		AggregatePath.ColumnInfo columnInfo = path.getTableInfo().backReferenceColumnInfos().any();
+		SqlIdentifier reverseColumnAlias = PropertyPathUtils.getReverseColumnAlias(path, columnInfo.name());
+		return getAliasedColumn(path, columnInfo, reverseColumnAlias);
+	}
+
+	/**
+	 * DIFF: additional 'columnAlias' argument
+	 * for {@link com.navercorp.spring.jdbc.plus.commons.annotations.SqlTableAlias}
+	 */
+	private Column getAliasedColumn(AggregatePath path, ColumnInfo columnInfo, SqlIdentifier columnAlias) {
+		return getTable(path).column(columnInfo.name()).as(columnAlias);
 	}
 }
