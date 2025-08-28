@@ -209,6 +209,10 @@ public class JdbcPlusRepositoryFactoryBean<T extends Repository<S, ID>, S, ID ex
 			this.operations = beanFactory.getBean(NamedParameterJdbcOperations.class);
 		}
 
+		if (this.queryMappingConfiguration == null) {
+			this.queryMappingConfiguration = QueryMappingConfiguration.EMPTY;
+		}
+
 		if (this.dataAccessStrategy == null) {
 
 			Assert.state(beanFactory != null,
@@ -247,10 +251,6 @@ public class JdbcPlusRepositoryFactoryBean<T extends Repository<S, ID>, S, ID ex
 
 					return factory.create();
 				});
-		}
-
-		if (this.queryMappingConfiguration == null) {
-			this.queryMappingConfiguration = QueryMappingConfiguration.EMPTY;
 		}
 
 		if (beanFactory != null) {
