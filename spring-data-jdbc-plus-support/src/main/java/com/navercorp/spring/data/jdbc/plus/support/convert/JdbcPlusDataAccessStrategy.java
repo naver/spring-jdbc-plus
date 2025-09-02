@@ -1,8 +1,5 @@
 package com.navercorp.spring.data.jdbc.plus.support.convert;
 
-import static com.navercorp.spring.data.jdbc.plus.support.convert.SqlGenerator.IDS_SQL_PARAMETER;
-import static com.navercorp.spring.data.jdbc.plus.support.convert.SqlGenerator.ID_SQL_PARAMETER;
-import static com.navercorp.spring.data.jdbc.plus.support.convert.SqlGenerator.ROOT_ID_PARAMETER;
 import static com.navercorp.spring.data.jdbc.plus.support.convert.SqlGenerator.VERSION_SQL_PARAMETER;
 import static java.util.Objects.requireNonNull;
 
@@ -64,7 +61,6 @@ public class JdbcPlusDataAccessStrategy extends DelegatingDataAccessStrategy {
 		SqlParameterSource parameters = softDeleteSqlParametersFactory.forSoftDeleteById(
 			rootId,
 			rootEntity.getType(),
-			ROOT_ID_PARAMETER,
 			requireNonNull(getSoftDeleteProperty(propertyPathType))
 		);
 		operations.update(softDelete, parameters);
@@ -88,7 +84,6 @@ public class JdbcPlusDataAccessStrategy extends DelegatingDataAccessStrategy {
 		SqlParameterSource parameters = softDeleteSqlParametersFactory.forSoftDeleteByIds(
 			rootIds,
 			rootEntity.getType(),
-			IDS_SQL_PARAMETER,
 			requireNonNull(getSoftDeleteProperty(propertyPathType))
 		);
 		operations.update(softDelete, parameters);
@@ -105,7 +100,6 @@ public class JdbcPlusDataAccessStrategy extends DelegatingDataAccessStrategy {
 		SqlParameterSource parameter = softDeleteSqlParametersFactory.forSoftDeleteById(
 			id,
 			domainType,
-			ID_SQL_PARAMETER,
 			requireNonNull(getSoftDeleteProperty(domainType))
 		);
 
@@ -123,7 +117,6 @@ public class JdbcPlusDataAccessStrategy extends DelegatingDataAccessStrategy {
 		SqlParameterSource parameter = softDeleteSqlParametersFactory.forSoftDeleteByIds(
 			ids,
 			domainType,
-			IDS_SQL_PARAMETER,
 			requireNonNull(getSoftDeleteProperty(domainType))
 		);
 
@@ -140,7 +133,6 @@ public class JdbcPlusDataAccessStrategy extends DelegatingDataAccessStrategy {
 		SqlParameterSource parameterSource = softDeleteSqlParametersFactory.forSoftDeleteByIdWithVersion(
 			id,
 			domainType,
-			ID_SQL_PARAMETER,
 			requireNonNull(getSoftDeleteProperty(domainType)),
 			VERSION_SQL_PARAMETER,
 			previousVersion
