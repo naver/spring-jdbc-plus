@@ -1,8 +1,8 @@
 package com.navercorp.spring.data.jdbc.plus.support.convert;
 
+import org.springframework.data.jdbc.core.dialect.JdbcHsqlDbDialect;
 import org.springframework.data.relational.core.dialect.AbstractDialect;
 import org.springframework.data.relational.core.dialect.Dialect;
-import org.springframework.data.relational.core.dialect.HsqlDbDialect;
 import org.springframework.data.relational.core.dialect.LimitClause;
 import org.springframework.data.relational.core.dialect.LockClause;
 import org.springframework.data.relational.core.sql.IdentifierProcessing;
@@ -20,12 +20,12 @@ public class NonQuotingDialect extends AbstractDialect implements Dialect {
 
 	@Override
 	public LimitClause limit() {
-		return HsqlDbDialect.INSTANCE.limit();
+		return JdbcHsqlDbDialect.INSTANCE.limit();
 	}
 
 	@Override
 	public LockClause lock() {
-		return HsqlDbDialect.INSTANCE.lock();
+		return JdbcHsqlDbDialect.INSTANCE.lock();
 	}
 
 	@Override

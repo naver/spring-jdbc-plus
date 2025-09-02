@@ -50,7 +50,7 @@ import com.navercorp.spring.jdbc.plus.commons.annotations.SoftDeleteColumn.Value
  */
 public class SqlGeneratorContextBasedNamingStrategyTest {
 
-	RelationalMappingContext context = new JdbcMappingContext();
+	RelationalMappingContext context = JdbcMappingContext.forQuotedIdentifiers();
 	ThreadLocal<String> userHandler = new ThreadLocal<>();
 
 	/**
@@ -97,7 +97,7 @@ public class SqlGeneratorContextBasedNamingStrategyTest {
 			assertThat(sql).isEqualTo( //
 				"DELETE FROM " //
 					+ user + ".referenced_entity WHERE " //
-					+ user + ".referenced_entity.dummy_entity = :rootId" //
+					+ user + ".referenced_entity.dummy_entity = :id" //
 			);
 		});
 	}
@@ -116,7 +116,7 @@ public class SqlGeneratorContextBasedNamingStrategyTest {
 					+ "WHERE " + user + ".second_level_referenced_entity.referenced_entity IN " //
 					+ "(SELECT " + user + ".referenced_entity.l1id "
 					+ "FROM " + user + ".referenced_entity " //
-					+ "WHERE " + user + ".referenced_entity.dummy_entity = :rootId)");
+					+ "WHERE " + user + ".referenced_entity.dummy_entity = :id)");
 		});
 	}
 
@@ -276,7 +276,7 @@ public class SqlGeneratorContextBasedNamingStrategyTest {
 	 */
 	private SqlGenerator configureSqlGenerator(NamingStrategy namingStrategy) {
 
-		RelationalMappingContext context = new JdbcMappingContext(namingStrategy);
+		RelationalMappingContext context = JdbcMappingContext.forQuotedIdentifiers(namingStrategy);
 		JdbcConverter converter = new MappingJdbcConverter(context, (identifier, path) -> {
 			throw new UnsupportedOperationException();
 		});
@@ -287,7 +287,7 @@ public class SqlGeneratorContextBasedNamingStrategyTest {
 
 	private SqlGenerator configureSoftDeleteSqlGenerator(NamingStrategy namingStrategy) {
 
-		RelationalMappingContext context = new JdbcMappingContext(namingStrategy);
+		RelationalMappingContext context = JdbcMappingContext.forQuotedIdentifiers(namingStrategy);
 		JdbcConverter converter = new MappingJdbcConverter(context, (identifier, path) -> {
 			throw new UnsupportedOperationException();
 		});

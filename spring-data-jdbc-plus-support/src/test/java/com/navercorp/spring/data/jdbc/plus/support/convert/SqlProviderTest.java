@@ -32,6 +32,7 @@ import org.springframework.data.relational.core.mapping.NamingStrategy;
 import org.springframework.data.relational.core.mapping.RelationalMappingContext;
 import org.springframework.data.relational.core.mapping.RelationalPersistentProperty;
 import org.springframework.data.relational.core.mapping.Table;
+import org.springframework.data.relational.core.sql.IdentifierProcessing;
 
 import com.navercorp.spring.jdbc.plus.commons.annotations.SqlFunction;
 import com.navercorp.spring.jdbc.plus.commons.annotations.SqlTableAlias;
@@ -235,7 +236,16 @@ class SqlProviderTest {
 		JdbcConverter converter = new MappingJdbcConverter(context, (identifier, path) -> {
 			throw new UnsupportedOperationException();
 		});
-		SqlProvider sut = new SqlProvider(context, converter, JdbcMySqlDialect.INSTANCE);
+		SqlProvider sut = new SqlProvider(
+			context,
+			converter,
+			new JdbcMySqlDialect(
+				IdentifierProcessing.create(
+					new IdentifierProcessing.Quoting("`"),
+					IdentifierProcessing.LetterCasing.LOWER_CASE
+				)
+			)
+		);
 
 		// when
 		String columns = sut.columns(TestOuterEntity.class);

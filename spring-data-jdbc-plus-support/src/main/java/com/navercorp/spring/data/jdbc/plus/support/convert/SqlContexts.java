@@ -28,19 +28,6 @@ import org.springframework.data.relational.core.sql.Table;
  * @author Myeonghyeon Lee
  */
 public interface SqlContexts {
-	/**
-	 * Gets id column.
-	 *
-	 * @return the id column
-	 */
-	Column getIdColumn();
-
-	/**
-	 * Gets dml id column for dml.
-	 *
-	 * @return the id column
-	 */
-	Column getDmlIdColumn();
 
 	/**
 	 * Gets table.
@@ -66,6 +53,14 @@ public interface SqlContexts {
 	Column getColumn(AggregatePath path);
 
 	/**
+	 * Gets column for dml.
+	 *
+	 * @param path the path
+	 * @return the column
+	 */
+	Column getDmlColumn(AggregatePath path);
+
+	/**
 	 * Gets version column.
 	 *
 	 * @return the version column
@@ -80,10 +75,10 @@ public interface SqlContexts {
 	Column getDmlVersionColumn();
 
 	/**
-	 * Gets reverse column.
+	 * A token reverse column, used in selects to identify, if an entity is present or {@literal null}.
 	 *
-	 * @param path the path
-	 * @return the reverse column
+	 * @param path must not be null.
+	 * @return a {@literal Column} that is part of the effective primary key for the given path.
 	 */
-	Column getReverseColumn(AggregatePath path);
+	Column getAnyReverseColumn(AggregatePath path);
 }

@@ -1,15 +1,17 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     id("spring.jdbc.plus.spring-bom-conventions")
     id("org.jlleitschuh.gradle.ktlint") version "13.0.0"
     kotlin("jvm")
-    kotlin("plugin.spring") version "1.9.20"
+    kotlin("plugin.spring") version "2.2.0"
 }
 
-tasks.withType<KotlinCompile> {
-    kotlinOptions.jvmTarget = "17"
-    kotlinOptions.javaParameters = true
+kotlin {
+    compilerOptions {
+        jvmTarget = JvmTarget.fromTarget("17")
+        javaParameters = true
+    }
 }
 
 ktlint {
