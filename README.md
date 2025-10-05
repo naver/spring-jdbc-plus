@@ -1,13 +1,7 @@
 [![GitHub release](https://img.shields.io/github/v/release/naver/spring-jdbc-plus.svg)](https://img.shields.io/github/v/release/naver/spring-jdbc-plus.svg?include_prereleases)
 [![GitHub license](https://img.shields.io/github/license/naver/spring-jdbc-plus.svg)](https://github.com/naver/spring-jdbc-plus.js/blob/master/LICENSE)
 
-# Spring JDBC Plus ![build](https://github.com/naver/spring-jdbc-plus/actions/workflows/gradle.yml/badge.svg) [![Gitter chat](https://badges.gitter.im/gitterHQ/gitter.png)](https://gitter.im/naver/spring-jdbc-plus) [![Project Diagrams](https://sourcespy.com/shield.svg)](https://sourcespy.com/github/naverspringjdbcplus/)
-
-**⚠️ Please do not use 3.3.3** <br>
-Spring JDBC Plus provides [Spring Data JDBC](https://github.com/spring-projects/spring-data-relational) based extension.
-It provides necessary features when writing more complex SQL than the functions supported by `CrudRepository`.
-If you need to use Spring Data JDBC's Persistence features and SQL execution function in combination, `Spring JDBC Plus`
-may be an appropriate choice.
+# Spring JDBC Plus ![build](https://github.com/naver/spring-jdbc-plus/actions/workflows/gradle.yml/badge.svg) [![Gitter chat](https://badges.gitter.im/gitterHQ/gitter.png)](https://gitter.im/naver/spring-jdbc-plus)
 
 ## Features
 
@@ -27,13 +21,6 @@ may be an appropriate choice.
 
     ```gradle
     buildscript {
-        repositories {
-            mavenCentral()
-            mavenLocal()
-            maven {
-                url "https://repo.spring.io/milestone/"
-            }
-        }
         dependencies {
             classpath("org.springframework.boot:spring-boot-gradle-plugin:3.5.5")
         }
@@ -260,7 +247,7 @@ $  ./gradlew clean build
 ## License
 
 ```
-   Copyright 2020-2021 NAVER Corp.
+   Copyright 2020-2025 NAVER Corp.
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
