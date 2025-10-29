@@ -41,7 +41,7 @@ may be an appropriate choice.
 
     dependencies {
         implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
-        implementation("com.navercorp.spring:spring-boot-starter-data-jdbc-plus-sql:3.4.9")
+        implementation("com.navercorp.spring:spring-boot-starter-data-jdbc-plus-sql:3.4.10")
     }
     ```
 
