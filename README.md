@@ -35,13 +35,13 @@ may be an appropriate choice.
             }
         }
         dependencies {
-            classpath("org.springframework.boot:spring-boot-gradle-plugin:3.4.10")
+            classpath("org.springframework.boot:spring-boot-gradle-plugin:3.4.11")
         }
     }
 
     dependencies {
         implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
-        implementation("com.navercorp.spring:spring-boot-starter-data-jdbc-plus-sql:3.4.10")
+        implementation("com.navercorp.spring:spring-boot-starter-data-jdbc-plus-sql:3.4.11")
     }
     ```
 
