@@ -35,13 +35,13 @@ may be an appropriate choice.
             }
         }
         dependencies {
-            classpath("org.springframework.boot:spring-boot-gradle-plugin:3.4.11")
+            classpath("org.springframework.boot:spring-boot-gradle-plugin:3.4.12")
         }
     }
 
     dependencies {
         implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
-        implementation("com.navercorp.spring:spring-boot-starter-data-jdbc-plus-sql:3.4.11")
+        implementation("com.navercorp.spring:spring-boot-starter-data-jdbc-plus-sql:3.4.12")
     }
     ```
 
@@ -51,7 +51,7 @@ may be an appropriate choice.
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.4.9</version>
+        <version>3.4.12</version>
         <relativePath/>
     </parent>
 
@@ -63,7 +63,7 @@ may be an appropriate choice.
     <dependency>
         <groupId>com.navercorp.spring</groupId>
         <artifactId>spring-boot-starter-data-jdbc-plus-sql</artifactId>
-        <version>3.4.9</version>
+        <version>3.4.12</version>
     </dependency>
     ```
 
