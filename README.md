@@ -22,13 +22,13 @@
     ```gradle
     buildscript {
         dependencies {
-            classpath("org.springframework.boot:spring-boot-gradle-plugin:3.5.5")
+            classpath("org.springframework.boot:spring-boot-gradle-plugin:3.5.8")
         }
     }
 
     dependencies {
         implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
-        implementation("com.navercorp.spring:spring-boot-starter-data-jdbc-plus-sql:3.5.5")
+        implementation("com.navercorp.spring:spring-boot-starter-data-jdbc-plus-sql:3.5.6")
     }
     ```
 
@@ -38,7 +38,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.5.5</version>
+        <version>3.5.6</version>
         <relativePath/>
     </parent>
 
@@ -50,7 +50,7 @@
     <dependency>
         <groupId>com.navercorp.spring</groupId>
         <artifactId>spring-boot-starter-data-jdbc-plus-sql</artifactId>
-        <version>3.5.5</version>
+        <version>3.5.6</version>
     </dependency>
     ```
 
