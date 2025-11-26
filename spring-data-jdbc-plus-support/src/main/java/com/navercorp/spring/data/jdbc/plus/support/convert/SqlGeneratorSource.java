@@ -48,6 +48,15 @@ public class SqlGeneratorSource {
 	// Generator for internal extension.
 	Function<RelationalPersistentEntity<?>, SqlContexts> sqlContextsGenerator;
 
+	/**
+	 * @param converter must not be {@literal null}.
+	 * @param dialect must not be {@literal null}.
+	 * @since 4.0
+	 */
+	public SqlGeneratorSource(JdbcConverter converter, Dialect dialect) {
+		this(converter.getMappingContext(), converter, dialect);
+	}
+
 	public SqlGeneratorSource(RelationalMappingContext context, JdbcConverter converter, Dialect dialect) {
 		this.context = context;
 		this.converter = converter;

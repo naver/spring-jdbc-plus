@@ -18,6 +18,7 @@ package com.navercorp.spring.data.jdbc.plus.support.convert;
 import org.springframework.data.jdbc.core.convert.DataAccessStrategy;
 import org.springframework.data.jdbc.core.convert.DefaultDataAccessStrategy;
 import org.springframework.data.jdbc.core.convert.JdbcConverter;
+import org.springframework.data.relational.core.dialect.Dialect;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
 import org.springframework.util.Assert;
 
@@ -37,6 +38,21 @@ public class JdbcPlusDataAccessStrategyFactory {
 	private final NamedParameterJdbcOperations operations;
 	private final SqlGeneratorSource jdbcPlusSqlGeneratorSource;
 	private final SoftDeleteSqlParametersFactory softDeleteSqlParametersFactory;
+
+	public JdbcPlusDataAccessStrategyFactory(
+		DataAccessStrategy delegate,
+		JdbcConverter converter,
+		NamedParameterJdbcOperations operations,
+		Dialect dialect
+	) {
+		this(
+			delegate,
+			converter,
+			operations,
+			new SqlGeneratorSource(converter, dialect),
+			new SoftDeleteSqlParametersFactory(converter)
+		);
+	}
 
 	public JdbcPlusDataAccessStrategyFactory(
 		DataAccessStrategy delegate,

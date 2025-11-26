@@ -304,10 +304,9 @@ public class JdbcPlusRepositoryFactoryBean<T extends Repository<S, ID>, S, ID ex
 
 						JdbcPlusDataAccessStrategyFactory factory = new JdbcPlusDataAccessStrategyFactory(
 							delegate,
-							this.converter,
+							converter,
 							jdbcOperations,
-							jdbcPlusSqlGeneratorSource,
-							new SoftDeleteSqlParametersFactory(this.mappingContext, this.converter)
+							dialect
 						);
 
 						return factory.create();

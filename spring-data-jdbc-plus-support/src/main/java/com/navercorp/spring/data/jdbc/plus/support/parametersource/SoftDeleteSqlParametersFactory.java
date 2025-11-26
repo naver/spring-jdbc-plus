@@ -32,6 +32,10 @@ public class SoftDeleteSqlParametersFactory {
 	private final RelationalMappingContext context;
 	private final JdbcConverter converter;
 
+	public SoftDeleteSqlParametersFactory(JdbcConverter converter) {
+		this(converter.getMappingContext(),  converter);
+	}
+
 	public SoftDeleteSqlParametersFactory(
 		RelationalMappingContext context,
 		JdbcConverter converter

@@ -31,15 +31,11 @@ public class AbstractJdbcPlusConfiguration extends AbstractJdbcConfiguration {
 	) {
 		DataAccessStrategy delegate = super.dataAccessStrategyBean(operations, jdbcConverter, context, dialect);
 
-		SqlGeneratorSource sqlGeneratorSource = new SqlGeneratorSource(context, jdbcConverter, dialect);
-		JdbcPlusDataAccessStrategyFactory factory = new JdbcPlusDataAccessStrategyFactory(
+		return new JdbcPlusDataAccessStrategyFactory(
 			delegate,
 			jdbcConverter,
 			operations,
-			sqlGeneratorSource,
-			new SoftDeleteSqlParametersFactory(context, jdbcConverter)
-		);
-
-		return factory.create();
+			dialect
+		).create();
 	}
 }
