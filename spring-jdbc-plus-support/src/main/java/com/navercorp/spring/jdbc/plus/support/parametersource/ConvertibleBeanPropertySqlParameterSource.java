@@ -20,8 +20,8 @@ package com.navercorp.spring.jdbc.plus.support.parametersource;
 
 import java.util.Objects;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
-import org.springframework.lang.Nullable;
 import org.springframework.util.StringUtils;
 
 import com.navercorp.spring.jdbc.plus.support.parametersource.converter.IterableExpandPadding;

@@ -24,8 +24,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import org.springframework.lang.Nullable;
-
 /**
  * The type Iterable expand padding.
  *
@@ -54,7 +52,7 @@ public class IterableExpandPadding {
 	 * @param paddingBoundaries the padding boundaries
 	 * @return the object
 	 */
-	public static Object expandIfIterable(Object source, boolean padArray, @Nullable int[] paddingBoundaries) {
+	public static Object expandIfIterable(Object source, boolean padArray, int[] paddingBoundaries) {
 		if (source == null) {
 			return null;
 		}

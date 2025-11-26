@@ -22,8 +22,8 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
+import org.springframework.data.jdbc.core.dialect.JdbcDialect;
 import org.springframework.data.jdbc.core.dialect.JdbcMySqlDialect;
-import org.springframework.data.relational.core.dialect.Dialect;
 import org.springframework.data.relational.core.sql.IdentifierProcessing;
 
 /**
@@ -37,7 +37,7 @@ public class Application {
 
 	@Bean
 	@Primary
-	public Dialect mysqlDialect() {
+	public JdbcDialect mysqlDialect() {
 		return new JdbcMySqlDialect(
 			IdentifierProcessing.create(
 				new IdentifierProcessing.Quoting("`"),

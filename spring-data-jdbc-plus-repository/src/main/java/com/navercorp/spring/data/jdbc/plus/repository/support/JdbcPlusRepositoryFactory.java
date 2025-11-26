@@ -27,7 +27,6 @@ import org.springframework.data.relational.core.dialect.Dialect;
 import org.springframework.data.relational.core.mapping.RelationalMappingContext;
 import org.springframework.data.repository.core.RepositoryMetadata;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
-import org.springframework.util.Assert;
 
 /**
  * Creates repository implementation based on JDBC.

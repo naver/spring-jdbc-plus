@@ -7,6 +7,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.BiFunction;
 
+import org.jspecify.annotations.Nullable;
+import org.springframework.data.core.TypeInformation;
 import org.springframework.data.jdbc.core.convert.JdbcConverter;
 import org.springframework.data.jdbc.core.mapping.JdbcValue;
 import org.springframework.data.mapping.PersistentPropertyAccessor;
@@ -15,9 +17,7 @@ import org.springframework.data.relational.core.mapping.RelationalMappingContext
 import org.springframework.data.relational.core.mapping.RelationalPersistentEntity;
 import org.springframework.data.relational.core.mapping.RelationalPersistentProperty;
 import org.springframework.data.relational.core.sql.SqlIdentifier;
-import org.springframework.data.util.TypeInformation;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
-import org.springframework.lang.Nullable;
 
 import com.navercorp.spring.data.jdbc.plus.support.convert.SoftDeleteProperty;
 import com.navercorp.spring.data.jdbc.plus.support.convert.SqlGenerator;

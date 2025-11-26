@@ -1,13 +1,12 @@
 package com.navercorp.spring.data.jdbc.plus.repository.guide.product;
 
-import static org.assertj.core.api.BDDAssertions.*;
+import static org.assertj.core.api.BDDAssertions.then;
 
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Test;

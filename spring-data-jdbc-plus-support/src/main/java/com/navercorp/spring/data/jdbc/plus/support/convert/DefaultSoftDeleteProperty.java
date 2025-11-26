@@ -2,10 +2,10 @@ package com.navercorp.spring.data.jdbc.plus.support.convert;
 
 import java.util.Arrays;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.data.relational.core.mapping.RelationalPersistentEntity;
 import org.springframework.data.relational.core.mapping.RelationalPersistentProperty;
 import org.springframework.data.relational.core.sql.SqlIdentifier;
-import org.springframework.lang.Nullable;
 import org.springframework.util.StringUtils;
 
 import com.navercorp.spring.jdbc.plus.commons.annotations.SoftDeleteColumn;

@@ -20,6 +20,7 @@ package com.navercorp.spring.data.jdbc.plus.sql.parametersource;
 
 import java.sql.SQLType;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.data.jdbc.core.convert.JdbcConverter;
 import org.springframework.data.jdbc.core.mapping.JdbcValue;
 import org.springframework.data.mapping.PersistentProperty;
@@ -28,7 +29,6 @@ import org.springframework.data.relational.core.mapping.RelationalMappingContext
 import org.springframework.data.relational.core.mapping.RelationalPersistentEntity;
 import org.springframework.data.relational.core.mapping.RelationalPersistentProperty;
 import org.springframework.data.relational.core.sql.SqlIdentifier;
-import org.springframework.lang.Nullable;
 
 import com.navercorp.spring.data.jdbc.plus.support.parametersource.MutableSqlIdentifierParameterSource;
 

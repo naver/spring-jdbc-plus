@@ -18,9 +18,9 @@
 
 package com.navercorp.spring.jdbc.plus.support.parametersource.converter;
 
-import static com.navercorp.spring.jdbc.plus.support.parametersource.converter.IterableExpandPadding.*;
-import static java.util.stream.Collectors.*;
-import static org.assertj.core.api.Assertions.*;
+import static com.navercorp.spring.jdbc.plus.support.parametersource.converter.IterableExpandPadding.ArrayExpandPadding;
+import static com.navercorp.spring.jdbc.plus.support.parametersource.converter.IterableExpandPadding.CollectionExpandPadding;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Arrays;
 import java.util.Collection;

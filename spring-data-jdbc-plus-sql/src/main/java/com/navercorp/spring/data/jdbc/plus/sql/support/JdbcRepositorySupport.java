@@ -18,7 +18,7 @@
 
 package com.navercorp.spring.data.jdbc.plus.sql.support;
 
-import static java.util.stream.Collectors.*;
+import static java.util.stream.Collectors.toList;
 
 import java.util.HashMap;
 import java.util.List;

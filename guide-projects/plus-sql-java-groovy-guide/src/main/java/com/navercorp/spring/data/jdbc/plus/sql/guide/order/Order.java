@@ -18,8 +18,6 @@
 
 package com.navercorp.spring.data.jdbc.plus.sql.guide.order;
 
-import java.nio.charset.StandardCharsets;
-
 import javax.annotation.Nullable;
 
 import org.springframework.data.annotation.Id;

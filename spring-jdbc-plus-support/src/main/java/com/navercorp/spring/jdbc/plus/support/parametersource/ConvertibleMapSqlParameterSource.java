@@ -21,8 +21,8 @@ package com.navercorp.spring.jdbc.plus.support.parametersource;
 import java.util.Map;
 import java.util.Objects;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
-import org.springframework.lang.Nullable;
 
 import com.navercorp.spring.jdbc.plus.support.parametersource.converter.IterableExpandPadding;
 import com.navercorp.spring.jdbc.plus.support.parametersource.converter.JdbcParameterSourceConverter;

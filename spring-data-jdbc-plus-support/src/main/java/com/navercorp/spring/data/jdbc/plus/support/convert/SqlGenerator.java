@@ -35,6 +35,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jdbc.core.convert.Identifier;
@@ -93,7 +94,6 @@ import org.springframework.data.util.Lazy;
 import org.springframework.data.util.Predicates;
 import org.springframework.data.util.ReflectionUtils;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
-import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 import com.navercorp.spring.data.jdbc.plus.support.parametersource.BindParameterNameSanitizer;
@@ -382,7 +382,7 @@ public class SqlGenerator {
 	 */
 	String getFindAllByProperty(
 		Identifier parentIdentifier,
-		@Nullable AggregatePath.ColumnInfo keyColumn,
+		AggregatePath.@Nullable ColumnInfo keyColumn,
 		boolean ordered
 	) {
 		Assert.isTrue(keyColumn != null || !ordered,

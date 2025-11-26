@@ -18,7 +18,7 @@ package com.navercorp.spring.data.jdbc.plus.support.convert;
 import org.springframework.data.jdbc.core.convert.DataAccessStrategy;
 import org.springframework.data.jdbc.core.convert.DefaultDataAccessStrategy;
 import org.springframework.data.jdbc.core.convert.JdbcConverter;
-import org.springframework.data.relational.core.dialect.Dialect;
+import org.springframework.data.jdbc.core.dialect.JdbcDialect;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
 import org.springframework.util.Assert;
 
@@ -43,7 +43,7 @@ public class JdbcPlusDataAccessStrategyFactory {
 		DataAccessStrategy delegate,
 		JdbcConverter converter,
 		NamedParameterJdbcOperations operations,
-		Dialect dialect
+		JdbcDialect dialect
 	) {
 		this(
 			delegate,

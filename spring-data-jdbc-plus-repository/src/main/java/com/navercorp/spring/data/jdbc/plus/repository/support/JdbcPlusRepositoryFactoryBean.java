@@ -33,6 +33,7 @@ import org.springframework.data.jdbc.core.convert.JdbcConverter;
 import org.springframework.data.jdbc.core.convert.QueryMappingConfiguration;
 import org.springframework.data.jdbc.core.convert.SqlGeneratorSource;
 import org.springframework.data.jdbc.core.convert.SqlParametersFactory;
+import org.springframework.data.jdbc.core.dialect.JdbcDialect;
 import org.springframework.data.jdbc.repository.support.JdbcRepositoryFactory;
 import org.springframework.data.mapping.callback.EntityCallbacks;
 import org.springframework.data.relational.core.dialect.Dialect;
@@ -44,7 +45,6 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
 import org.springframework.util.Assert;
 
 import com.navercorp.spring.data.jdbc.plus.support.convert.JdbcPlusDataAccessStrategyFactory;
-import com.navercorp.spring.data.jdbc.plus.support.parametersource.SoftDeleteSqlParametersFactory;
 
 /**
  * Special adapter for Springs {@link org.springframework.beans.factory.FactoryBean} interface to allow easy setup of
@@ -66,7 +66,7 @@ public class JdbcPlusRepositoryFactoryBean<T extends Repository<S, ID>, S, ID ex
 	private @Nullable JdbcAggregateOperations aggregateOperations;
 	private @Nullable NamedParameterJdbcOperations jdbcOperations;
 	private @Nullable JdbcConverter converter;
-	private @Nullable Dialect dialect;
+	private @Nullable JdbcDialect dialect;
 	private @Nullable DataAccessStrategy dataAccessStrategy;
 	private EntityCallbacks entityCallbacks = EntityCallbacks.create();
 	private @Nullable RelationalMappingContext mappingContext;
@@ -153,7 +153,7 @@ public class JdbcPlusRepositoryFactoryBean<T extends Repository<S, ID>, S, ID ex
 	 *
 	 * @param dialect the dialect
 	 */
-	public void setDialect(Dialect dialect) {
+	public void setDialect(JdbcDialect dialect) {
 
 		Assert.notNull(dialect, "Dialect must not be null");
 
@@ -209,10 +209,10 @@ public class JdbcPlusRepositoryFactoryBean<T extends Repository<S, ID>, S, ID ex
 		Assert.state(this.queryMappingConfiguration != null, "RelationalConverter is required and must not be null");
 		Assert.state(this.publisher != null, "ApplicationEventPublisher is required and must not be null");
 
-		JdbcRepositoryFactory repositoryFactory;
+		JdbcPlusRepositoryFactory repositoryFactory;
 
 		if (this.aggregateOperations != null) {
-			repositoryFactory = new JdbcRepositoryFactory(this.aggregateOperations);
+			repositoryFactory = new JdbcPlusRepositoryFactory(this.aggregateOperations);
 		} else {
 
 			Assert.state(this.dataAccessStrategy != null, "DataAccessStrategy is required and must not be null");
@@ -220,7 +220,7 @@ public class JdbcPlusRepositoryFactoryBean<T extends Repository<S, ID>, S, ID ex
 
 			JdbcAggregateOperations operations = new JdbcAggregateTemplate(converter, dataAccessStrategy);
 
-			repositoryFactory = new JdbcRepositoryFactory(operations);
+			repositoryFactory = new JdbcPlusRepositoryFactory(operations);
 			repositoryFactory.setEntityCallbacks(entityCallbacks);
 		}
 

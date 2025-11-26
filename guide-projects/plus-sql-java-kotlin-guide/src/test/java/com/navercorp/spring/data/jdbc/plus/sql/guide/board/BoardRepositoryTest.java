@@ -18,9 +18,9 @@
 
 package com.navercorp.spring.data.jdbc.plus.sql.guide.board;
 
-import static java.util.Comparator.*;
-import static java.util.stream.Collectors.*;
-import static org.assertj.core.api.Assertions.*;
+import static java.util.Comparator.comparingLong;
+import static java.util.stream.Collectors.toMap;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.ArrayList;
 import java.util.Arrays;

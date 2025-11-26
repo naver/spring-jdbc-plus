@@ -2,6 +2,7 @@ package com.navercorp.spring.boot.autoconfigure.data.jdbc.plus.aot;
 
 import java.util.Arrays;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.aot.hint.MemberCategory;
 import org.springframework.aot.hint.RuntimeHints;
 import org.springframework.aot.hint.RuntimeHintsRegistrar;
@@ -13,7 +14,6 @@ import org.springframework.data.relational.core.mapping.event.AfterSaveCallback;
 import org.springframework.data.relational.core.mapping.event.BeforeConvertCallback;
 import org.springframework.data.relational.core.mapping.event.BeforeDeleteCallback;
 import org.springframework.data.relational.core.mapping.event.BeforeSaveCallback;
-import org.springframework.lang.Nullable;
 
 import com.navercorp.spring.data.jdbc.plus.repository.support.JdbcPlusRepository;
 

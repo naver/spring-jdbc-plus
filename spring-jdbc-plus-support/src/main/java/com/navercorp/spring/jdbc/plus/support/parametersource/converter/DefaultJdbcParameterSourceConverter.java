@@ -18,7 +18,7 @@
 
 package com.navercorp.spring.jdbc.plus.support.parametersource.converter;
 
-import static java.util.stream.Collectors.*;
+import static java.util.stream.Collectors.toMap;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -27,9 +27,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.core.ResolvableType;
 import org.springframework.core.convert.converter.Converter;
-import org.springframework.lang.Nullable;
 
 import com.navercorp.spring.jdbc.plus.support.parametersource.converter.EnumParameterTypeConverter.EnumToNameConverter;
 
