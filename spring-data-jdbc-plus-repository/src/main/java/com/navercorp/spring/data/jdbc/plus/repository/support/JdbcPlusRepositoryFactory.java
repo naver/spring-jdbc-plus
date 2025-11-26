@@ -19,6 +19,7 @@
 package com.navercorp.spring.data.jdbc.plus.repository.support;
 
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.data.jdbc.core.JdbcAggregateOperations;
 import org.springframework.data.jdbc.core.convert.DataAccessStrategy;
 import org.springframework.data.jdbc.core.convert.JdbcConverter;
 import org.springframework.data.jdbc.repository.support.JdbcRepositoryFactory;
@@ -26,6 +27,7 @@ import org.springframework.data.relational.core.dialect.Dialect;
 import org.springframework.data.relational.core.mapping.RelationalMappingContext;
 import org.springframework.data.repository.core.RepositoryMetadata;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
+import org.springframework.util.Assert;
 
 /**
  * Creates repository implementation based on JDBC.
@@ -39,6 +41,15 @@ public class JdbcPlusRepositoryFactory extends JdbcRepositoryFactory {
 	/**
 	 * Instantiates a new Jdbc plus repository factory.
 	 *
+	 * @param jdbcAggregateOperations the jdbc aggregate operations
+	 */
+	public JdbcPlusRepositoryFactory(JdbcAggregateOperations jdbcAggregateOperations) {
+		super(jdbcAggregateOperations);
+	}
+
+	/**
+	 * Instantiates a new Jdbc plus repository factory.
+	 *
 	 * @param dataAccessStrategy the data access strategy
 	 * @param context            the context
 	 * @param converter          the converter
@@ -46,6 +57,7 @@ public class JdbcPlusRepositoryFactory extends JdbcRepositoryFactory {
 	 * @param publisher          the publisher
 	 * @param operations         the operations
 	 */
+	@Deprecated(since = "4.0", forRemoval = true)
 	public JdbcPlusRepositoryFactory(
 		DataAccessStrategy dataAccessStrategy,
 		RelationalMappingContext context,

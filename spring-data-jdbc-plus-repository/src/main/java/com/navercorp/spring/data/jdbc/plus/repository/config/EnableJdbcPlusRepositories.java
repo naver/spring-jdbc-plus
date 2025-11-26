@@ -174,6 +174,12 @@ public @interface EnableJdbcPlusRepositories {
 	String transactionManagerRef() default "transactionManager";
 
 	/**
+	 * Configure the name of the {@link org.springframework.data.jdbc.core.JdbcAggregateOperations} bean definition to be
+	 * used to create repositories discovered through this annotation.
+	 */
+	String jdbcAggregateOperationsRef() default "";
+
+	/**
 	 * Returns the key of the {@link QueryLookupStrategy} to be used for lookup queries for query methods. Defaults to
 	 * {@link QueryLookupStrategy.Key#CREATE_IF_NOT_FOUND}.
 	 */
