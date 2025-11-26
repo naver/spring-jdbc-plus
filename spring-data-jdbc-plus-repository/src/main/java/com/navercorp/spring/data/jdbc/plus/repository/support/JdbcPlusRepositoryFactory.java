@@ -55,7 +55,7 @@ public class JdbcPlusRepositoryFactory extends JdbcRepositoryFactory {
 	 * @param converter          the converter
 	 * @param dialect            the dialect
 	 * @param publisher          the publisher
-	 * @param operations         the operations
+	 * @param jdbcOperations     the operations
 	 */
 	@Deprecated(since = "4.0", forRemoval = true)
 	public JdbcPlusRepositoryFactory(
@@ -64,9 +64,9 @@ public class JdbcPlusRepositoryFactory extends JdbcRepositoryFactory {
 		JdbcConverter converter,
 		Dialect dialect,
 		ApplicationEventPublisher publisher,
-		NamedParameterJdbcOperations operations
+		NamedParameterJdbcOperations jdbcOperations
 	) {
-		super(dataAccessStrategy, context, converter, dialect, publisher, operations);
+		super(dataAccessStrategy, context, converter, dialect, publisher, jdbcOperations);
 	}
 
 	@Override
