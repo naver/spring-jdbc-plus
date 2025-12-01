@@ -405,7 +405,7 @@ public abstract class JdbcRepositorySupport<T> {
 				+ params;
 			throw new IncorrectResultSizeDataAccessException(message, 1, list.size());
 		}
-		return Optional.ofNullable(this.triggerAfterConvert(list.get(0)));
+		return Optional.of(this.triggerAfterConvert(list.get(0)));
 	}
 
 	/**
@@ -430,7 +430,7 @@ public abstract class JdbcRepositorySupport<T> {
 		if (list.size() > 1) {
 			throw new IncorrectResultSizeDataAccessException(1, list.size());
 		}
-		return Optional.ofNullable(this.triggerAfterConvert(list.get(0)));
+		return Optional.of(this.triggerAfterConvert(list.get(0)));
 	}
 
 	/**

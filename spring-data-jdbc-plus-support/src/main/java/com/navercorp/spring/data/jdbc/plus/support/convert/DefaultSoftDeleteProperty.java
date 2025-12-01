@@ -21,7 +21,7 @@ class DefaultSoftDeleteProperty implements SoftDeleteProperty {
 	private final SqlIdentifier columnName;
 	private final Object updateValue;
 
-	private DefaultSoftDeleteProperty(boolean exists, SqlIdentifier columnName, @Nullable Object updateValue) {
+	private DefaultSoftDeleteProperty(boolean exists, SqlIdentifier columnName, Object updateValue) {
 		this.exists = exists;
 		this.columnName = columnName;
 		this.updateValue = updateValue;

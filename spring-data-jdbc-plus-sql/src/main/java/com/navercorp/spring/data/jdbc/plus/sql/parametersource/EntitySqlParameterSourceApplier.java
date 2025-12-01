@@ -63,7 +63,7 @@ class EntitySqlParameterSourceApplier {
 	// DefaultDataAccessStrategy#getParameterSource
 	void addParameterSource(
 		MutableSqlIdentifierParameterSource parameterSource,
-		Object instance,
+		@Nullable Object instance,
 		RelationalPersistentEntity<?> persistentEntity,
 		String prefix
 	) {
@@ -98,7 +98,7 @@ class EntitySqlParameterSourceApplier {
 	private void addConvertedPropertyValue(
 		MutableSqlIdentifierParameterSource parameterSource,
 		RelationalPersistentProperty property,
-		Object value,
+		@Nullable Object value,
 		SqlIdentifier name
 	) {
 		Class<?> javaType = this.jdbcConverter.getColumnType(property);
@@ -108,12 +108,15 @@ class EntitySqlParameterSourceApplier {
 	}
 
 	/**
-	 * COPY {@link org.springframework.data.jdbc.core.convert.DefaultDataAccessStrategy.NoValuePropertyAccessor}
+	 * COPY OF {@link org.springframework.data.jdbc.core.convert.SqlParametersFactory.NoValuePropertyAccessor}
+	 * A {@link PersistentPropertyAccessor} implementation always returning null
+	 *
+	 * @param <T>
 	 */
 	@SuppressWarnings("unchecked")
 	private static class NoValuePropertyAccessor<T> implements PersistentPropertyAccessor<T> {
 
-		private static final NoValuePropertyAccessor INSTANCE = new NoValuePropertyAccessor();
+		private static final NoValuePropertyAccessor<?> INSTANCE = new NoValuePropertyAccessor<>();
 
 		/**
 		 * Instance no value property accessor.
@@ -122,7 +125,7 @@ class EntitySqlParameterSourceApplier {
 		 * @return the no value property accessor
 		 */
 		static <T> NoValuePropertyAccessor<T> instance() {
-			return INSTANCE;
+			return (NoValuePropertyAccessor<T>) INSTANCE;
 		}
 
 		@Override
@@ -131,13 +134,13 @@ class EntitySqlParameterSourceApplier {
 		}
 
 		@Override
-		public Object getProperty(PersistentProperty<?> property) {
+		public @Nullable Object getProperty(PersistentProperty<?> property) {
 			return null;
 		}
 
 		@Override
 		public T getBean() {
-			return null;
+			throw new UnsupportedOperationException("Cannot get bean of NoValuePropertyAccessor");
 		}
 	}
 }

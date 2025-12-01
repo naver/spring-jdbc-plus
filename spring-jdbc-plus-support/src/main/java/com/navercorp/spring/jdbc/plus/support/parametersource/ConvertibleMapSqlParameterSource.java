@@ -23,6 +23,7 @@ import java.util.Objects;
 
 import org.jspecify.annotations.Nullable;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.util.Assert;
 
 import com.navercorp.spring.jdbc.plus.support.parametersource.converter.IterableExpandPadding;
 import com.navercorp.spring.jdbc.plus.support.parametersource.converter.JdbcParameterSourceConverter;
@@ -36,11 +37,11 @@ import com.navercorp.spring.jdbc.plus.support.parametersource.fallback.FallbackP
  */
 public class ConvertibleMapSqlParameterSource extends MapSqlParameterSource {
 	private final JdbcParameterSourceConverter converter;
-	private final FallbackParameterSource fallbackParameterSource;
+	private final @Nullable FallbackParameterSource fallbackParameterSource;
 
 	private boolean padArray = false;
 	private boolean paddingIterableParams = false;
-	private int[] paddingIterableBoundaries = null;
+	private int @Nullable [] paddingIterableBoundaries = null;
 
 	/**
 	 * Instantiates a new Convertible map sql parameter source.
@@ -62,7 +63,7 @@ public class ConvertibleMapSqlParameterSource extends MapSqlParameterSource {
 	public ConvertibleMapSqlParameterSource(
 		Map<String, ?> map,
 		JdbcParameterSourceConverter converter,
-		FallbackParameterSource fallbackParameterSource) {
+		@Nullable FallbackParameterSource fallbackParameterSource) {
 
 		super(map);
 		this.converter = Objects.requireNonNull(converter, "Converter must not be null.");
@@ -82,7 +83,7 @@ public class ConvertibleMapSqlParameterSource extends MapSqlParameterSource {
 		}
 
 		if (value == null && this.isFallback(paramName)) {
-			value = this.fallbackParameterSource.fallback(paramName);
+			value = this.fallback(paramName);
 		}
 
 		value = this.converter.convert(paramName, value);
@@ -102,7 +103,7 @@ public class ConvertibleMapSqlParameterSource extends MapSqlParameterSource {
 	 *
 	 * @param setPaddingIterableBoundaries the set padding iterable boundaries
 	 */
-	public void setPaddingIterableBoundaries(int[] setPaddingIterableBoundaries) {
+	public void setPaddingIterableBoundaries(int @Nullable [] setPaddingIterableBoundaries) {
 		this.paddingIterableBoundaries = setPaddingIterableBoundaries;
 	}
 
@@ -117,5 +118,11 @@ public class ConvertibleMapSqlParameterSource extends MapSqlParameterSource {
 
 	private boolean isFallback(String paramName) {
 		return this.fallbackParameterSource != null && this.fallbackParameterSource.isFallback(paramName);
+	}
+
+	private @Nullable Object fallback(String paramName) {
+		Assert.notNull(fallbackParameterSource, "FallbackParameterSource must not be null to use fallback");
+
+		return this.fallbackParameterSource.fallback(paramName);
 	}
 }

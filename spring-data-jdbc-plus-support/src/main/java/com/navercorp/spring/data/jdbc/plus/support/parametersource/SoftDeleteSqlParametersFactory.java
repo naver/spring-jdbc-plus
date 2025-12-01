@@ -139,7 +139,7 @@ public class SoftDeleteSqlParametersFactory {
 	/**
 	 * COPY {@link org.springframework.data.jdbc.core.convert.SqlParametersFactory#getIdMapper}
 	 */
-	private BiFunction<Object, AggregatePath, Object> getIdMapper(@Nullable RelationalPersistentEntity<?> complexId) {
+	private BiFunction<Object, AggregatePath, @Nullable Object> getIdMapper(@Nullable RelationalPersistentEntity<?> complexId) {
 
 		if (complexId == null) {
 			return (id, aggregatePath) -> id;
@@ -192,7 +192,7 @@ public class SoftDeleteSqlParametersFactory {
 	interface IdentifierCallback<T> {
 
 		T doWithIdentifiers(AggregatePath.ColumnInfos columns, RelationalPersistentProperty idProperty,
-			RelationalPersistentEntity<?> complexId);
+			@Nullable RelationalPersistentEntity<?> complexId);
 	}
 
 	private void addConvertedValue(

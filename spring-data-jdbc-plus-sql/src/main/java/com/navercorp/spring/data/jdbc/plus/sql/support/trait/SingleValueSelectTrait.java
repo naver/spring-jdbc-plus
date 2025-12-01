@@ -18,6 +18,7 @@
 
 package com.navercorp.spring.data.jdbc.plus.sql.support.trait;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 
@@ -43,7 +44,7 @@ public interface SingleValueSelectTrait {
 	 * @param returnType the return type
 	 * @return the t
 	 */
-	default <T> T selectSingleValue(String sql, SqlParameterSource params, Class<T> returnType) {
+	default <T> @Nullable T selectSingleValue(String sql, SqlParameterSource params, Class<T> returnType) {
 		return this.getJdbcOperations().queryForObject(sql, params, returnType);
 	}
 }

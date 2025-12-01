@@ -1,7 +1,6 @@
 package com.navercorp.spring.data.jdbc.plus.support.convert;
 
-import javax.annotation.Nullable;
-
+import org.jspecify.annotations.Nullable;
 import org.springframework.data.mapping.PersistentPropertyPath;
 import org.springframework.data.relational.core.mapping.AggregatePath;
 import org.springframework.data.relational.core.mapping.RelationalPersistentEntity;
@@ -24,7 +23,11 @@ class TableAliasUtils {
 	 * @return
 	 */
 	@Nullable
-	static SqlIdentifier getTableAlias(RelationalPersistentEntity<?> entity) {
+	static SqlIdentifier getTableAlias(@Nullable RelationalPersistentEntity<?> entity) {
+		if (entity == null) {
+			return null;
+		}
+
 		SqlTableAlias sqlTableAlias = entity.findAnnotation(SqlTableAlias.class);
 		if (sqlTableAlias != null) {
 			return SqlIdentifier.quoted(sqlTableAlias.value());

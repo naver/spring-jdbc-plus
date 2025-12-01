@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Embedded;
@@ -60,14 +61,14 @@ public class Board {
 
 	@SqlTableAlias("b_audit")
 	@Column("board_id")
-	private Audit audit;
+	private @Nullable Audit audit;
 
 	@Embedded.Nullable(prefix = "board_")
-	private Memo memo;
+	private @Nullable Memo memo;
 
 	@MappedCollection(idColumn = "board_id", keyColumn = "config_key")
 	@Builder.Default
-	private Map<String, Config> configMap = new HashMap<>();
+	private @Nullable Map<String, Config> configMap = new HashMap<>();
 
 	@Table("n_label")
 	@Getter
@@ -101,14 +102,14 @@ public class Board {
 		private List<Comment> comments = new ArrayList<>();
 
 		@Column("post_id")
-		private Audit audit;
+		private @Nullable Audit audit;
 
 		@Embedded.Nullable
-		private Memo memo;
+		private @Nullable Memo memo;
 
 		@MappedCollection(idColumn = "post_id", keyColumn = "config_key")
 		@Builder.Default
-		private Map<String, Config> configMap = new HashMap<>();
+		private @Nullable Map<String, Config> configMap = new HashMap<>();
 	}
 
 	@Table("n_tag")
@@ -132,7 +133,7 @@ public class Board {
 		private String content;
 
 		@Column("comment_id")
-		private Audit audit;
+		private @Nullable Audit audit;
 	}
 
 	@Table("n_audit")
@@ -145,10 +146,10 @@ public class Board {
 		private String name;
 
 		@Embedded.Nullable
-		private Memo memo;
+		private @Nullable Memo memo;
 
 		@Column("audit_id")
-		private AuditSecret secret;
+		private @Nullable AuditSecret secret;
 	}
 
 	@Value

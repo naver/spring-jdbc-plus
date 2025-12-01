@@ -29,14 +29,14 @@ public class EnumParameterTypeConverter {
 	/**
 	 * The enum Enum to name converter.
 	 */
-	public enum EnumToNameConverter implements Converter<Enum, String> {
+	public enum EnumToNameConverter implements Converter<Enum<?>, String> {
 		/**
 		 * Instance enum to name converter.
 		 */
 		INSTANCE;
 
 		@Override
-		public String convert(Enum source) {
+		public String convert(Enum<?> source) {
 			return source.name();
 		}
 	}
@@ -44,14 +44,14 @@ public class EnumParameterTypeConverter {
 	/**
 	 * The enum Enum to ordinal converter.
 	 */
-	public enum EnumToOrdinalConverter implements Converter<Enum, Integer> {
+	public enum EnumToOrdinalConverter implements Converter<Enum<?>, Integer> {
 		/**
 		 * Instance enum to ordinal converter.
 		 */
 		INSTANCE;
 
 		@Override
-		public Integer convert(Enum source) {
+		public Integer convert(Enum<?> source) {
 			return source.ordinal();
 		}
 	}

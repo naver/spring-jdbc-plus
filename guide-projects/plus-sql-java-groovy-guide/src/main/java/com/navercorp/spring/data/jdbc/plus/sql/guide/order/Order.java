@@ -18,8 +18,8 @@
 
 package com.navercorp.spring.data.jdbc.plus.sql.guide.order;
 
-import javax.annotation.Nullable;
-
+import org.jspecify.annotations.NullUnmarked;
+import org.jspecify.annotations.Nullable;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Embedded;
 import org.springframework.data.relational.core.mapping.Table;
@@ -48,11 +48,10 @@ public class Order implements EmptyStringToNullTraits {
 
 	private String purchaserNo;
 
-	private String name;
+	private @Nullable String name;
 
-	@Nullable
 	@Embedded.Nullable(prefix = "discount_")
-	private Discount discount;
+	private @Nullable Discount discount;
 
 	public void complete() {
 		this.status = OrderStatus.COMPLETED;

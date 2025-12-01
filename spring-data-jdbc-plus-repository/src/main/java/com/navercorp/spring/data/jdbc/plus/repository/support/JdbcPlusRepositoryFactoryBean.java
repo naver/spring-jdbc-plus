@@ -317,17 +317,22 @@ public class JdbcPlusRepositoryFactoryBean<T extends Repository<S, ID>, S, ID ex
 		super.afterPropertiesSet();
 	}
 
-	private DataAccessStrategy buildDataAccessStrategyDelegate(SqlGeneratorSource sqlGeneratorSource,
-		SqlParametersFactory sqlParametersFactory, InsertStrategyFactory insertStrategyFactory) {
-		DataAccessStrategyFactory factory = new DataAccessStrategyFactory(
+	private DataAccessStrategy buildDataAccessStrategyDelegate(
+		SqlGeneratorSource sqlGeneratorSource,
+		SqlParametersFactory sqlParametersFactory,
+		InsertStrategyFactory insertStrategyFactory
+	) {
+		Assert.state(this.converter != null, "Converter must not be null");
+		Assert.state(this.jdbcOperations != null, "JdbcOperations must not be null");
+		Assert.state(this.queryMappingConfiguration != null, "QueryMappingConfiguration must not be null");
+
+		return new DataAccessStrategyFactory(
 			sqlGeneratorSource,
 			this.converter,
 			this.jdbcOperations,
 			sqlParametersFactory,
 			insertStrategyFactory,
 			this.queryMappingConfiguration
-		);
-		DataAccessStrategy delegate = factory.create();
-		return delegate;
+		).create();
 	}
 }

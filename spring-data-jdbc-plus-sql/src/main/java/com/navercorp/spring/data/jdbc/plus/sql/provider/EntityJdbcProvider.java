@@ -19,6 +19,7 @@
 package com.navercorp.spring.data.jdbc.plus.sql.provider;
 
 import java.util.Map;
+import java.util.Objects;
 
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.jdbc.core.convert.QueryMappingConfiguration;
@@ -118,10 +119,9 @@ public class EntityJdbcProvider {
 	 * @param entityType the entity type
 	 * @return the row mapper
 	 */
-	@SuppressWarnings("unchecked")
 	public <T> RowMapper<T> getRowMapper(Class<T> entityType) {
 		try {
-			return (RowMapper<T>)this.queryMappingConfiguration.getRowMapper(entityType);
+			return Objects.requireNonNull(this.queryMappingConfiguration.getRowMapper(entityType));
 		} catch (MappingException e) {
 			throw new IllegalReturnTypeException(
 				"EntityRowMapper returnType must be entity type. returnType: " + entityType, e);

@@ -40,6 +40,7 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  * @author Myeonghyeon Lee
  */
+@SuppressWarnings("DataFlowIssue")
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional

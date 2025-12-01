@@ -49,6 +49,7 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  * @author Myeonghyeon Lee
  */
+@SuppressWarnings("ALL")
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional

@@ -16,6 +16,7 @@
 
 package com.navercorp.spring.data.jdbc.plus.sql.convert;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.data.mapping.model.PropertyValueProvider;
 import org.springframework.data.relational.core.mapping.AggregatePath;
 import org.springframework.data.relational.core.mapping.RelationalPersistentProperty;
@@ -49,7 +50,7 @@ class JdbcPropertyValueProvider implements PropertyValueProvider<RelationalPersi
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public <T> T getPropertyValue(RelationalPersistentProperty property) {
+	public <T> @Nullable T getPropertyValue(RelationalPersistentProperty property) {
 		return (T)rowDocument.get(getColumnName(property));
 	}
 

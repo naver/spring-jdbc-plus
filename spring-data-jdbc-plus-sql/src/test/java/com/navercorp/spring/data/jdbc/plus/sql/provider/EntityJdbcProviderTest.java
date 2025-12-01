@@ -36,6 +36,7 @@ class EntityJdbcProviderTest {
 		when(queryMappingConfiguration.getRowMapper(any()))
 			.thenThrow(new MappingException("mapping Exception"));
 
+		@SuppressWarnings("DataFlowIssue")
 		EntityJdbcProvider sut = new EntityJdbcProvider(null, null, null, queryMappingConfiguration, null, null);
 		assertThatThrownBy(() -> sut.getRowMapper(Long.class))
 			.isInstanceOf(IllegalReturnTypeException.class)

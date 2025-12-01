@@ -28,7 +28,7 @@ import org.springframework.data.relational.core.sql.SqlIdentifier;
  *
  * @author Myeonghyeon Lee
  */
-@SuppressWarnings("checkstyle:linelength")
+@SuppressWarnings({"checkstyle:linelength", "DataFlowIssue"})
 class SqlGeneratorEmbeddedTest {
 	private RelationalMappingContext context = JdbcMappingContext.forQuotedIdentifiers();
 	JdbcConverter converter = new MappingJdbcConverter(context, (identifier, path) -> {

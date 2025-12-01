@@ -33,6 +33,7 @@ dependencies {
     implementation("org.springframework.data:spring-data-jdbc")
     implementation("org.springframework.data:spring-data-relational")
     implementation("org.springframework.data:spring-data-commons")
+    compileOnly("org.jspecify:jspecify:1.0.0")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.projectlombok:lombok")

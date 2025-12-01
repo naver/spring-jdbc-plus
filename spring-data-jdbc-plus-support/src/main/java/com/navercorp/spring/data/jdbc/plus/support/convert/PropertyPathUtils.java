@@ -112,7 +112,6 @@ public class PropertyPathUtils {
 	@Nullable
 	private static SqlIdentifier assembleTableAlias(AggregatePath path) {
 
-		Assert.state(path != null, "Path is null");
 		if (path.isRoot()) {
 			return null;
 		}

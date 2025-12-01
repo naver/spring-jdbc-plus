@@ -50,6 +50,7 @@ import com.navercorp.spring.data.jdbc.plus.sql.guide.board.Board.Tag;
 /**
  * @author Myeonghyeon Lee
  */
+@SuppressWarnings("ALL")
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
