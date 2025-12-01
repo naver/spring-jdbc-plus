@@ -256,7 +256,7 @@ public class AggregateResultJdbcConverter extends MappingJdbcConverter {
 			RowDocument document = toRowDocument(resultSet);
 			Map<String, Object> entityMap = this.mapSingleTableRow(persistentEntity, document);
 
-			Object rootId = this.getRootId(document, persistentEntity);
+			Object rootId = this.getRootId(document, rootPath);
 			ExtractedRow rootRow = extractedRows.computeIfAbsent(rootId, i -> new ExtractedRow(
 				null, persistentEntity, entityMap, i, null, new LinkedMultiValueMap<>()));
 			this.appendExtractRelationRows(document, rootRow, entityPathRelations.getRelations());
@@ -486,8 +486,8 @@ public class AggregateResultJdbcConverter extends MappingJdbcConverter {
 		}
 	}
 
-	private Object getRootId(RowDocument rowDocument, RelationalPersistentEntity<?> entity) {
-		return rowDocument.get(entity.getIdColumn().getReference());
+	private Object getRootId(RowDocument rowDocument, AggregatePath rootPath) {
+		return rowDocument.get(rootPath.getLeafEntity().getIdColumn().getReference());
 	}
 
 	private Identifier getRelationEntityIdentifier(

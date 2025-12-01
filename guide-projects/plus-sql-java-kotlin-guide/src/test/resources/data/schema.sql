@@ -76,3 +76,15 @@ CREATE TABLE IF NOT EXISTS n_pay_adms (
   pay_method_type VARCHAR(20),
   PRIMARY KEY(id));
 
+CREATE TABLE IF NOT EXISTS cupn_pubt (
+  pubt_nm VARCHAR(255),
+  ver BIGINT,
+  discount_amt DECIMAL(20, 2),
+  PRIMARY KEY(pubt_nm, ver));
+
+CREATE TABLE IF NOT EXISTS cupn (
+  cupn_no VARCHAR(255),
+  discount_amt DECIMAL(20, 2),
+  pubt_nm VARCHAR(255),
+  ver BIGINT,
+  PRIMARY KEY(cupn_no));
