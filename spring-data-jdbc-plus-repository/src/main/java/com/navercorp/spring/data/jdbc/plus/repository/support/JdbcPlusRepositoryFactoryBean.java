@@ -284,7 +284,7 @@ public class JdbcPlusRepositoryFactoryBean<T extends Repository<S, ID>, S, ID ex
 
 						SqlGeneratorSource sqlGeneratorSource = new SqlGeneratorSource(
 							this.mappingContext, this.converter, this.dialect);
-						com.navercorp.spring.data.jdbc.plus.support.convert.SqlGeneratorSource jdbcPlusSqlGeneratorSource =
+						com.navercorp.spring.data.jdbc.plus.support.convert.SqlGeneratorSource plusSqlGeneratorSource =
 							new com.navercorp.spring.data.jdbc.plus.support.convert.SqlGeneratorSource(
 								this.mappingContext,
 								this.converter,

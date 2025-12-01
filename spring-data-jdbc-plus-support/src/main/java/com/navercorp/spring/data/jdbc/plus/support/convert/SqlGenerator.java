@@ -983,14 +983,16 @@ public class SqlGenerator {
 
 				AggregatePath.ColumnInfos idColumnInfos = idDefiningParentPath.getTableInfo().idColumnInfos();
 
-				Condition joinCondition = backRefColumnInfos.reduce(Conditions.unrestricted(), (aggregatePath, columnInfo) -> {
+				Condition joinCondition = backRefColumnInfos.reduce(
+					Conditions.unrestricted(), (aggregatePath, columnInfo) -> {
 
-					AggregatePath.ColumnInfo idColumnInfo = idColumnInfos.get(aggregatePath);
+						AggregatePath.ColumnInfo idColumnInfo = idColumnInfos.get(aggregatePath);
 
-					Assert.notNull(idColumnInfo, "IdColumnInfo must not be null");
+						Assert.notNull(idColumnInfo, "IdColumnInfo must not be null");
 
-					return currentTable.column(columnInfo.name()).isEqualTo(parentTable.column(idColumnInfo.name()));
-				}, Condition::and);
+						return currentTable.column(
+							columnInfo.name()).isEqualTo(parentTable.column(idColumnInfo.name()));
+					}, Condition::and);
 
 				joinTables.add(new Join(currentTable, joinCondition));
 			}

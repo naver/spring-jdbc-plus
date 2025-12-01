@@ -154,7 +154,8 @@ public @interface EnableJdbcPlusRepositories {
 
 
 	/**
-	 * Configure the name of the {@link org.springframework.data.jdbc.core.JdbcAggregateOperations} bean definition to be
+	 * Configure the name of the
+	 * {@link org.springframework.data.jdbc.core.JdbcAggregateOperations} bean definition to be
 	 * used to create repositories discovered through this annotation.
 	 */
 	String jdbcAggregateOperationsRef() default "";

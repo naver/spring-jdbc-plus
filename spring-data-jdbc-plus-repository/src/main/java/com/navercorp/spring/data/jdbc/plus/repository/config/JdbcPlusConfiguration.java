@@ -19,7 +19,8 @@ import com.navercorp.spring.data.jdbc.plus.support.convert.JdbcPlusDataAccessStr
  * @since 4.0
  */
 public class JdbcPlusConfiguration {
-	private JdbcPlusConfiguration() {}
+	private JdbcPlusConfiguration() {
+	}
 
 	public static DataAccessStrategy createDataAccessStrategy(
 		NamedParameterJdbcOperations operations,
