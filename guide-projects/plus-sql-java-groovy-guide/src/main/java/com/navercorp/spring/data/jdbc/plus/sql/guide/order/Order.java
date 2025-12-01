@@ -18,7 +18,6 @@
 
 package com.navercorp.spring.data.jdbc.plus.sql.guide.order;
 
-import org.jspecify.annotations.NullUnmarked;
 import org.jspecify.annotations.Nullable;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Embedded;
