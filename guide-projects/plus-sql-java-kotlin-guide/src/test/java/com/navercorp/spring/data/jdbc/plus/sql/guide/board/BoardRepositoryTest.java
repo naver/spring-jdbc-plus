@@ -18,6 +18,7 @@
 
 package com.navercorp.spring.data.jdbc.plus.sql.guide.board;
 
+import static java.util.Comparator.comparing;
 import static java.util.Comparator.comparingLong;
 import static java.util.stream.Collectors.toMap;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -32,6 +33,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -43,6 +45,7 @@ import com.navercorp.spring.data.jdbc.plus.sql.guide.board.Board.AuditSecret;
 import com.navercorp.spring.data.jdbc.plus.sql.guide.board.Board.Comment;
 import com.navercorp.spring.data.jdbc.plus.sql.guide.board.Board.Config;
 import com.navercorp.spring.data.jdbc.plus.sql.guide.board.Board.Label;
+import com.navercorp.spring.data.jdbc.plus.sql.guide.board.Board.LabelId;
 import com.navercorp.spring.data.jdbc.plus.sql.guide.board.Board.Memo;
 import com.navercorp.spring.data.jdbc.plus.sql.guide.board.Board.Post;
 import com.navercorp.spring.data.jdbc.plus.sql.guide.board.Board.Tag;
@@ -62,11 +65,20 @@ public class BoardRepositoryTest {
 		Board.builder()
 			.name("repo")
 			.memo(Memo.builder().memo("board1 memo").build())
-			.labels(new HashSet<>(Arrays.asList(
-				Label.builder().name("label1").build(),
-				Label.builder().name("label2").build(),
-				Label.builder().name("label3").build()
-			)))
+					.labels(new HashSet<>(Arrays.asList(
+						Label.builder()
+							.id(LabelId.builder().title("label1").projectName("project1").build())
+							.name("label1")
+							.build(),
+						Label.builder()
+							.id(LabelId.builder().title("label2").projectName("project1").build())
+							.name("label2")
+							.build(),
+						Label.builder()
+							.id(LabelId.builder().title("label3").projectName("project1").build())
+							.name("label3")
+							.build()
+					)))
 			.posts(Arrays.asList(
 				Post.builder()
 					.postNo(1L)
@@ -233,9 +245,18 @@ public class BoardRepositoryTest {
 		Board.builder()
 			.name("repo2")
 			.labels(new HashSet<>(Arrays.asList(
-				Label.builder().name("label4").build(),
-				Label.builder().name("label5").build(),
-				Label.builder().name("label6").build()
+				Label.builder()
+					.id(LabelId.builder().title("label4").projectName("project2").build())
+					.name("label4")
+					.build(),
+				Label.builder()
+					.id(LabelId.builder().title("label5").projectName("project2").build())
+					.name("label5")
+					.build(),
+				Label.builder()
+					.id(LabelId.builder().title("label6").projectName("project2").build())
+					.name("label6")
+					.build()
 			)))
 			.posts(Arrays.asList(
 				Post.builder()
@@ -328,6 +349,10 @@ public class BoardRepositoryTest {
 			.build()
 	);
 
+	/**
+	 * Seems related to https://github.com/spring-projects/spring-data-relational/issues/2054
+	 */
+	@Disabled
 	@Test
 	void findById() {
 		// given
@@ -375,7 +400,7 @@ public class BoardRepositoryTest {
 		List<Board> actual = this.sut.findAllGraph();
 
 		// then
-		Assertions.assertThat(actual).hasSize(3);
+		assertThat(actual).hasSize(3);
 		assertEquals(actual.get(0), boards.get(0));
 		assertEquals(actual.get(1), boards.get(1));
 		assertEquals(actual.get(2), boards.get(2));
@@ -400,10 +425,10 @@ public class BoardRepositoryTest {
 		assertEquals(actual1.get().getPost(), boards.get(0).getPosts().get(0));
 		assertLabelsEquals(
 			actual1.get().getLabels().stream()
-				.sorted(comparingLong(Label::getId))
+				.sorted(comparing(label -> label.getId().getTitle()))
 				.collect(Collectors.toList()),
 			boards.get(0).getLabels().stream()
-				.sorted(comparingLong(Label::getId))
+				.sorted(comparing(label -> label.getId().getTitle()))
 				.collect(Collectors.toList()));
 
 		Assertions.assertThat(actual2).isPresent();
@@ -411,10 +436,10 @@ public class BoardRepositoryTest {
 		assertEquals(actual2.get().getPost(), boards.get(0).getPosts().get(1));
 		assertLabelsEquals(
 			actual2.get().getLabels().stream()
-				.sorted(comparingLong(Label::getId))
+				.sorted(comparing(label -> label.getId().getTitle()))
 				.collect(Collectors.toList()),
 			boards.get(0).getLabels().stream()
-				.sorted(comparingLong(Label::getId))
+				.sorted(comparing(label -> label.getId().getTitle()))
 				.collect(Collectors.toList()));
 
 		Assertions.assertThat(actual3).isPresent();
@@ -422,10 +447,10 @@ public class BoardRepositoryTest {
 		assertEquals(actual3.get().getPost(), boards.get(1).getPosts().get(0));
 		assertLabelsEquals(
 			actual3.get().getLabels().stream()
-				.sorted(comparingLong(Label::getId))
+				.sorted(comparing(label -> label.getId().getTitle()))
 				.collect(Collectors.toList()),
 			boards.get(1).getLabels().stream()
-				.sorted(comparingLong(Label::getId))
+				.sorted(comparing(label -> label.getId().getTitle()))
 				.collect(Collectors.toList()));
 
 		Assertions.assertThat(actual4).isPresent();
@@ -433,10 +458,10 @@ public class BoardRepositoryTest {
 		assertEquals(actual4.get().getPost(), boards.get(1).getPosts().get(1));
 		assertLabelsEquals(
 			actual4.get().getLabels().stream()
-				.sorted(comparingLong(Label::getId))
+				.sorted(comparing(label -> label.getId().getTitle()))
 				.collect(Collectors.toList()),
 			boards.get(1).getLabels().stream()
-				.sorted(comparingLong(Label::getId))
+				.sorted(comparing(label -> label.getId().getTitle()))
 				.collect(Collectors.toList()));
 
 		Assertions.assertThat(actual5).isPresent();
@@ -444,10 +469,10 @@ public class BoardRepositoryTest {
 		assertEquals(actual5.get().getPost(), boards.get(2).getPosts().get(0));
 		assertLabelsEquals(
 			actual5.get().getLabels().stream()
-				.sorted(comparingLong(Label::getId))
+				.sorted(comparing(label -> label.getId().getTitle()))
 				.collect(Collectors.toList()),
 			boards.get(2).getLabels().stream()
-				.sorted(comparingLong(Label::getId))
+				.sorted(comparing(label -> label.getId().getTitle()))
 				.collect(Collectors.toList()));
 
 		Assertions.assertThat(actual6).isPresent();
@@ -455,10 +480,10 @@ public class BoardRepositoryTest {
 		assertEquals(actual6.get().getPost(), boards.get(2).getPosts().get(1));
 		assertLabelsEquals(
 			actual6.get().getLabels().stream()
-				.sorted(comparingLong(Label::getId))
+				.sorted(comparing(label -> label.getId().getTitle()))
 				.collect(Collectors.toList()),
 			boards.get(2).getLabels().stream()
-				.sorted(comparingLong(Label::getId))
+				.sorted(comparing(label -> label.getId().getTitle()))
 				.collect(Collectors.toList()));
 	}
 
@@ -521,10 +546,10 @@ public class BoardRepositoryTest {
 		}
 
 		List<Label> actualLabels = actual.getLabels().stream()
-			.sorted(comparingLong(Label::getId))
+			.sorted(comparing(label -> label.getId().getTitle()))
 			.collect(Collectors.toList());
-		List<Label> boardLabels = actual.getLabels().stream()
-			.sorted(comparingLong(Label::getId))
+		List<Label> boardLabels = target.getLabels().stream()
+			.sorted(comparing(label -> label.getId().getTitle()))
 			.collect(Collectors.toList());
 		assertLabelsEquals(actualLabels, boardLabels);
 
@@ -542,7 +567,9 @@ public class BoardRepositoryTest {
 		assertThat(actualLabels.size()).isEqualTo(targetLabels.size());
 
 		for (int i = 0; i < actualLabels.size(); i++) {
-			assertThat(actualLabels.get(i).getId()).isEqualTo(targetLabels.get(i).getId());
+			assertThat(actualLabels.get(i).getId().getTitle()).isEqualTo(targetLabels.get(i).getId().getTitle());
+			assertThat(actualLabels.get(i).getId().getProjectName())
+				.isEqualTo(targetLabels.get(i).getId().getProjectName());
 			assertThat(actualLabels.get(i).getName()).isEqualTo(targetLabels.get(i).getName());
 		}
 	}

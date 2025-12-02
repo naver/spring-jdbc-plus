@@ -80,3 +80,10 @@ CREATE TABLE IF NOT EXISTS plain_reviews (
     last_modified_at TIMESTAMP,
     visible TINYINT,
     PRIMARY KEY(id));
+
+CREATE TABLE IF NOT EXISTS coupon (
+  coupon_id VARCHAR(36),
+  pubt_id VARCHAR(36),
+  discount_amt BIGINT,
+  purchaser_no VARCHAR(255),
+  PRIMARY KEY(coupon_id, pubt_id));

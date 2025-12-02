@@ -27,6 +27,7 @@ import java.util.Set;
 
 import org.jspecify.annotations.Nullable;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.domain.Persistable;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Embedded;
 import org.springframework.data.relational.core.mapping.MappedCollection;
@@ -73,11 +74,28 @@ public class Board {
 	@Table("n_label")
 	@Getter
 	@Builder
-	public static class Label {
+	public static class Label implements Persistable<LabelId> {
 		@Id
-		private Long id;
+		@Nullable
+		@Embedded.Empty
+		private LabelId id;
 
 		private String name;
+
+		@Override
+		public boolean isNew() {
+			return false;
+		}
+	}
+
+	@Value
+	@Builder
+	public static class LabelId {
+		@Column("title")
+		String title;
+
+		@Column("project_name")
+		String projectName;
 	}
 
 	@Table("n_post")
