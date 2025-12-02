@@ -18,6 +18,9 @@
 
 package com.navercorp.spring.data.jdbc.plus.sql.support;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullUnmarked;
+
 import com.navercorp.spring.data.jdbc.plus.support.convert.SqlProvider;
 
 /**
@@ -25,13 +28,15 @@ import com.navercorp.spring.data.jdbc.plus.support.convert.SqlProvider;
  *
  * @author Myeonghyeon Lee
  */
+// FIXME: Mark nullable
+@NullUnmarked
 public abstract class SqlGeneratorSupport implements SqlAware {
 	/**
 	 * The Sql.
 	 */
 	protected SqlProvider sql;
 
-	public void setSql(SqlProvider sql) {
+	public void setSql(@NonNull SqlProvider sql) {
 		this.sql = sql;
 	}
 }

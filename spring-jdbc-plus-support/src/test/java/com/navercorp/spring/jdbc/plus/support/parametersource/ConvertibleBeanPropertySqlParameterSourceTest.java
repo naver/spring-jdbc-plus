@@ -27,6 +27,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.javaunit.autoparams.AutoSource;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -47,6 +48,7 @@ class ConvertibleBeanPropertySqlParameterSourceTest {
 	@AutoSource
 	void constructorNullConverter(String name) {
 		Criteria criteria = Criteria.of(name, Instant.now());
+		//noinspection DataFlowIssue
 		assertThatThrownBy(() -> new ConvertibleBeanPropertySqlParameterSource(criteria, null))
 			.isExactlyInstanceOf(NullPointerException.class)
 			.hasMessageContaining("Converter must not be null");
@@ -302,7 +304,7 @@ class ConvertibleBeanPropertySqlParameterSourceTest {
 
 	static class TestFallbackParamSource implements FallbackParameterSource {
 		@Override
-		public boolean isFallback(String paramName) {
+		public boolean isFallback(@NotNull String paramName) {
 			return paramName.equals("none");
 		}
 

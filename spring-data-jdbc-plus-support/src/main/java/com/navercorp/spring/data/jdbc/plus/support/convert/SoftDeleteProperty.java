@@ -1,7 +1,9 @@
 package com.navercorp.spring.data.jdbc.plus.support.convert;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.data.relational.core.mapping.RelationalPersistentEntity;
 import org.springframework.data.relational.core.sql.SqlIdentifier;
+import org.springframework.util.Assert;
 
 /**
  * A property to generate sql for soft delete.
@@ -16,7 +18,9 @@ public interface SoftDeleteProperty {
 	 * @param entity
 	 * @return
 	 */
-	static SoftDeleteProperty from(RelationalPersistentEntity<?> entity) {
+	static SoftDeleteProperty from(@Nullable RelationalPersistentEntity<?> entity) {
+		Assert.state(entity != null, "RelationalPersistentEntity must not be null");
+
 		return DefaultSoftDeleteProperty.from(entity);
 	}
 

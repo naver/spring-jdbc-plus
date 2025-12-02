@@ -25,6 +25,7 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.OptionalLong;
 import java.util.Set;
 import java.util.TreeMap;
@@ -35,6 +36,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jdbc.core.convert.Identifier;
@@ -93,7 +95,6 @@ import org.springframework.data.util.Lazy;
 import org.springframework.data.util.Predicates;
 import org.springframework.data.util.ReflectionUtils;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
-import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 import com.navercorp.spring.data.jdbc.plus.support.parametersource.BindParameterNameSanitizer;
@@ -382,7 +383,7 @@ public class SqlGenerator {
 	 */
 	String getFindAllByProperty(
 		Identifier parentIdentifier,
-		@Nullable AggregatePath.ColumnInfo keyColumn,
+		AggregatePath.@Nullable ColumnInfo keyColumn,
 		boolean ordered
 	) {
 		Assert.isTrue(keyColumn != null || !ordered,
@@ -642,7 +643,11 @@ public class SqlGenerator {
 			.idColumnInfos();
 
 		return createPredicate(columnMap, (aggregatePath, column) -> {
-			return column.isEqualTo(getBindMarker(idColumnInfos.get(aggregatePath).name()));
+			AggregatePath.ColumnInfo columnInfo = idColumnInfos.get(aggregatePath);
+
+			Assert.notNull(columnInfo, "ColumnInfo must not be null");
+
+			return column.isEqualTo(getBindMarker(columnInfo.name()));
 		});
 	}
 
@@ -978,19 +983,18 @@ public class SqlGenerator {
 
 				AggregatePath.ColumnInfos idColumnInfos = idDefiningParentPath.getTableInfo().idColumnInfos();
 
-				final Condition[] joinCondition = {null};
-				backRefColumnInfos.forEach((ap, ci) -> {
+				Condition joinCondition = backRefColumnInfos.reduce(
+					Conditions.unrestricted(), (aggregatePath, columnInfo) -> {
 
-					Condition elementalCondition = currentTable.column(ci.name())
-						.isEqualTo(parentTable.column(idColumnInfos.get(ap).name()));
-					joinCondition[0] =
-						joinCondition[0] == null ? elementalCondition : joinCondition[0].and(elementalCondition);
-				});
+						AggregatePath.ColumnInfo idColumnInfo = idColumnInfos.get(aggregatePath);
 
-				joinTables.add(new Join( //
-					currentTable, //
-					joinCondition[0] //
-				));
+						Assert.notNull(idColumnInfo, "IdColumnInfo must not be null");
+
+						return currentTable.column(
+							columnInfo.name()).isEqualTo(parentTable.column(idColumnInfo.name()));
+					}, Condition::and);
+
+				joinTables.add(new Join(currentTable, joinCondition));
 			}
 
 			Column column;
@@ -1087,18 +1091,16 @@ public class SqlGenerator {
 		Table parentTable = sqlContext.getTable(idDefiningParentPath);
 		AggregatePath.ColumnInfos idColumnInfos = idDefiningParentPath.getTableInfo().idColumnInfos();
 
-		final Condition[] joinCondition = {null};
-		backRefColumnInfos.forEach((ap, ci) -> {
+		Condition joinCondition = backRefColumnInfos.reduce(Conditions.unrestricted(), (aggregatePath, columnInfo) -> {
 
-			Condition elementalCondition = currentTable.column(ci.name())
-				.isEqualTo(parentTable.column(idColumnInfos.get(ap).name()));
-			joinCondition[0] = joinCondition[0] == null ? elementalCondition : joinCondition[0].and(elementalCondition);
-		});
+			AggregatePath.ColumnInfo idColumnInfo = idColumnInfos.get(aggregatePath);
 
-		return new Join( //
-			currentTable, //
-			joinCondition[0] //
-		);
+			Assert.notNull(idColumnInfo, "IdColumnInfo must not be null");
+
+			return currentTable.column(columnInfo.name()).isEqualTo(parentTable.column(idColumnInfo.name()));
+		}, Condition::and);
+
+		return new Join(currentTable, joinCondition);
 	}
 
 	private String createFindAllInListSql() {
@@ -1912,7 +1914,7 @@ public class SqlGenerator {
 			try {
 				Constructor<?> selectListConstructor =
 					ReflectionUtils.findConstructor(SelectList.class, selectList);
-				selectListConstructor.setAccessible(true);
+				Objects.requireNonNull(selectListConstructor).setAccessible(true);
 				this.selectList = (SelectList)selectListConstructor.newInstance(selectList);
 			} catch (Exception e) {
 				throw new MappingException("Can not created SimpleSelect.");
@@ -1952,7 +1954,7 @@ public class SqlGenerator {
 		}
 
 		@Override
-		public LockMode getLockMode() {
+		public @Nullable LockMode getLockMode() {
 			return null;
 		}
 	}

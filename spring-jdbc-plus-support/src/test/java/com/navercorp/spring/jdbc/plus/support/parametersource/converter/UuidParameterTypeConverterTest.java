@@ -18,13 +18,12 @@
 
 package com.navercorp.spring.jdbc.plus.support.parametersource.converter;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.nio.ByteBuffer;
 import java.util.UUID;
 
 import org.javaunit.autoparams.AutoSource;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 
 import com.navercorp.spring.jdbc.plus.support.parametersource.converter.UuidParameterTypeConverter.UuidToByteTypeConverter;

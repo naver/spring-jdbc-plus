@@ -11,8 +11,8 @@ import org.springframework.core.convert.converter.Converter
 import org.springframework.data.convert.ReadingConverter
 import org.springframework.data.jdbc.core.convert.JdbcConverter
 import org.springframework.data.jdbc.core.convert.JdbcCustomConversions
+import org.springframework.data.jdbc.core.dialect.JdbcDialect
 import org.springframework.data.jdbc.core.dialect.JdbcMySqlDialect
-import org.springframework.data.relational.core.dialect.Dialect
 import org.springframework.data.relational.core.mapping.RelationalMappingContext
 import org.springframework.data.relational.core.sql.IdentifierProcessing
 import org.springframework.data.relational.core.sql.IdentifierProcessing.Quoting
@@ -24,7 +24,7 @@ class JdbcConfiguration {
     fun sqlParameterSourceFactory(
         mappingContext: RelationalMappingContext,
         jdbcConverter: JdbcConverter,
-        dialect: Dialect
+        dialect: JdbcDialect
     ): SqlParameterSourceFactory {
         val converters = storeConverters()
         converters.addAll(dialect.converters as List<Converter<*, *>>)
@@ -40,7 +40,7 @@ class JdbcConfiguration {
     }
 
     @Bean
-    fun jdbcDialect(): Dialect =
+    fun jdbcDialect(): JdbcDialect =
         JdbcMySqlDialect(
             IdentifierProcessing.create(Quoting("`"), IdentifierProcessing.LetterCasing.LOWER_CASE)
         )

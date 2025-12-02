@@ -33,4 +33,6 @@ checkstyle {
 dependencies {
     compileOnly("com.google.code.findbugs:jsr305:3.0.2")
     testCompileOnly("com.google.code.findbugs:jsr305:3.0.2")
+    compileOnly("org.jspecify:jspecify:1.0.0")
+    testCompileOnly("org.jspecify:jspecify:1.0.0")
 }

@@ -310,7 +310,7 @@ public abstract class JdbcDaoSupport {
 				+ params;
 			throw new IncorrectResultSizeDataAccessException(message, 1, list.size());
 		}
-		return Optional.ofNullable(list.get(0));
+		return Optional.of(list.get(0));
 	}
 
 	/**
@@ -335,7 +335,7 @@ public abstract class JdbcDaoSupport {
 		if (list.size() > 1) {
 			throw new IncorrectResultSizeDataAccessException(1, list.size());
 		}
-		return Optional.ofNullable(list.get(0));
+		return Optional.of(list.get(0));
 	}
 
 	/**

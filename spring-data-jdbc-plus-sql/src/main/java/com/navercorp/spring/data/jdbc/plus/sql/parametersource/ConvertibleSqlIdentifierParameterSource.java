@@ -21,7 +21,9 @@ package com.navercorp.spring.data.jdbc.plus.sql.parametersource;
 import java.util.Objects;
 import java.util.Set;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.data.relational.core.sql.SqlIdentifier;
+import org.springframework.util.Assert;
 
 import com.navercorp.spring.data.jdbc.plus.support.parametersource.MutableSqlIdentifierParameterSource;
 import com.navercorp.spring.jdbc.plus.support.parametersource.converter.IterableExpandPadding;
@@ -36,11 +38,11 @@ import com.navercorp.spring.jdbc.plus.support.parametersource.fallback.FallbackP
 class ConvertibleSqlIdentifierParameterSource implements MutableSqlIdentifierParameterSource {
 	private final MutableSqlIdentifierParameterSource delegate;
 	private final JdbcParameterSourceConverter converter;
-	private final FallbackParameterSource fallbackParameterSource;
+	private final @Nullable FallbackParameterSource fallbackParameterSource;
 
 	private boolean padArray = false;
 	private boolean paddingIterableParams = false;
-	private int[] paddingIterableBoundaries = null;
+	private int @Nullable [] paddingIterableBoundaries = null;
 
 	/**
 	 * Instantiates a new Convertible sql identifier parameter source.
@@ -50,7 +52,7 @@ class ConvertibleSqlIdentifierParameterSource implements MutableSqlIdentifierPar
 	 */
 	ConvertibleSqlIdentifierParameterSource(
 		JdbcParameterSourceConverter converter,
-		FallbackParameterSource fallbackParameterSource
+		@Nullable FallbackParameterSource fallbackParameterSource
 	) {
 		this.delegate = MutableSqlIdentifierParameterSource.create();
 		this.converter = Objects.requireNonNull(converter, "Converter must not be null.");
@@ -58,7 +60,7 @@ class ConvertibleSqlIdentifierParameterSource implements MutableSqlIdentifierPar
 	}
 
 	@Override
-	public Object getValue(String paramName) throws IllegalArgumentException {
+	public @Nullable Object getValue(String paramName) throws IllegalArgumentException {
 		Object value = null;
 		try {
 			value = delegate.getValue(paramName);
@@ -69,7 +71,7 @@ class ConvertibleSqlIdentifierParameterSource implements MutableSqlIdentifierPar
 		}
 
 		if (value == null && this.isFallback(paramName)) {
-			value = this.fallbackParameterSource.fallback(paramName);
+			value = this.fallback(paramName);
 		}
 
 		value = this.converter.convert(paramName, value);
@@ -115,7 +117,7 @@ class ConvertibleSqlIdentifierParameterSource implements MutableSqlIdentifierPar
 	}
 
 	@Override
-	public String getTypeName(String paramName) {
+	public @Nullable String getTypeName(String paramName) {
 		return delegate.getTypeName(paramName);
 	}
 
@@ -129,7 +131,7 @@ class ConvertibleSqlIdentifierParameterSource implements MutableSqlIdentifierPar
 	 *
 	 * @param setPaddingIterableBoundaries the set padding iterable boundaries
 	 */
-	public void setPaddingIterableBoundaries(int[] setPaddingIterableBoundaries) {
+	public void setPaddingIterableBoundaries(int @Nullable [] setPaddingIterableBoundaries) {
 		this.paddingIterableBoundaries = setPaddingIterableBoundaries;
 	}
 
@@ -144,5 +146,11 @@ class ConvertibleSqlIdentifierParameterSource implements MutableSqlIdentifierPar
 
 	private boolean isFallback(String paramName) {
 		return this.fallbackParameterSource != null && this.fallbackParameterSource.isFallback(paramName);
+	}
+
+	private @Nullable Object fallback(String paramName) {
+		Assert.notNull(fallbackParameterSource, "FallbackParameterSource must not be null to use fallback");
+
+		return this.fallbackParameterSource.fallback(paramName);
 	}
 }

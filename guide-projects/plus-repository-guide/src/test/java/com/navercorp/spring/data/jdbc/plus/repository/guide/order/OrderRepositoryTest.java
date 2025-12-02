@@ -18,7 +18,7 @@
 
 package com.navercorp.spring.data.jdbc.plus.repository.guide.order;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.math.BigDecimal;
 import java.util.Arrays;

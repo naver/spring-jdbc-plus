@@ -28,12 +28,13 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.jspecify.annotations.Nullable;
 import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.jdbc.core.RowCountCallbackHandler;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
-import org.springframework.lang.Nullable;
+import org.springframework.util.Assert;
 
 import reactor.core.publisher.Flux;
 import reactor.core.scheduler.Scheduler;
@@ -221,7 +222,7 @@ public class JdbcReactiveTemplate {
 	 * @param ex the exception
 	 * @throws Exception will be propagated to flux.
 	 */
-	protected void handleError(Exception ex) throws Exception {
+	protected void handleError(@Nullable Exception ex) throws Exception {
 		if (ex == null) {
 			return;
 		}
@@ -289,14 +290,14 @@ public class JdbcReactiveTemplate {
 		@SuppressWarnings("rawtypes")
 		private static final FluxItem END_ITEM = new EndOfFluxItem();
 
-		private final R item;
+		private final @Nullable R item;
 
 		/**
 		 * Instantiates a new Flux item.
 		 *
 		 * @param item the item
 		 */
-		private FluxItem(R item) {
+		private FluxItem(@Nullable R item) {
 			this.item = item;
 		}
 
@@ -323,7 +324,8 @@ public class JdbcReactiveTemplate {
 		 *
 		 * @return the item
 		 */
-		private R getItem() {
+		protected R getItem() {
+			Assert.state(this.item != null, "FluxItem must not be null");
 			return this.item;
 		}
 
@@ -349,6 +351,11 @@ public class JdbcReactiveTemplate {
 		}
 
 		@Override
+		protected R getItem() {
+			throw new UnsupportedOperationException("EndOfFluxItem does not support getItem");
+		}
+
+		@Override
 		protected boolean isEnd() {
 			return true;
 		}
@@ -370,6 +377,11 @@ public class JdbcReactiveTemplate {
 		@Override
 		protected boolean isEnd() {
 			return true;
+		}
+
+		@Override
+		protected R getItem() {
+			throw new UnsupportedOperationException("ErrorFluxItem does not support getItem");
 		}
 
 		@Override

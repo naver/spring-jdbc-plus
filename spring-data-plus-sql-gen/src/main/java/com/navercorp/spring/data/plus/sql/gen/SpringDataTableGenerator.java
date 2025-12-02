@@ -82,7 +82,7 @@ public class SpringDataTableGenerator extends AbstractProcessor {
 			return false;
 		}
 
-		if (annotations.size() == 0) {
+		if (annotations.isEmpty()) {
 			return true;
 		}
 
@@ -336,7 +336,7 @@ public class SpringDataTableGenerator extends AbstractProcessor {
 				className.packageName(),
 				convertTableTypeName(className.simpleName()));
 			Element embeddedElement = this.processingEnv.getElementUtils()
-				.getTypeElement(fieldElement.asType().toString());
+				.getTypeElement(className.canonicalName());
 			this.generateType(embeddedElement);
 		} else if (this.processingEnv.getTypeUtils()
 			.asElement(fieldElement.asType())

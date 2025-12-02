@@ -66,7 +66,7 @@ public class PropertyPathUtils {
 	 * @return
 	 */
 	public static SqlIdentifier getReverseColumnAlias(AggregatePath path) {
-		return getReverseColumnAlias(path, path.getTableInfo().backReferenceColumnInfos().any().name());
+		return getReverseColumnAlias(path, path.getTableInfo().reverseColumnInfo().name());
 	}
 
 	/**
@@ -112,7 +112,6 @@ public class PropertyPathUtils {
 	@Nullable
 	private static SqlIdentifier assembleTableAlias(AggregatePath path) {
 
-		Assert.state(path != null, "Path is null");
 		if (path.isRoot()) {
 			return null;
 		}

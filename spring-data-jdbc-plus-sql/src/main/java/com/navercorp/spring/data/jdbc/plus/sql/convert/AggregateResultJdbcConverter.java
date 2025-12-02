@@ -31,8 +31,11 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.function.Function;
 
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
@@ -53,6 +56,7 @@ import org.springframework.data.mapping.model.SpELContext;
 import org.springframework.data.mapping.model.ValueExpressionEvaluator;
 import org.springframework.data.mapping.model.ValueExpressionParameterValueProvider;
 import org.springframework.data.relational.core.conversion.MappingRelationalConverter;
+import org.springframework.data.relational.core.conversion.RowDocumentAccessor;
 import org.springframework.data.relational.core.mapping.AggregatePath;
 import org.springframework.data.relational.core.mapping.RelationalMappingContext;
 import org.springframework.data.relational.core.mapping.RelationalPersistentEntity;
@@ -62,11 +66,11 @@ import org.springframework.data.util.Streamable;
 import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.jdbc.support.JdbcUtils;
-import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.util.ObjectUtils;
 
 import com.navercorp.spring.data.jdbc.plus.support.convert.PropertyPathUtils;
 
@@ -247,19 +251,17 @@ public class AggregateResultJdbcConverter extends MappingJdbcConverter {
 		AggregatePath rootPath = entityPathRelations.getRootPath();
 		RelationalPersistentEntity<?> persistentEntity = rootPath.getLeafEntity();
 
+		Assert.state(persistentEntity != null, "persistentEntity must not be null");
+
 		Map<Object, ExtractedRow> extractedRows = new LinkedHashMap<>();
 
 		while (resultSet.next()) {
 			RowDocument document = toRowDocument(resultSet);
 			Map<String, Object> entityMap = this.mapSingleTableRow(persistentEntity, document);
 
-			Object rootId = this.getRootId(document, persistentEntity);
-			ExtractedRow rootRow = extractedRows.get(rootId);
-			if (rootRow == null) {
-				rootRow = new ExtractedRow(
-					null, persistentEntity, entityMap, rootId, null, new LinkedMultiValueMap<>());
-				extractedRows.put(rootId, rootRow);
-			}
+			Object rootId = this.getRootId(document, rootPath);
+			ExtractedRow rootRow = extractedRows.computeIfAbsent(rootId, i -> new ExtractedRow(
+				null, persistentEntity, entityMap, i, null, new LinkedMultiValueMap<>()));
 			this.appendExtractRelationRows(document, rootRow, entityPathRelations.getRelations());
 		}
 
@@ -310,29 +312,29 @@ public class AggregateResultJdbcConverter extends MappingJdbcConverter {
 			: relationEntityPaths.entrySet()) {
 
 			AggregatePath relationPath = relationEntityPath.getKey();
+			RelationalPersistentProperty idProperty = relationPath.getRequiredIdProperty();
 			List<ExtractedRow> relationRows = relationEntities.get(relationPath);
 
-			// extract relation entity Id
-			String idColumnAlias = this.getIdColumnAlias(relationEntityPath.getKey());
-			Object relationEntityId = rowDocument.get(idColumnAlias);
+			Identifier identifier = this.getRelationEntityIdentifier(
+				relationPath, Objects.requireNonNull(rootRow.getRootEntity()), rootRow.getRoot());
 
-			if (relationEntityId == null) {
+			if (identifier == null) {
 				continue;
 			}
 
-			Identifier identifier = this.getRelationEntityIdentifier(
-				relationPath, rootRow.getRootEntity(), rootRow.getRoot());
+			ExtractedRow extractedRow = this.extractRelationRow(
+				rowDocument,
+				rootRow.getRootId(),
+				relationPath,
+				identifier,
+				relationEntityPath.getValue().getRelations());
+
+			if (!extractedRow.hasValue(idProperty)) {
+				continue;
+			}
 
 			if (CollectionUtils.isEmpty(relationRows)) {
 				// First relation extract
-				ExtractedRow extractedRow = this.extractRelationRow(
-					rowDocument,
-					rootRow.getRootId(),
-					relationPath,
-					identifier,
-					relationEntityId,
-					relationEntityPath.getValue().getRelations());
-
 				List<ExtractedRow> newRelations = new ArrayList<>();
 				newRelations.add(extractedRow);
 
@@ -342,7 +344,7 @@ public class AggregateResultJdbcConverter extends MappingJdbcConverter {
 
 			ExtractedRow existRow = null;
 			for (ExtractedRow relationRow : relationRows) {
-				if (relationRow.getRootId().equals(relationEntityId)) {
+				if (relationRow.getRootId().equals(extractedRow.getPropertyValue(idProperty))) {
 					// Next row relation is same entity
 					existRow = relationRow;
 					break;
@@ -357,24 +359,27 @@ public class AggregateResultJdbcConverter extends MappingJdbcConverter {
 					relationEntityPath.getValue().getRelations());
 			} else {
 				// extract new relation rows
-				ExtractedRow relationExtractedRows = this.extractRelationRow(
-					rowDocument,
-					rootRow.getRootId(),
-					relationPath,
-					identifier,
-					relationEntityId,
-					relationEntityPath.getValue().getRelations());
-				relationEntities.add(relationPath, relationExtractedRows);
+				relationEntities.add(relationPath, extractedRow);
 			}
 		}
 	}
 
 	private ExtractedRow extractRelationRow(
 		RowDocument rowDocument,
-		Object rootId,
+		@Nullable Object rootId,
 		AggregatePath relationPath,
 		Identifier identifier,
-		Object relationEntityId,
+		Map<AggregatePath, EntityPathRelations> nestedRelations
+	) throws SQLException {
+		return extractRelationRow(rowDocument, rootId, relationPath, identifier, null, nestedRelations);
+	}
+
+	private ExtractedRow extractRelationRow(
+		RowDocument rowDocument,
+		@Nullable Object rootId,
+		AggregatePath relationPath,
+		Identifier identifier,
+		@Nullable Object relationEntityId,
 		Map<AggregatePath, EntityPathRelations> nestedRelations
 	) throws SQLException {
 
@@ -389,6 +394,10 @@ public class AggregateResultJdbcConverter extends MappingJdbcConverter {
 		} else {
 			relationValue = this.mapSingleTableRow(
 				relationPath, rowDocument, identifier);
+		}
+
+		if (relationEntityId == null) {
+			relationEntityId = relationValue.get(relationPath.getRequiredIdProperty().getName());
 		}
 
 		ExtractedRow extractedRow = new ExtractedRow(
@@ -409,8 +418,11 @@ public class AggregateResultJdbcConverter extends MappingJdbcConverter {
 
 	private EntityPathRelations getEntityPathRelations(AggregatePath entityPath) {
 		Map<AggregatePath, EntityPathRelations> relations = new HashMap<>();
+		RelationalPersistentEntity<?> leafEntity = entityPath.getLeafEntity();
 
-		for (RelationalPersistentProperty property : entityPath.getLeafEntity()) {
+		Assert.state(leafEntity != null, "leafEntity must not be null");
+
+		for (RelationalPersistentProperty property : leafEntity) {
 			if (property.isEmbedded()) {
 				continue;
 			}
@@ -445,9 +457,11 @@ public class AggregateResultJdbcConverter extends MappingJdbcConverter {
 
 	private void setEntityRelations(
 		Map<String, Object> rootEntity,
-		RelationalPersistentEntity<?> persistentEntity,
+		@Nullable RelationalPersistentEntity<?> persistentEntity,
 		MultiValueMap<AggregatePath, RelationValue> relationValues
 	) {
+		Assert.notNull(persistentEntity, "The persistentEntity must not be null.");
+
 		for (Map.Entry<AggregatePath, List<RelationValue>> relations : relationValues.entrySet()) {
 
 			AggregatePath propertyPath = relations.getKey();
@@ -466,6 +480,9 @@ public class AggregateResultJdbcConverter extends MappingJdbcConverter {
 
 				MultiValueMap<Object, RelationValue> parentKeyChildren = new LinkedMultiValueMap<>();
 				for (RelationValue value : relations.getValue()) {
+					if (value.getParentId() == null) {
+						continue;
+					}
 					parentKeyChildren.add(value.getParentId(), value);
 				}
 
@@ -479,16 +496,23 @@ public class AggregateResultJdbcConverter extends MappingJdbcConverter {
 		}
 	}
 
-	private Object getRootId(RowDocument rowDocument, RelationalPersistentEntity<?> entity) {
-		return rowDocument.get(entity.getIdColumn().getReference());
+	private Object getRootId(RowDocument rowDocument, AggregatePath rootPath) {
+		if (rootPath.getRequiredIdProperty().isEmbedded()) {
+			return read(rootPath.getRequiredIdProperty().getTypeInformation(),  rowDocument);
+		}
+		return rowDocument.get(rootPath.getRequiredIdProperty().getColumnName().getReference());
 	}
 
-	private Identifier getRelationEntityIdentifier(
+	private @Nullable Identifier getRelationEntityIdentifier(
 		AggregatePath relationPath,
 		RelationalPersistentEntity<?> entity,
 		Map<String, Object> entityMap
 	) {
 		Object id = entityMap.get(entity.getRequiredIdProperty().getName());
+		if (id == null) {
+			return null;
+		}
+
 		return Identifier.of(
 			relationPath.getTableInfo().backReferenceColumnInfos().any().name(),
 			id,
@@ -496,15 +520,9 @@ public class AggregateResultJdbcConverter extends MappingJdbcConverter {
 		);
 	}
 
-	protected String getIdColumnAlias(AggregatePath relationPath) {
-		return PropertyPathUtils.getColumnAlias(
-			relationPath.append(relationPath.getLeafEntity().getRequiredIdProperty())
-		).getReference();
-	}
-
 	protected String getQualifierColumnAlias(AggregatePath relationPath) {
-		return PropertyPathUtils.getTableAlias(relationPath).getReference()
-			+ "_" + relationPath.getTableInfo().qualifierColumnInfo().name().getReference();
+		return Objects.requireNonNull(PropertyPathUtils.getTableAlias(relationPath)).getReference()
+			+ "_" + Objects.requireNonNull(relationPath.getTableInfo().qualifierColumnInfo()).name().getReference();
 	}
 
 	private Object determineRelationValue(
@@ -530,9 +548,7 @@ public class AggregateResultJdbcConverter extends MappingJdbcConverter {
 					property.getOwner().getType() + "#" + property.getName(), relationMapValues));
 			}
 
-			if (relationMapValues.isEmpty()) {
-				return null;
-			} else {
+			if (!relationMapValues.isEmpty()) {
 				return relationMapValues.get(0);
 			}
 		}
@@ -603,11 +619,11 @@ public class AggregateResultJdbcConverter extends MappingJdbcConverter {
 	}
 
 	private static class ExtractedRow {
-		private final Object parentId;
-		private final RelationalPersistentEntity<?> rootEntity;
+		private final @Nullable Object parentId;
+		private final @Nullable RelationalPersistentEntity<?> rootEntity;
 		private final Map<String, Object> root;
-		private final Object rootId;
-		private final Object keyValue;
+		private final @Nullable Object rootId;
+		private final @Nullable Object keyValue;
 		private final MultiValueMap<AggregatePath, ExtractedRow> relations;
 
 		/**
@@ -621,11 +637,11 @@ public class AggregateResultJdbcConverter extends MappingJdbcConverter {
 		 * @param relations  the relations
 		 */
 		ExtractedRow(
-			Object parentId,
-			RelationalPersistentEntity<?> rootEntity,
+			@Nullable Object parentId,
+			@Nullable RelationalPersistentEntity<?> rootEntity,
 			Map<String, Object> root,
-			Object rootId,
-			Object keyValue,
+			@Nullable Object rootId,
+			@Nullable Object keyValue,
 			MultiValueMap<AggregatePath, ExtractedRow> relations
 		) {
 			this.parentId = parentId;
@@ -641,7 +657,7 @@ public class AggregateResultJdbcConverter extends MappingJdbcConverter {
 		 *
 		 * @return the parent id
 		 */
-		public Object getParentId() {
+		public @Nullable Object getParentId() {
 			return this.parentId;
 		}
 
@@ -650,7 +666,7 @@ public class AggregateResultJdbcConverter extends MappingJdbcConverter {
 		 *
 		 * @return the root entity
 		 */
-		public RelationalPersistentEntity<?> getRootEntity() {
+		public @Nullable RelationalPersistentEntity<?> getRootEntity() {
 			return this.rootEntity;
 		}
 
@@ -668,6 +684,7 @@ public class AggregateResultJdbcConverter extends MappingJdbcConverter {
 		 *
 		 * @return the root id
 		 */
+		@Nullable
 		public Object getRootId() {
 			return this.rootId;
 		}
@@ -681,20 +698,28 @@ public class AggregateResultJdbcConverter extends MappingJdbcConverter {
 			return this.relations;
 		}
 
+		public @Nullable Object getPropertyValue(RelationalPersistentProperty property) {
+			return this.root.get(property.getName());
+		}
+
+		public boolean hasValue(RelationalPersistentProperty property) {
+			return !ObjectUtils.isEmpty(this.root.get(property.getName()));
+		}
+
 		/**
 		 * Gets key value.
 		 *
 		 * @return the key value
 		 */
-		public Object getKeyValue() {
+		public @Nullable Object getKeyValue() {
 			return this.keyValue;
 		}
 	}
 
 	private static class RelationValue {
-		private final Object parentId;
-		private final Object valueId;
-		private final Object keyValue;
+		private final @Nullable Object parentId;
+		private final @Nullable Object valueId;
+		private final @Nullable Object keyValue;
 		private final Map<String, Object> value;
 
 		/**
@@ -706,9 +731,9 @@ public class AggregateResultJdbcConverter extends MappingJdbcConverter {
 		 * @param value    the value
 		 */
 		public RelationValue(
-			Object parentId,
-			Object valueId,
-			Object keyValue,
+			@Nullable Object parentId,
+			@Nullable Object valueId,
+			@Nullable Object keyValue,
 			Map<String, Object> value
 		) {
 			this.parentId = parentId;
@@ -722,7 +747,7 @@ public class AggregateResultJdbcConverter extends MappingJdbcConverter {
 		 *
 		 * @return the parent id
 		 */
-		public Object getParentId() {
+		public @Nullable Object getParentId() {
 			return this.parentId;
 		}
 
@@ -731,7 +756,7 @@ public class AggregateResultJdbcConverter extends MappingJdbcConverter {
 		 *
 		 * @return the value id
 		 */
-		public Object getValueId() {
+		public @Nullable Object getValueId() {
 			return this.valueId;
 		}
 
@@ -740,7 +765,7 @@ public class AggregateResultJdbcConverter extends MappingJdbcConverter {
 		 *
 		 * @return the key value
 		 */
-		public Object getKeyValue() {
+		public @Nullable Object getKeyValue() {
 			return this.keyValue;
 		}
 
@@ -790,7 +815,7 @@ public class AggregateResultJdbcConverter extends MappingJdbcConverter {
 		private final AggregatePath rootPath;
 		private final AggregatePath path;
 		private final Identifier identifier;
-		private final Object key;
+		private final @Nullable Object key;
 
 		private final JdbcPropertyValueProvider propertyValueProvider;
 		private final JdbcBackReferencePropertyValueProvider backReferencePropertyValueProvider;
@@ -800,7 +825,7 @@ public class AggregateResultJdbcConverter extends MappingJdbcConverter {
 			AggregatePath rootPath,
 			RowDocument rowDocument,
 			Identifier identifier,
-			Object key
+			@Nullable Object key
 		) {
 			RelationalPersistentEntity<?> entity = rootPath.getLeafEntity();
 
@@ -817,13 +842,15 @@ public class AggregateResultJdbcConverter extends MappingJdbcConverter {
 		}
 
 		private SingleTableMapReadingContext(
-			RelationalPersistentEntity<?> entity,
+			@Nullable RelationalPersistentEntity<?> entity,
 			RowDocument rowDocument,
 			AggregatePath rootPath,
 			AggregatePath path,
 			Identifier identifier,
-			Object key
+			@Nullable Object key
 		) {
+			Assert.notNull(entity, "The rootPath must point to an entity.");
+
 			this.entity = entity;
 			this.rootPath = rootPath;
 			this.path = path;
@@ -835,15 +862,17 @@ public class AggregateResultJdbcConverter extends MappingJdbcConverter {
 		}
 
 		private SingleTableMapReadingContext(
-			RelationalPersistentEntity<?> entity,
+			@Nullable RelationalPersistentEntity<?> entity,
 			AggregatePath rootPath,
 			AggregatePath path,
 			Identifier identifier,
-			Object key,
+			@Nullable Object key,
 			JdbcPropertyValueProvider propertyValueProvider,
 			JdbcBackReferencePropertyValueProvider backReferencePropertyValueProvider,
 			RowDocument rowDocument
 		) {
+			Assert.notNull(entity, "The rootPath must point to an entity.");
+
 			this.entity = entity;
 			this.rootPath = rootPath;
 			this.path = path;
@@ -890,6 +919,10 @@ public class AggregateResultJdbcConverter extends MappingJdbcConverter {
 				}
 
 				Object value = readOrLoadProperty(idValue, property);
+				if (value == null) {
+					return;
+				}
+
 				map.put(property.getName(), value);
 			});
 		}
@@ -960,13 +993,16 @@ public class AggregateResultJdbcConverter extends MappingJdbcConverter {
 		}
 
 		@Nullable
-		@SuppressWarnings("unchecked")
 		private Object readEntityFrom(RelationalPersistentProperty property) {
 
 			SingleTableMapReadingContext newContext = extendBy(property);
 			RelationalPersistentEntity<?> entity = getMappingContext()
 				.getRequiredPersistentEntity(property.getActualType());
 			RelationalPersistentProperty idProperty = entity.getIdProperty();
+
+			if (property.isIdProperty()) {
+				return readEmbeddedEntityFrom(UUID.randomUUID().toString(), property);
+			}
 
 			Object idValue;
 
@@ -995,7 +1031,7 @@ public class AggregateResultJdbcConverter extends MappingJdbcConverter {
 
 		private final RelationalPersistentEntity<T> entity;
 
-		private final Map<String, Object> entityMap;
+		private final @Nullable Map<String, @Nullable Object> entityMap;
 		private final AggregatePath path;
 
 		@SuppressWarnings("unchecked")
@@ -1014,7 +1050,7 @@ public class AggregateResultJdbcConverter extends MappingJdbcConverter {
 
 		private MapReadingContext(
 			RelationalPersistentEntity<T> entity,
-			@Nullable Map<String, Object> entityMap,
+			@Nullable Map<String, @Nullable Object> entityMap,
 			AggregatePath path
 		) {
 			this.entity = entity;
@@ -1025,7 +1061,7 @@ public class AggregateResultJdbcConverter extends MappingJdbcConverter {
 		@SuppressWarnings({"rawtypes", "unchecked"})
 		private <S> MapReadingContext<S> extendEntityBy(
 			RelationalPersistentProperty property,
-			@Nullable Map<String, Object> entityMap
+			@Nullable Map<String, @Nullable Object> entityMap
 		) {
 			return new MapReadingContext(
 				getMappingContext().getRequiredPersistentEntity(property.getActualType()),
@@ -1040,15 +1076,10 @@ public class AggregateResultJdbcConverter extends MappingJdbcConverter {
 		 * @return the t
 		 */
 		T mapRow() {
-
-			RelationalPersistentProperty idProperty = entity.getIdProperty();
-
-			Object idValue = idProperty == null ? null : readFrom(idProperty);
-
-			return createInstanceInternal(idValue);
+			return createInstanceInternal();
 		}
 
-		private T populateProperties(T instance, @Nullable Object idValue) {
+		private T populateProperties(T instance) {
 
 			PersistentPropertyAccessor<T> propertyAccessor = getPropertyAccessor(entity, instance);
 
@@ -1069,7 +1100,7 @@ public class AggregateResultJdbcConverter extends MappingJdbcConverter {
 					}
 				}
 
-				Object value = readOrLoadProperty(idValue, property);
+				Object value = readOrLoadProperty(property);
 				propertyAccessor.setProperty(property, value);
 			});
 
@@ -1078,7 +1109,6 @@ public class AggregateResultJdbcConverter extends MappingJdbcConverter {
 
 		@Nullable
 		private Object readOrLoadProperty(
-			@Nullable Object id,
 			RelationalPersistentProperty property
 		) {
 			if (property.isMap()) {
@@ -1086,7 +1116,7 @@ public class AggregateResultJdbcConverter extends MappingJdbcConverter {
 			} else if (property.isCollectionLike() && property.isEntity()) {
 				return this.readCollectionFrom(property);
 			} else if (property.isEmbedded()) {
-				return readEmbeddedEntityFrom(id, property);
+				return readEmbeddedEntityFrom(property);
 			} else {
 				return readFrom(property);
 			}
@@ -1104,9 +1134,7 @@ public class AggregateResultJdbcConverter extends MappingJdbcConverter {
 		}
 
 		@SuppressWarnings("unchecked")
-		@Nullable
-		private Object readEmbeddedEntityFrom(
-			@Nullable Object idValue,
+		private @Nullable Object readEmbeddedEntityFrom(
 			RelationalPersistentProperty property
 		) {
 			if (this.entityMap == null) {
@@ -1116,8 +1144,8 @@ public class AggregateResultJdbcConverter extends MappingJdbcConverter {
 			Object value = this.entityMap.get(property.getName());
 			MapReadingContext<?> newContext = extendEntityBy(property, (Map<String, Object>)value);
 
-			if (shouldCreateEmptyEmbeddedInstance(property) || newContext.hasInstanceValues(idValue)) {
-				return newContext.createInstanceInternal(idValue);
+			if (shouldCreateEmptyEmbeddedInstance(property) || newContext.hasInstanceValues()) {
+				return newContext.createInstanceInternal();
 			}
 
 			return null;
@@ -1129,9 +1157,12 @@ public class AggregateResultJdbcConverter extends MappingJdbcConverter {
 			return property.shouldCreateEmptyEmbedded();
 		}
 
-		private boolean hasInstanceValues(@Nullable Object idValue) {
+		private boolean hasInstanceValues() {
 
 			RelationalPersistentEntity<?> persistentEntity = path.getLeafEntity();
+			if (persistentEntity == null) {
+				return false;
+			}
 
 			for (RelationalPersistentProperty embeddedProperty : persistentEntity) {
 
@@ -1140,7 +1171,7 @@ public class AggregateResultJdbcConverter extends MappingJdbcConverter {
 					return true;
 				}
 
-				Object value = readOrLoadProperty(idValue, embeddedProperty);
+				Object value = readOrLoadProperty(embeddedProperty);
 				if (value != null) {
 					return true;
 				}
@@ -1149,22 +1180,19 @@ public class AggregateResultJdbcConverter extends MappingJdbcConverter {
 			return false;
 		}
 
-		@Nullable
 		@SuppressWarnings("unchecked")
-		private Object readEntityFrom(RelationalPersistentProperty property) {
+		private @Nullable Object readEntityFrom(RelationalPersistentProperty property) {
 			if (this.entityMap == null) {
 				return null;
 			}
 
-			Map<String, Object> value = (Map<String, Object>)this.entityMap.get(property.getName());
+			Map<String, @Nullable Object> value = (Map<String, @Nullable Object>)this.entityMap.get(property.getName());
 			return this.readEntityFrom(property, value);
 		}
 
-		@Nullable
-		@SuppressWarnings("unchecked")
-		private Object readEntityFrom(
+		private @Nullable Object readEntityFrom(
 			RelationalPersistentProperty property,
-			@Nullable Map<String, Object> value
+			@Nullable Map<String, @Nullable Object> value
 		) {
 			if (value == null) {
 				return null;
@@ -1178,7 +1206,7 @@ public class AggregateResultJdbcConverter extends MappingJdbcConverter {
 			Object idValue;
 
 			if (idProperty != null) {
-				idValue = newContext.readFrom(idProperty);
+				idValue = newContext.readOrLoadProperty(idProperty);
 			} else {
 				idValue = newContext.getObjectFromResultSet(property.getName());
 			}
@@ -1187,16 +1215,16 @@ public class AggregateResultJdbcConverter extends MappingJdbcConverter {
 				return null;
 			}
 
-			return newContext.createInstanceInternal(idValue);
+			return newContext.createInstanceInternal();
 		}
 
-		private Map<Object, Object> readMapFrom(RelationalPersistentProperty property) {
+		private Map<Object, @Nullable Object> readMapFrom(RelationalPersistentProperty property) {
 			if (this.entityMap == null) {
 				return new HashMap<>();
 			}
 
 			@SuppressWarnings("unchecked")
-			Map<Object, Map<String, Object>> mapValues = (Map<Object, Map<String, Object>>)
+			Map<Object, @Nullable Map<String, @Nullable Object>> mapValues = (Map<Object, Map<String, Object>>)
 				this.entityMap.get(property.getName());
 			if (mapValues == null) {
 				return new HashMap<>();
@@ -1221,12 +1249,13 @@ public class AggregateResultJdbcConverter extends MappingJdbcConverter {
 			}
 
 			return Streamable.of(collectionValues).stream()
-				.map(value -> this.readEntityFrom(property, value))
+				.map(value -> Optional.ofNullable(this.readEntityFrom(property, value)))
+				.filter(Optional::isPresent)
+				.map(Optional::get)
 				.collect(toList());
 		}
 
-		@Nullable
-		private Object getObjectFromResultSet(String propertyName) {
+		private @Nullable Object getObjectFromResultSet(String propertyName) {
 			if (this.entityMap == null) {
 				return null;
 			}
@@ -1234,40 +1263,39 @@ public class AggregateResultJdbcConverter extends MappingJdbcConverter {
 			return this.entityMap.get(propertyName);
 		}
 
-		private T createInstanceInternal(@Nullable Object idValue) {
+		private T createInstanceInternal() {
 
 			InstanceCreatorMetadata<RelationalPersistentProperty> creatorMetadata =
 				entity.getInstanceCreatorMetadata();
 			ParameterValueProvider<RelationalPersistentProperty> provider;
 
-			if (creatorMetadata != null && creatorMetadata.hasParameters()) {
+			if (creatorMetadata != null && creatorMetadata.hasParameters() && this.entityMap != null) {
 				ValueExpressionEvaluator expressionEvaluator = valueExpressionEvaluatorFactory.create(this.entityMap);
 				provider = new ValueExpressionParameterValueProvider<>(expressionEvaluator, getConversionService(),
-					new ResultSetParameterValueProvider(idValue, entity));
+					new ResultSetParameterValueProvider(entity));
 			} else {
 				provider = NoOpParameterValueProvider.INSTANCE;
 			}
 
+			//noinspection DataFlowIssue
 			T instance = getEntityInstantiators().getInstantiatorFor(entity)
 				.createInstance(entity, new ConvertingParameterValueProvider<>(provider::getParameterValue));
 
-			return entity.requiresPropertyPopulation() ? populateProperties(instance, idValue) : instance;
+			return entity.requiresPropertyPopulation() ? populateProperties(instance) : instance;
 		}
 
 		/**
 		 * {@link ParameterValueProvider} that reads a simple property or materializes an object for a
 		 * {@link RelationalPersistentProperty}.
 		 *
-		 * @see #readOrLoadProperty(Object, RelationalPersistentProperty)
+		 * @see #readOrLoadProperty(RelationalPersistentProperty)
 		 * @since 2.1
 		 */
 		private class ResultSetParameterValueProvider implements ParameterValueProvider<RelationalPersistentProperty> {
 
-			private final @Nullable Object idValue;
 			private final RelationalPersistentEntity<?> entity;
 
-			public ResultSetParameterValueProvider(@Nullable Object idValue, RelationalPersistentEntity<?> entity) {
-				this.idValue = idValue;
+			public ResultSetParameterValueProvider(RelationalPersistentEntity<?> entity) {
 				this.entity = entity;
 			}
 
@@ -1275,9 +1303,9 @@ public class AggregateResultJdbcConverter extends MappingJdbcConverter {
 			 * (non-Javadoc)
 			 * @see org.springframework.data.mapping.model.ParameterValueProvider#getParameterValue()
 			 */
+			@SuppressWarnings("unchecked")
 			@Override
-			@Nullable
-			public <T> T getParameterValue(Parameter<T, RelationalPersistentProperty> parameter) {
+			public <P> @Nullable P getParameterValue(Parameter<P, RelationalPersistentProperty> parameter) {
 
 				String parameterName = parameter.getName();
 
@@ -1285,7 +1313,7 @@ public class AggregateResultJdbcConverter extends MappingJdbcConverter {
 					"A constructor parameter name must not be null to be used with Spring Data JDBC");
 
 				RelationalPersistentProperty property = entity.getRequiredPersistentProperty(parameterName);
-				return (T)readOrLoadProperty(idValue, property);
+				return (P)readOrLoadProperty(property);
 			}
 		}
 	}
@@ -1295,7 +1323,7 @@ public class AggregateResultJdbcConverter extends MappingJdbcConverter {
 		INSTANCE;
 
 		@Override
-		public <T> T getParameterValue(Parameter<T, RelationalPersistentProperty> parameter) {
+		public <T> @Nullable T getParameterValue(Parameter<T, RelationalPersistentProperty> parameter) {
 			return null;
 		}
 	}
@@ -1304,15 +1332,15 @@ public class AggregateResultJdbcConverter extends MappingJdbcConverter {
 	 * COPY OF {@link MappingRelationalConverter.ConvertingParameterValueProvider}
 	 */
 	class ConvertingParameterValueProvider<P extends PersistentProperty<P>> implements ParameterValueProvider<P> {
-		private final Function<Parameter<?, P>, Object> delegate;
+		private final Function<Parameter<?, P>, @Nullable Object> delegate;
 
-		ConvertingParameterValueProvider(Function<Parameter<?, P>, Object> delegate) {
+		ConvertingParameterValueProvider(Function<Parameter<?, P>, @Nullable Object> delegate) {
 			Assert.notNull(delegate, "Delegate must not be null");
 			this.delegate = delegate;
 		}
 
 		@SuppressWarnings("unchecked")
-		public <T> T getParameterValue(Parameter<T, P> parameter) {
+		public <T> @Nullable T getParameterValue(Parameter<T, P> parameter) {
 			return (T)AggregateResultJdbcConverter.this.readValue(this.delegate.apply(parameter), parameter.getType());
 		}
 	}

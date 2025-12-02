@@ -12,10 +12,11 @@ CREATE TABLE IF NOT EXISTS n_board (
   PRIMARY KEY(id));
 
 CREATE TABLE IF NOT EXISTS n_label (
-  id INT AUTO_INCREMENT,
+  title VARCHAR(255),
+  project_name VARCHAR(255),
   name VARCHAR(255),
   board_id INT,
-  PRIMARY KEY(id));
+  PRIMARY KEY(title, project_name));
 
 CREATE TABLE IF NOT EXISTS n_post (
   id INT AUTO_INCREMENT,
@@ -76,3 +77,20 @@ CREATE TABLE IF NOT EXISTS n_pay_adms (
   pay_method_type VARCHAR(20),
   PRIMARY KEY(id));
 
+CREATE TABLE IF NOT EXISTS n_pay_hist (
+  pay_no INT,
+  pay_hist_no INT,
+  order_id INT,
+  pay_amt BIGINT,
+  PRIMARY KEY(pay_no, pay_hist_no));
+
+CREATE TABLE IF NOT EXISTS cupn_pubt (
+  pubt_no INT AUTO_INCREMENT,
+  discount_amt DECIMAL(20, 2),
+  PRIMARY KEY(pubt_no));
+
+CREATE TABLE IF NOT EXISTS cupn_pubt_hist (
+  pubt_no INT,
+  hist_no BIGINT,
+  discount_amt DECIMAL(20, 2),
+  PRIMARY KEY(pubt_no, hist_no));

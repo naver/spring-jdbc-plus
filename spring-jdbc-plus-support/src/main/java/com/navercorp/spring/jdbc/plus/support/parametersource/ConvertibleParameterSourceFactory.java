@@ -20,6 +20,7 @@ package com.navercorp.spring.jdbc.plus.support.parametersource;
 
 import java.util.Map;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 
@@ -34,10 +35,10 @@ import com.navercorp.spring.jdbc.plus.support.parametersource.fallback.FallbackP
  */
 public class ConvertibleParameterSourceFactory {
 	private final JdbcParameterSourceConverter converter;
-	private final FallbackParameterSource fallbackParameterSource;
+	private final @Nullable FallbackParameterSource fallbackParameterSource;
 
 	private boolean paddingIterableParams = false;
-	private int[] paddingIterableBoundaries = null;
+	private int @Nullable [] paddingIterableBoundaries = null;
 
 	/**
 	 * Instantiates a new Convertible parameter source factory.
@@ -53,7 +54,7 @@ public class ConvertibleParameterSourceFactory {
 	 * @param fallbackParameterSource the fallback parameter source
 	 */
 	public ConvertibleParameterSourceFactory(
-		JdbcParameterSourceConverter converter, FallbackParameterSource fallbackParameterSource) {
+		JdbcParameterSourceConverter converter, @Nullable FallbackParameterSource fallbackParameterSource) {
 
 		this.converter = converter;
 		this.fallbackParameterSource = fallbackParameterSource;
@@ -118,7 +119,7 @@ public class ConvertibleParameterSourceFactory {
 	 *
 	 * @return the int [ ]
 	 */
-	public int[] getPaddingIterableBoundaries() {
+	public int @Nullable [] getPaddingIterableBoundaries() {
 		return this.paddingIterableBoundaries;
 	}
 
@@ -127,7 +128,7 @@ public class ConvertibleParameterSourceFactory {
 	 *
 	 * @param paddingIterableBoundaries the padding iterable boundaries
 	 */
-	public void setPaddingIterableBoundaries(int[] paddingIterableBoundaries) {
+	public void setPaddingIterableBoundaries(int @Nullable [] paddingIterableBoundaries) {
 		this.paddingIterableBoundaries = paddingIterableBoundaries;
 	}
 
@@ -154,7 +155,7 @@ public class ConvertibleParameterSourceFactory {
 	 *
 	 * @return the fallback
 	 */
-	public FallbackParameterSource getFallback() {
+	public @Nullable FallbackParameterSource getFallback() {
 		return this.fallbackParameterSource;
 	}
 }

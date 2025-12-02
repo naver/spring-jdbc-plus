@@ -20,11 +20,12 @@ package com.navercorp.spring.data.jdbc.plus.repository.support;
 
 import java.io.Serializable;
 
-import javax.annotation.Nullable;
-
+import org.jspecify.annotations.Nullable;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationEventPublisherAware;
+import org.springframework.data.jdbc.core.JdbcAggregateOperations;
+import org.springframework.data.jdbc.core.JdbcAggregateTemplate;
 import org.springframework.data.jdbc.core.convert.DataAccessStrategy;
 import org.springframework.data.jdbc.core.convert.DataAccessStrategyFactory;
 import org.springframework.data.jdbc.core.convert.InsertStrategyFactory;
@@ -32,9 +33,8 @@ import org.springframework.data.jdbc.core.convert.JdbcConverter;
 import org.springframework.data.jdbc.core.convert.QueryMappingConfiguration;
 import org.springframework.data.jdbc.core.convert.SqlGeneratorSource;
 import org.springframework.data.jdbc.core.convert.SqlParametersFactory;
-import org.springframework.data.jdbc.repository.support.JdbcRepositoryFactory;
+import org.springframework.data.jdbc.core.dialect.JdbcDialect;
 import org.springframework.data.mapping.callback.EntityCallbacks;
-import org.springframework.data.relational.core.dialect.Dialect;
 import org.springframework.data.relational.core.mapping.RelationalMappingContext;
 import org.springframework.data.repository.Repository;
 import org.springframework.data.repository.core.support.RepositoryFactorySupport;
@@ -43,7 +43,6 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
 import org.springframework.util.Assert;
 
 import com.navercorp.spring.data.jdbc.plus.support.convert.JdbcPlusDataAccessStrategyFactory;
-import com.navercorp.spring.data.jdbc.plus.support.parametersource.SoftDeleteSqlParametersFactory;
 
 /**
  * Special adapter for Springs {@link org.springframework.beans.factory.FactoryBean} interface to allow easy setup of
@@ -60,15 +59,16 @@ import com.navercorp.spring.data.jdbc.plus.support.parametersource.SoftDeleteSql
 public class JdbcPlusRepositoryFactoryBean<T extends Repository<S, ID>, S, ID extends Serializable>
 	extends TransactionalRepositoryFactoryBeanSupport<T, S, ID> implements ApplicationEventPublisherAware {
 
-	private ApplicationEventPublisher publisher;
-	private BeanFactory beanFactory;
-	private RelationalMappingContext mappingContext;
-	private JdbcConverter converter;
-	private DataAccessStrategy dataAccessStrategy;
-	private QueryMappingConfiguration queryMappingConfiguration = QueryMappingConfiguration.EMPTY;
-	private NamedParameterJdbcOperations operations;
-	private EntityCallbacks entityCallbacks;
-	private Dialect dialect;
+	private @Nullable ApplicationEventPublisher publisher;
+	private @Nullable BeanFactory beanFactory;
+	private @Nullable JdbcAggregateOperations aggregateOperations;
+	private @Nullable NamedParameterJdbcOperations jdbcOperations;
+	private @Nullable JdbcConverter converter;
+	private @Nullable JdbcDialect dialect;
+	private @Nullable DataAccessStrategy dataAccessStrategy;
+	private EntityCallbacks entityCallbacks = EntityCallbacks.create();
+	private @Nullable RelationalMappingContext mappingContext;
+	private @Nullable QueryMappingConfiguration queryMappingConfiguration;
 
 	/**
 	 * Creates a new {@link TransactionalRepositoryFactoryBeanSupport} for the given repository interface.
@@ -92,32 +92,58 @@ public class JdbcPlusRepositoryFactoryBean<T extends Repository<S, ID>, S, ID ex
 		this.publisher = publisher;
 	}
 
-	/**
-	 * Creates the actual {@link RepositoryFactorySupport} instance.
-	 */
 	@Override
-	protected RepositoryFactorySupport doCreateRepositoryFactory() {
+	public void setBeanFactory(BeanFactory beanFactory) {
 
-		JdbcRepositoryFactory jdbcRepositoryFactory = new JdbcPlusRepositoryFactory(
-			dataAccessStrategy, mappingContext, converter, dialect, publisher, operations);
-		jdbcRepositoryFactory.setQueryMappingConfiguration(queryMappingConfiguration);
-		jdbcRepositoryFactory.setEntityCallbacks(entityCallbacks);
-		jdbcRepositoryFactory.setBeanFactory(beanFactory);
+		super.setBeanFactory(beanFactory);
 
-		return jdbcRepositoryFactory;
+		this.entityCallbacks = EntityCallbacks.create(beanFactory);
+		this.beanFactory = beanFactory;
 	}
 
 	/**
-	 * Sets mapping context.
+	 * Set the {@link JdbcAggregateOperations} to use for this factory bean.
 	 *
-	 * @param mappingContext the mapping context
+	 * @param jdbcAggregateOperations
+	 * @since 4.0
 	 */
-	public void setMappingContext(RelationalMappingContext mappingContext) {
+	public void setJdbcAggregateOperations(JdbcAggregateOperations jdbcAggregateOperations) {
+		Assert.notNull(jdbcAggregateOperations, "JdbcAggregateOperations must not be null");
 
-		Assert.notNull(mappingContext, "MappingContext must not be null");
+		this.aggregateOperations = jdbcAggregateOperations;
 
-		super.setMappingContext(mappingContext);
-		this.mappingContext = mappingContext;
+		if (this.converter == null) {
+			setConverter(jdbcAggregateOperations.getConverter());
+		}
+
+		if (this.mappingContext == null) {
+			setMappingContext(jdbcAggregateOperations.getConverter().getMappingContext());
+		}
+	}
+
+
+	/**
+	 * Sets jdbc operations.
+	 *
+	 * @param operations the operations
+	 */
+	public void setJdbcOperations(NamedParameterJdbcOperations operations) {
+
+		Assert.notNull(operations, "NamedParameterJdbcOperations must not be null");
+
+		this.jdbcOperations = operations;
+	}
+
+	/**
+	 * Sets converter.
+	 *
+	 * @param converter the converter
+	 */
+	public void setConverter(JdbcConverter converter) {
+
+		Assert.notNull(converter, "JdbcConverter must not be null");
+
+		this.converter = converter;
 	}
 
 	/**
@@ -125,7 +151,7 @@ public class JdbcPlusRepositoryFactoryBean<T extends Repository<S, ID>, S, ID ex
 	 *
 	 * @param dialect the dialect
 	 */
-	public void setDialect(Dialect dialect) {
+	public void setDialect(JdbcDialect dialect) {
 
 		Assert.notNull(dialect, "Dialect must not be null");
 
@@ -145,6 +171,19 @@ public class JdbcPlusRepositoryFactoryBean<T extends Repository<S, ID>, S, ID ex
 	}
 
 	/**
+	 * Sets mapping context.
+	 *
+	 * @param mappingContext the mapping context
+	 */
+	public void setMappingContext(RelationalMappingContext mappingContext) {
+
+		Assert.notNull(mappingContext, "MappingContext must not be null");
+
+		super.setMappingContext(mappingContext);
+		this.mappingContext = mappingContext;
+	}
+
+	/**
 	 * Sets query mapping configuration.
 	 *
 	 * @param queryMappingConfiguration can be {@literal null}.
@@ -160,35 +199,34 @@ public class JdbcPlusRepositoryFactoryBean<T extends Repository<S, ID>, S, ID ex
 	}
 
 	/**
-	 * Sets jdbc operations.
-	 *
-	 * @param operations the operations
+	 * Creates the actual {@link RepositoryFactorySupport} instance.
 	 */
-	public void setJdbcOperations(NamedParameterJdbcOperations operations) {
-
-		Assert.notNull(operations, "NamedParameterJdbcOperations must not be null");
-
-		this.operations = operations;
-	}
-
-	/**
-	 * Sets converter.
-	 *
-	 * @param converter the converter
-	 */
-	public void setConverter(JdbcConverter converter) {
-
-		Assert.notNull(converter, "JdbcConverter must not be null");
-
-		this.converter = converter;
-	}
-
 	@Override
-	public void setBeanFactory(BeanFactory beanFactory) {
+	protected RepositoryFactorySupport doCreateRepositoryFactory() {
 
-		super.setBeanFactory(beanFactory);
+		Assert.state(this.queryMappingConfiguration != null, "RelationalConverter is required and must not be null");
+		Assert.state(this.publisher != null, "ApplicationEventPublisher is required and must not be null");
 
-		this.beanFactory = beanFactory;
+		JdbcPlusRepositoryFactory repositoryFactory;
+
+		if (this.aggregateOperations != null) {
+			repositoryFactory = new JdbcPlusRepositoryFactory(this.aggregateOperations);
+		} else {
+
+			Assert.state(this.dataAccessStrategy != null, "DataAccessStrategy is required and must not be null");
+			Assert.state(this.converter != null, "RelationalConverter is required and must not be null");
+
+			JdbcAggregateOperations operations = new JdbcAggregateTemplate(converter, dataAccessStrategy);
+
+			repositoryFactory = new JdbcPlusRepositoryFactory(operations);
+			repositoryFactory.setEntityCallbacks(entityCallbacks);
+		}
+
+		repositoryFactory.setApplicationEventPublisher(this.publisher);
+		repositoryFactory.setQueryMappingConfiguration(queryMappingConfiguration);
+		repositoryFactory.setBeanFactory(beanFactory);
+
+		return repositoryFactory;
 	}
 
 	/*
@@ -201,76 +239,98 @@ public class JdbcPlusRepositoryFactoryBean<T extends Repository<S, ID>, S, ID ex
 		Assert.state(this.mappingContext != null, "MappingContext is required and must not be null");
 		Assert.state(this.converter != null, "RelationalConverter is required and must not be null");
 
-		if (this.operations == null) {
-
-			Assert.state(beanFactory != null,
-				"If no JdbcOperations are set a BeanFactory must be available");
-
-			this.operations = beanFactory.getBean(NamedParameterJdbcOperations.class);
-		}
-
 		if (this.queryMappingConfiguration == null) {
-			this.queryMappingConfiguration = QueryMappingConfiguration.EMPTY;
+			if (this.beanFactory == null) {
+				this.queryMappingConfiguration = QueryMappingConfiguration.EMPTY;
+			} else {
+
+				this.queryMappingConfiguration = beanFactory.getBeanProvider(QueryMappingConfiguration.class)
+					.getIfAvailable(() -> QueryMappingConfiguration.EMPTY);
+			}
 		}
 
-		if (this.dataAccessStrategy == null) {
+		if (this.aggregateOperations == null) {
 
-			Assert.state(beanFactory != null,
-				"If no DataAccessStrategy is set a BeanFactory must be available");
+			if (this.jdbcOperations == null && this.dataAccessStrategy == null && this.beanFactory != null) {
+				JdbcAggregateOperations operations = this.beanFactory.getBeanProvider(JdbcAggregateOperations.class)
+					.getIfAvailable();
+				if (operations != null) {
+					setJdbcAggregateOperations(operations);
+				}
+			}
 
-			this.dataAccessStrategy = this.beanFactory.getBeanProvider(DataAccessStrategy.class) //
-				.getIfAvailable(() -> {
+			if (this.converter != null && this.mappingContext == null) {
+				setMappingContext(this.converter.getMappingContext());
+			}
 
-					Assert.state(this.dialect != null, "Dialect is required and must not be null");
+			Assert.state(this.publisher != null, "ApplicationPublisher is null");
+			Assert.state(this.mappingContext != null, "MappingContext is null");
 
-					SqlGeneratorSource sqlGeneratorSource = new SqlGeneratorSource(
-						this.mappingContext, this.converter, this.dialect);
-					com.navercorp.spring.data.jdbc.plus.support.convert.SqlGeneratorSource jdbcPlusSqlGeneratorSource =
-						new com.navercorp.spring.data.jdbc.plus.support.convert.SqlGeneratorSource(
-							this.mappingContext,
-							this.converter,
+			if (this.jdbcOperations == null) {
+
+				Assert.state(this.beanFactory != null, "If no JdbcOperations are set a BeanFactory must be available");
+				this.jdbcOperations = this.beanFactory.getBean(NamedParameterJdbcOperations.class);
+			}
+
+			if (this.dataAccessStrategy == null) {
+
+				Assert.state(beanFactory != null,
+					"If no DataAccessStrategy is set a BeanFactory must be available");
+
+				this.dataAccessStrategy = this.beanFactory.getBeanProvider(DataAccessStrategy.class) //
+					.getIfAvailable(() -> {
+
+						Assert.state(this.dialect != null, "Dialect is required and must not be null");
+
+						SqlGeneratorSource sqlGeneratorSource = new SqlGeneratorSource(
+							this.mappingContext, this.converter, this.dialect);
+						com.navercorp.spring.data.jdbc.plus.support.convert.SqlGeneratorSource plusSqlGeneratorSource =
+							new com.navercorp.spring.data.jdbc.plus.support.convert.SqlGeneratorSource(
+								this.mappingContext,
+								this.converter,
+								dialect
+							);
+						SqlParametersFactory sqlParametersFactory = new SqlParametersFactory(
+							this.mappingContext, this.converter);
+						InsertStrategyFactory insertStrategyFactory = new InsertStrategyFactory(this.jdbcOperations,
+							this.dialect);
+						DataAccessStrategy delegate = buildDataAccessStrategyDelegate(
+							sqlGeneratorSource,
+							sqlParametersFactory,
+							insertStrategyFactory
+						);
+
+						JdbcPlusDataAccessStrategyFactory factory = new JdbcPlusDataAccessStrategyFactory(
+							delegate,
+							converter,
+							jdbcOperations,
 							dialect
 						);
-					SqlParametersFactory sqlParametersFactory = new SqlParametersFactory(
-						this.mappingContext, this.converter);
-					InsertStrategyFactory insertStrategyFactory = new InsertStrategyFactory(this.operations,
-						this.dialect);
-					DataAccessStrategy delegate = buildDataAccessStrategyDelegate(
-						sqlGeneratorSource,
-						sqlParametersFactory,
-						insertStrategyFactory
-					);
 
-					JdbcPlusDataAccessStrategyFactory factory = new JdbcPlusDataAccessStrategyFactory(
-						delegate,
-						this.converter,
-						operations,
-						jdbcPlusSqlGeneratorSource,
-						new SoftDeleteSqlParametersFactory(this.mappingContext, this.converter)
-					);
-
-					return factory.create();
-				});
-		}
-
-		if (beanFactory != null) {
-			entityCallbacks = EntityCallbacks.create(beanFactory);
+						return factory.create();
+					});
+			}
 		}
 
 		super.afterPropertiesSet();
 	}
 
-	private DataAccessStrategy buildDataAccessStrategyDelegate(SqlGeneratorSource sqlGeneratorSource,
-		SqlParametersFactory sqlParametersFactory, InsertStrategyFactory insertStrategyFactory) {
-		DataAccessStrategyFactory factory = new DataAccessStrategyFactory(
+	private DataAccessStrategy buildDataAccessStrategyDelegate(
+		SqlGeneratorSource sqlGeneratorSource,
+		SqlParametersFactory sqlParametersFactory,
+		InsertStrategyFactory insertStrategyFactory
+	) {
+		Assert.state(this.converter != null, "Converter must not be null");
+		Assert.state(this.jdbcOperations != null, "JdbcOperations must not be null");
+		Assert.state(this.queryMappingConfiguration != null, "QueryMappingConfiguration must not be null");
+
+		return new DataAccessStrategyFactory(
 			sqlGeneratorSource,
 			this.converter,
-			this.operations,
+			this.jdbcOperations,
 			sqlParametersFactory,
 			insertStrategyFactory,
 			this.queryMappingConfiguration
-		);
-		DataAccessStrategy delegate = factory.create();
-		return delegate;
+		).create();
 	}
 }

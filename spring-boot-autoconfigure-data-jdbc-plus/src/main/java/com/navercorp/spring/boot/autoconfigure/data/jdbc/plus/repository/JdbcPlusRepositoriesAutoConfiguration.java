@@ -38,9 +38,9 @@ import org.springframework.data.jdbc.core.convert.DataAccessStrategy;
 import org.springframework.data.jdbc.core.convert.JdbcConverter;
 import org.springframework.data.jdbc.core.convert.JdbcCustomConversions;
 import org.springframework.data.jdbc.core.convert.RelationResolver;
+import org.springframework.data.jdbc.core.dialect.JdbcDialect;
 import org.springframework.data.jdbc.core.mapping.JdbcMappingContext;
 import org.springframework.data.relational.RelationalManagedTypes;
-import org.springframework.data.relational.core.dialect.Dialect;
 import org.springframework.data.relational.core.mapping.NamingStrategy;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -125,7 +125,7 @@ public class JdbcPlusRepositoriesAutoConfiguration {
 			NamedParameterJdbcOperations operations,
 			@Lazy RelationResolver relationResolver,
 			JdbcCustomConversions conversions,
-			Dialect dialect
+			JdbcDialect dialect
 		) {
 			return super.jdbcConverter(mappingContext, operations, relationResolver, conversions, dialect);
 		}
@@ -155,7 +155,7 @@ public class JdbcPlusRepositoriesAutoConfiguration {
 		public DataAccessStrategy dataAccessStrategyBean(
 			NamedParameterJdbcOperations operations,
 			JdbcConverter jdbcConverter, JdbcMappingContext context,
-			Dialect dialect
+			JdbcDialect dialect
 		) {
 			return super.dataAccessStrategyBean(operations, jdbcConverter, context, dialect);
 		}
@@ -163,7 +163,7 @@ public class JdbcPlusRepositoriesAutoConfiguration {
 		@Override
 		@Bean
 		@ConditionalOnMissingBean
-		public Dialect jdbcDialect(NamedParameterJdbcOperations operations) {
+		public JdbcDialect jdbcDialect(NamedParameterJdbcOperations operations) {
 			return super.jdbcDialect(operations);
 		}
 	}

@@ -20,6 +20,8 @@ package com.navercorp.spring.jdbc.plus.support.parametersource.converter;
 
 import java.util.function.BiFunction;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * The interface Jdbc parameter source converter.
  *
@@ -27,8 +29,9 @@ import java.util.function.BiFunction;
  */
 @FunctionalInterface
 public interface JdbcParameterSourceConverter extends BiFunction<String, Object, Object> {
+	@Nullable
 	@Override
-	default Object apply(String paramName, Object value) {
+	default Object apply(String paramName, @Nullable Object value) {
 		return convert(paramName, value);
 	}
 
@@ -39,5 +42,6 @@ public interface JdbcParameterSourceConverter extends BiFunction<String, Object,
 	 * @param value     the value
 	 * @return the object
 	 */
-	Object convert(String paramName, Object value);
+	@Nullable
+	Object convert(String paramName, @Nullable Object value);
 }

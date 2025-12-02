@@ -18,10 +18,10 @@
 
 package com.navercorp.spring.data.jdbc.plus.sql.guide.order;
 
-import static java.util.Comparator.*;
-import static java.util.function.Function.*;
-import static java.util.stream.Collectors.*;
-import static org.assertj.core.api.Assertions.*;
+import static java.util.Comparator.comparing;
+import static java.util.function.Function.identity;
+import static java.util.stream.Collectors.toMap;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Arrays;
 import java.util.List;
@@ -40,6 +40,7 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  * @author Myeonghyeon Lee
  */
+@SuppressWarnings("DataFlowIssue")
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional

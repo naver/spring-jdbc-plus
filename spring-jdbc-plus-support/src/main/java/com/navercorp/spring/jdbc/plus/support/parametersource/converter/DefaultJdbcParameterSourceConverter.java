@@ -18,7 +18,7 @@
 
 package com.navercorp.spring.jdbc.plus.support.parametersource.converter;
 
-import static java.util.stream.Collectors.*;
+import static java.util.stream.Collectors.toMap;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -27,9 +27,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.core.ResolvableType;
 import org.springframework.core.convert.converter.Converter;
-import org.springframework.lang.Nullable;
 
 import com.navercorp.spring.jdbc.plus.support.parametersource.converter.EnumParameterTypeConverter.EnumToNameConverter;
 
@@ -61,12 +61,12 @@ public class DefaultJdbcParameterSourceConverter implements JdbcParameterSourceC
 	 * @param converters the converters
 	 * @param unwrappers the unwrappers
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({"unchecked", "rawtypes"})
 	public DefaultJdbcParameterSourceConverter(List<Converter<?, ?>> converters, List<Unwrapper<?>> unwrappers) {
 		this.converters = getConvertersMapExcludeConditional(converters);
 		this.conditionalConverters = getConditionalConverters(converters);
 		Converter enumConverter = this.converters.get(Enum.class);
-		this.enumConverter = defaultIfNull(enumConverter, EnumToNameConverter.INSTANCE);
+		this.enumConverter = enumConverter != null ? enumConverter : (Converter) EnumToNameConverter.INSTANCE;
 		this.unwrappers = getUnwrappersMapExcludeConditional(unwrappers);
 		this.conditionalUnwrappers = getConditionalUnwrappers(unwrappers);
 	}
@@ -88,7 +88,7 @@ public class DefaultJdbcParameterSourceConverter implements JdbcParameterSourceC
 				continue;
 			}
 			Class<?> generics = resolveConverterGenerics(converter.getClass()).get(0);
-			if (generics == Object.class) {
+			if (generics == null || generics == Object.class) {
 				throw new ParameterTypeConverterResolveException(
 					"Could not know Converter target type. converterType: " + converter.getClass());
 			}
@@ -141,7 +141,7 @@ public class DefaultJdbcParameterSourceConverter implements JdbcParameterSourceC
 				continue;
 			}
 			Class<?> generics = resolveUnwrapperGenerics(unwrapper.getClass()).get(0);
-			if (generics == Object.class) {
+			if (generics == null || generics == Object.class) {
 				throw new ParameterTypeConverterResolveException(
 					"Could not know Unwrapper target containerType. "
 						+ "containerType: " + unwrapper.getClass());
@@ -159,21 +159,16 @@ public class DefaultJdbcParameterSourceConverter implements JdbcParameterSourceC
 		return Collections.unmodifiableMap(unwrapperMap);
 	}
 
-	private static List<Class<?>> resolveConverterGenerics(Class<?> type) {
+	private static List<@Nullable Class<?>> resolveConverterGenerics(Class<?> type) {
 		return Arrays.asList(ResolvableType.forClass(Converter.class, type).resolveGenerics());
 	}
 
-	private static List<Class<?>> resolveUnwrapperGenerics(Class<?> type) {
+	private static List<@Nullable Class<?>> resolveUnwrapperGenerics(Class<?> type) {
 		return Arrays.asList(ResolvableType.forClass(Unwrapper.class, type).resolveGenerics());
 	}
 
-	private static <T> T defaultIfNull(T object, T defaultValue) {
-		return object != null ? object : defaultValue;
-	}
-
-	@Nullable
 	@Override
-	public Object convert(String paramName, Object value) {
+	public @Nullable Object convert(String paramName, @Nullable Object value) {
 		if (value == null) {
 			return null;
 		}
@@ -182,7 +177,7 @@ public class DefaultJdbcParameterSourceConverter implements JdbcParameterSourceC
 	}
 
 	@SuppressWarnings({"unchecked", "rawtypes"})
-	private Object convert(Object value) {
+	private @Nullable Object convert(@Nullable Object value) {
 		Unwrapper unwrapper = resolveUnwrapper(value);
 		if (unwrapper != null) {
 			value = unwrapper.unwrap(value);
@@ -213,7 +208,7 @@ public class DefaultJdbcParameterSourceConverter implements JdbcParameterSourceC
 
 	@SuppressWarnings("rawtypes")
 	@Nullable
-	private Unwrapper resolveUnwrapper(Object value) {
+	private Unwrapper resolveUnwrapper(@Nullable Object value) {
 		if (value == null) {
 			return null;
 		}
@@ -249,8 +244,8 @@ public class DefaultJdbcParameterSourceConverter implements JdbcParameterSourceC
 		return null;
 	}
 
-	private Object[] convertElements(Object[] array) {
-		Object[] result = new Object[array.length];
+	private @Nullable Object[] convertElements(Object[] array) {
+		@Nullable Object[] result = new Object[array.length];
 		for (int i = 0; i < array.length; i++) {
 			result[i] = this.convert(array[i]);
 		}
@@ -258,7 +253,7 @@ public class DefaultJdbcParameterSourceConverter implements JdbcParameterSourceC
 	}
 
 	private List<?> convertElements(Iterable<?> iterable) {
-		List<Object> result = new ArrayList<>();
+		List<@Nullable Object> result = new ArrayList<>();
 		for (Object element : iterable) {
 			result.add(this.convert(element));
 		}

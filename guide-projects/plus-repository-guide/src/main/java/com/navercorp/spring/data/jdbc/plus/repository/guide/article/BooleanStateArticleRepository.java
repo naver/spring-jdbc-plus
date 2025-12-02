@@ -19,7 +19,6 @@
 package com.navercorp.spring.data.jdbc.plus.repository.guide.article;
 
 import com.navercorp.spring.data.jdbc.plus.repository.JdbcRepository;
-import com.navercorp.spring.data.jdbc.plus.repository.guide.order.Order;
 
 /**
  * @author Chanhyeong Cho

@@ -18,6 +18,8 @@
 
 package com.navercorp.spring.jdbc.plus.support.parametersource.fallback;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * The type None fallback parameter source.
  *
@@ -30,7 +32,7 @@ public class NoneFallbackParameterSource implements FallbackParameterSource {
 	}
 
 	@Override
-	public Object fallback(String paramName) {
+	public @Nullable Object fallback(String paramName) {
 		return null;
 	}
 }

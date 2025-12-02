@@ -24,7 +24,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * The type Iterable expand padding.
@@ -42,7 +42,7 @@ public class IterableExpandPadding {
 	 * @param padArray    the pad array y/n
 	 * @return the object
 	 */
-	public static Object expandIfIterable(Object source, boolean padArray) {
+	public static @Nullable Object expandIfIterable(Object source, boolean padArray) {
 		return expandIfIterable(source, padArray, REGULAR_SIZES);
 	}
 
@@ -54,7 +54,11 @@ public class IterableExpandPadding {
 	 * @param paddingBoundaries the padding boundaries
 	 * @return the object
 	 */
-	public static Object expandIfIterable(Object source, boolean padArray, @Nullable int[] paddingBoundaries) {
+	public static @Nullable Object expandIfIterable(
+		@Nullable Object source,
+		boolean padArray,
+		int @Nullable [] paddingBoundaries) {
+
 		if (source == null) {
 			return null;
 		}
@@ -72,7 +76,10 @@ public class IterableExpandPadding {
 		return source;
 	}
 
-	private static Object[] expandRegularSizePadding(Object[] source, int[] paddingBoundaries) {
+	private static @Nullable Object @Nullable [] expandRegularSizePadding(
+		@Nullable Object @Nullable [] source,
+		int[] paddingBoundaries
+	) {
 		if (source == null) {
 			return null;
 		}
@@ -87,7 +94,7 @@ public class IterableExpandPadding {
 			return Arrays.copyOf(source, 0);
 		}
 
-		Object[] result = Arrays.copyOf(source, targetSize);
+		@Nullable Object[] result = Arrays.copyOf(source, targetSize);
 		Object value = source[sourceSize - 1];
 		for (int i = sourceSize; i < targetSize; i++) {
 			result[i] = value;
@@ -96,7 +103,10 @@ public class IterableExpandPadding {
 		return result;
 	}
 
-	private static Collection<?> expandRegularSizePadding(Collection<?> source, int[] paddingBoundaries) {
+	private static @Nullable Collection<?> expandRegularSizePadding(
+		@Nullable Collection<?> source,
+		int[] paddingBoundaries
+	) {
 		if (source == null) {
 			return null;
 		}
@@ -149,7 +159,7 @@ public class IterableExpandPadding {
 		 * @param source the source
 		 * @return the object [ ]
 		 */
-		public Object[] expand(Object[] source) {
+		public @Nullable Object @Nullable [] expand(Object[] source) {
 			return expandRegularSizePadding(source, REGULAR_SIZES);
 		}
 
@@ -160,7 +170,7 @@ public class IterableExpandPadding {
 		 * @param paddingBoundaries the padding boundaries
 		 * @return the object [ ]
 		 */
-		public Object[] expand(Object[] source, int[] paddingBoundaries) {
+		public @Nullable Object @Nullable [] expand(Object[] source, int[] paddingBoundaries) {
 			return expandRegularSizePadding(source, paddingBoundaries);
 		}
 	}
@@ -180,7 +190,7 @@ public class IterableExpandPadding {
 		 * @param source the source
 		 * @return the collection
 		 */
-		public Collection<?> expand(Collection<?> source) {
+		public @Nullable Collection<?> expand(Collection<?> source) {
 			return expandRegularSizePadding(source, REGULAR_SIZES);
 		}
 
@@ -191,7 +201,7 @@ public class IterableExpandPadding {
 		 * @param paddingBoundaries the padding boundaries
 		 * @return the collection
 		 */
-		public Collection<?> expand(Collection<?> source, int[] paddingBoundaries) {
+		public @Nullable Collection<?> expand(Collection<?> source, int[] paddingBoundaries) {
 			return expandRegularSizePadding(source, paddingBoundaries);
 		}
 	}

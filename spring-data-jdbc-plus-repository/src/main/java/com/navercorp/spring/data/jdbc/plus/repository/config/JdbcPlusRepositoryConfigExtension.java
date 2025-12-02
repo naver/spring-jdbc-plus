@@ -24,6 +24,7 @@ import org.springframework.data.jdbc.core.convert.QueryMappingConfiguration;
 import org.springframework.data.jdbc.repository.config.JdbcRepositoryConfigExtension;
 import org.springframework.data.repository.config.RepositoryConfigurationSource;
 
+import com.navercorp.spring.data.jdbc.plus.repository.support.JdbcPlusRepository;
 import com.navercorp.spring.data.jdbc.plus.repository.support.JdbcPlusRepositoryFactoryBean;
 
 /**
@@ -49,6 +50,11 @@ public class JdbcPlusRepositoryConfigExtension extends JdbcRepositoryConfigExten
 	@Override
 	public String getModuleName() {
 		return "JDBC-PLUS-REPOSITORY";
+	}
+
+	@Override
+	public String getRepositoryBaseClassName() {
+		return JdbcPlusRepository.class.getName();
 	}
 
 	@Override

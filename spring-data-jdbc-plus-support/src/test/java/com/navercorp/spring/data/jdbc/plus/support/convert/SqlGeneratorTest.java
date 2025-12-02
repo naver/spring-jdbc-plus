@@ -52,6 +52,7 @@ import com.navercorp.spring.jdbc.plus.commons.annotations.SqlTableAlias;
  *
  * @author Myeonghyeon Lee
  */
+@SuppressWarnings("ALL")
 class SqlGeneratorTest {
 	static final Identifier BACKREF = Identifier.of(unquoted("backref"), "some-value", String.class);
 
