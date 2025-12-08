@@ -2,10 +2,10 @@ package com.navercorp.spring.data.jdbc.plus.sql.convert;
 
 import java.util.Map;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.PropertyAccessor;
 import org.springframework.expression.TypedValue;
-import org.springframework.lang.Nullable;
 
 /**
  * Refer org.springframework.data.jdbc.core.convert.ResultSetAccessorPropertyAccessor

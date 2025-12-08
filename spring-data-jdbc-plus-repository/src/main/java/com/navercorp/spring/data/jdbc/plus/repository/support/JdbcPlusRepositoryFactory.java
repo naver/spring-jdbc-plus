@@ -19,6 +19,7 @@
 package com.navercorp.spring.data.jdbc.plus.repository.support;
 
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.data.jdbc.core.JdbcAggregateOperations;
 import org.springframework.data.jdbc.core.convert.DataAccessStrategy;
 import org.springframework.data.jdbc.core.convert.JdbcConverter;
 import org.springframework.data.jdbc.repository.support.JdbcRepositoryFactory;
@@ -39,22 +40,32 @@ public class JdbcPlusRepositoryFactory extends JdbcRepositoryFactory {
 	/**
 	 * Instantiates a new Jdbc plus repository factory.
 	 *
+	 * @param jdbcAggregateOperations the jdbc aggregate operations
+	 */
+	public JdbcPlusRepositoryFactory(JdbcAggregateOperations jdbcAggregateOperations) {
+		super(jdbcAggregateOperations);
+	}
+
+	/**
+	 * Instantiates a new Jdbc plus repository factory.
+	 *
 	 * @param dataAccessStrategy the data access strategy
 	 * @param context            the context
 	 * @param converter          the converter
 	 * @param dialect            the dialect
 	 * @param publisher          the publisher
-	 * @param operations         the operations
+	 * @param jdbcOperations     the operations
 	 */
+	@Deprecated(since = "4.0", forRemoval = true)
 	public JdbcPlusRepositoryFactory(
 		DataAccessStrategy dataAccessStrategy,
 		RelationalMappingContext context,
 		JdbcConverter converter,
 		Dialect dialect,
 		ApplicationEventPublisher publisher,
-		NamedParameterJdbcOperations operations
+		NamedParameterJdbcOperations jdbcOperations
 	) {
-		super(dataAccessStrategy, context, converter, dialect, publisher, operations);
+		super(dataAccessStrategy, context, converter, dialect, publisher, jdbcOperations);
 	}
 
 	@Override

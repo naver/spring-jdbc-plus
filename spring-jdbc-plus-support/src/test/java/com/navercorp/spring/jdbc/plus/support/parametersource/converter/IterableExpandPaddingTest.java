@@ -18,9 +18,9 @@
 
 package com.navercorp.spring.jdbc.plus.support.parametersource.converter;
 
-import static com.navercorp.spring.jdbc.plus.support.parametersource.converter.IterableExpandPadding.*;
-import static java.util.stream.Collectors.*;
-import static org.assertj.core.api.Assertions.*;
+import static com.navercorp.spring.jdbc.plus.support.parametersource.converter.IterableExpandPadding.ArrayExpandPadding;
+import static com.navercorp.spring.jdbc.plus.support.parametersource.converter.IterableExpandPadding.CollectionExpandPadding;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -52,6 +52,7 @@ class IterableExpandPaddingTest {
 
 	@Test
 	void expandIfIterable() {
+		//noinspection DataFlowIssue
 		assertThat(IterableExpandPadding.expandIfIterable(null, true)).isNull();
 
 		Map<String, Object> map = Collections.singletonMap("key", "value");
@@ -118,7 +119,7 @@ class IterableExpandPaddingTest {
 	void arrayConverter() {
 		ArrayExpandPadding sut = ArrayExpandPadding.INSTANCE;
 
-		String[] actualNull = (String[])sut.expand(null);
+		@SuppressWarnings("DataFlowIssue") String[] actualNull = (String[])sut.expand(null);
 		assertThat(actualNull).isNull();
 
 		String[] actualEmpty = (String[])sut.expand(new String[0]);
@@ -187,7 +188,7 @@ class IterableExpandPaddingTest {
 		int[] paddingBoundaries = {5, 10};
 		ArrayExpandPadding sut = ArrayExpandPadding.INSTANCE;
 
-		String[] actualNull = (String[])sut.expand(null, paddingBoundaries);
+		@SuppressWarnings("DataFlowIssue") String[] actualNull = (String[])sut.expand(null, paddingBoundaries);
 		assertThat(actualNull).isNull();
 
 		String[] actualEmpty = (String[])sut.expand(new String[0], paddingBoundaries);
@@ -211,7 +212,7 @@ class IterableExpandPaddingTest {
 	void collectionConverter() {
 		CollectionExpandPadding sut = CollectionExpandPadding.INSTANCE;
 
-		List<String> actualNull = (List<String>)sut.expand(null);
+		@SuppressWarnings("DataFlowIssue") List<String> actualNull = (List<String>)sut.expand(null);
 		assertThat(actualNull).isNull();
 
 		List<String> actualEmpty = (List<String>)sut.expand(Collections.emptyList());
@@ -281,7 +282,7 @@ class IterableExpandPaddingTest {
 		int[] paddingBoundaries = {5, 10};
 		CollectionExpandPadding sut = CollectionExpandPadding.INSTANCE;
 
-		List<String> actualNull = (List<String>)sut.expand(null, paddingBoundaries);
+		@SuppressWarnings("DataFlowIssue") List<String> actualNull = (List<String>)sut.expand(null, paddingBoundaries);
 		assertThat(actualNull).isNull();
 
 		List<String> actualEmpty = (List<String>)sut.expand(Collections.emptyList(), paddingBoundaries);

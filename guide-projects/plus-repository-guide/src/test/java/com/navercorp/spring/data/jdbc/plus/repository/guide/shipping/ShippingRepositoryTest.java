@@ -18,7 +18,7 @@
 
 package com.navercorp.spring.data.jdbc.plus.repository.guide.shipping;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Optional;
 import java.util.UUID;

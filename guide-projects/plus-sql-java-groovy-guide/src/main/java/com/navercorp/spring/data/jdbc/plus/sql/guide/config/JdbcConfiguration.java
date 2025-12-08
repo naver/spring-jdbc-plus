@@ -10,8 +10,7 @@ import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.convert.ReadingConverter;
 import org.springframework.data.jdbc.core.convert.JdbcConverter;
 import org.springframework.data.jdbc.core.convert.JdbcCustomConversions;
-import org.springframework.data.relational.core.conversion.MutableAggregateChange;
-import org.springframework.data.relational.core.dialect.Dialect;
+import org.springframework.data.jdbc.core.dialect.JdbcDialect;
 import org.springframework.data.relational.core.mapping.RelationalMappingContext;
 import org.springframework.data.relational.core.mapping.event.BeforeSaveCallback;
 
@@ -36,7 +35,7 @@ public class JdbcConfiguration {
 	public SqlParameterSourceFactory sqlParameterSourceFactory(
 		RelationalMappingContext mappingContext,
 		JdbcConverter jdbcConverter,
-		Dialect dialect) {
+		JdbcDialect dialect) {
 		List<?> dialectConverters = (List<?>)dialect.getConverters();
 		List<Converter<?, ?>> converters = storeConverters();
 		converters.addAll((List<Converter<?, ?>>)dialectConverters);

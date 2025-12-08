@@ -71,7 +71,7 @@ class OrderRepositoryImpl(entityProvider: EntityJdbcProvider) : JdbcRepositorySu
             mapParameterSource()
                 .addValue("purchaserNo", purchaserNo),
             Long::class.java
-        )
+        ) ?: 0L
     }
 
     override fun findByPurchaserNoAndStatusAndPrice(criteria: OrderCriteria, price: Long): List<Order> {

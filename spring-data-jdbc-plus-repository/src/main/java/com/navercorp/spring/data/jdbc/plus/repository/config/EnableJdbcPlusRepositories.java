@@ -114,6 +114,14 @@ public @interface EnableJdbcPlusRepositories {
 	String namedQueriesLocation() default "";
 
 	/**
+	 * Returns the key of the {@link QueryLookupStrategy} to be used for lookup queries for query methods. Defaults to
+	 * {@link QueryLookupStrategy.Key#CREATE_IF_NOT_FOUND}.
+	 */
+	QueryLookupStrategy.Key queryLookupStrategy() default QueryLookupStrategy.Key.CREATE_IF_NOT_FOUND;
+
+	// JDBC-specific configuration
+
+	/**
 	 * Returns the {@link FactoryBean} class to be used for each repository instance. Defaults to
 	 * {@link JdbcRepositoryFactoryBean}.
 	 *
@@ -144,6 +152,14 @@ public @interface EnableJdbcPlusRepositories {
 	 */
 	boolean considerNestedRepositories() default false;
 
+
+	/**
+	 * Configure the name of the
+	 * {@link org.springframework.data.jdbc.core.JdbcAggregateOperations} bean definition to be
+	 * used to create repositories discovered through this annotation.
+	 */
+	String jdbcAggregateOperationsRef() default "";
+
 	/**
 	 * Configures the name of the
 	 * {@link org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations} bean
@@ -152,6 +168,7 @@ public @interface EnableJdbcPlusRepositories {
 	 *
 	 * @return jdbcOperationsRef
 	 */
+	@Deprecated(since = "4.0")
 	String jdbcOperationsRef() default "";
 
 	/**
@@ -162,20 +179,25 @@ public @interface EnableJdbcPlusRepositories {
 	 *
 	 * @return dataAccessStrategyRef
 	 */
+	@Deprecated(since = "4.0")
 	String dataAccessStrategyRef() default "";
 
 	/**
-	 * Configures the name of the {@link org.springframework.jdbc.datasource.DataSourceTransactionManager}
-	 * bean definition to be used to create repositories
-	 * discovered through this annotation. Defaults to {@code transactionManager}.
+	 * Configures the name of the {@link org.springframework.transaction.PlatformTransactionManager}
+	 * bean definition to be used to create repositories discovered
+	 * through this annotation. Defaults to {@code transactionManager}.
 	 *
 	 * @return transactionManager
 	 */
 	String transactionManagerRef() default "transactionManager";
 
 	/**
-	 * Returns the key of the {@link QueryLookupStrategy} to be used for lookup queries for query methods. Defaults to
-	 * {@link QueryLookupStrategy.Key#CREATE_IF_NOT_FOUND}.
+	 * Configures whether to enable default transactions for Spring Data JDBC repositories. Defaults to {@literal true}.
+	 * If disabled, repositories must be used behind a facade that's configuring transactions (e.g. using Spring's
+	 * annotation driven transaction facilities) or repository methods have to be used to demarcate transactions.
+	 *
+	 * @return whether to enable default transactions, defaults to {@literal true}.
+	 * @since 4.0
 	 */
-	QueryLookupStrategy.Key queryLookupStrategy() default QueryLookupStrategy.Key.CREATE_IF_NOT_FOUND;
+	boolean enableDefaultTransactions() default true;
 }

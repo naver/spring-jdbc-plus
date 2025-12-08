@@ -18,6 +18,8 @@
 
 package com.navercorp.spring.jdbc.plus.support.parametersource.fallback;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * The interface Fallback parameter source.
  *
@@ -38,5 +40,6 @@ public interface FallbackParameterSource {
 	 * @param paramName the param name
 	 * @return the object
 	 */
+	@Nullable
 	Object fallback(String paramName);
 }

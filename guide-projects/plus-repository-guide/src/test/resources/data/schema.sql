@@ -33,8 +33,8 @@ CREATE TABLE IF NOT EXISTS boolean_state_articles (
     id BIGINT AUTO_INCREMENT,
     writer_id VARCHAR(20),
     contents TEXT,
-    created_at DATETIME,
-    last_modified_at DATETIME,
+    created_at TIMESTAMP,
+    last_modified_at TIMESTAMP,
     visible TINYINT,
     PRIMARY KEY(id));
 
@@ -42,8 +42,8 @@ CREATE TABLE IF NOT EXISTS enum_state_articles (
     id BIGINT AUTO_INCREMENT,
     writer_id VARCHAR(20),
     contents TEXT,
-    created_at DATETIME,
-    last_modified_at DATETIME,
+    created_at TIMESTAMP,
+    last_modified_at TIMESTAMP,
     version INT,
     article_state VARCHAR(2),
     PRIMARY KEY(id));
@@ -51,8 +51,8 @@ CREATE TABLE IF NOT EXISTS enum_state_articles (
 CREATE TABLE IF NOT EXISTS soft_delete_products (
     id BIGINT AUTO_INCREMENT,
     product_name VARCHAR(20),
-    created_at DATETIME,
-    last_modified_at DATETIME,
+    created_at TIMESTAMP,
+    last_modified_at TIMESTAMP,
     visible TINYINT,
     PRIMARY KEY(id));
 
@@ -60,23 +60,30 @@ CREATE TABLE IF NOT EXISTS soft_delete_reviews (
     id BIGINT AUTO_INCREMENT,
     product_id BIGINT,
     contents TEXT,
-    created_at DATETIME,
-    last_modified_at DATETIME,
+    created_at TIMESTAMP,
+    last_modified_at TIMESTAMP,
     visible TINYINT,
     PRIMARY KEY(id));
 
 CREATE TABLE IF NOT EXISTS plain_products (
     id BIGINT AUTO_INCREMENT,
     product_name VARCHAR(20),
-    created_at DATETIME,
-    last_modified_at DATETIME,
+    created_at TIMESTAMP,
+    last_modified_at TIMESTAMP,
     PRIMARY KEY(id));
 
 CREATE TABLE IF NOT EXISTS plain_reviews (
     id BIGINT AUTO_INCREMENT,
     product_id BIGINT,
     contents TEXT,
-    created_at DATETIME,
-    last_modified_at DATETIME,
+    created_at TIMESTAMP,
+    last_modified_at TIMESTAMP,
     visible TINYINT,
     PRIMARY KEY(id));
+
+CREATE TABLE IF NOT EXISTS coupon (
+  coupon_id VARCHAR(36),
+  pubt_id VARCHAR(36),
+  discount_amt BIGINT,
+  purchaser_no VARCHAR(255),
+  PRIMARY KEY(coupon_id, pubt_id));

@@ -18,7 +18,8 @@
 
 package com.navercorp.spring.jdbc.plus.support.parametersource.converter;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -43,6 +44,7 @@ import com.navercorp.spring.jdbc.plus.support.parametersource.converter.Jsr310Ti
 /**
  * @author Myeonghyeon Lee
  */
+@SuppressWarnings("DataFlowIssue")
 class DefaultJdbcParameterSourceConverterTest {
 	@Test
 	@SuppressWarnings("unchecked")
@@ -73,6 +75,7 @@ class DefaultJdbcParameterSourceConverterTest {
 		assertThat(enumName).isExactlyInstanceOf(String.class);
 		assertThat(uuid).isExactlyInstanceOf(String.class);
 
+		//noinspection DataFlowIssue
 		assertThat(collections.get(0)).isEqualTo(":1:");
 		assertThat(collections.get(1)).isEqualTo(":2:");
 		assertThat(collections.get(2)).isEqualTo(":3:");

@@ -56,9 +56,14 @@ public class OrderRepositoryImpl extends JdbcRepositorySupport<Order>
 	@Override
 	public long countByPurchaserNo(String purchaserNo) {
 		String sql = this.sqls.countByPurchaserNo();
-		return selectSingleValue(sql, mapParameterSource()
+		Long result = selectSingleValue(
+			sql,
+			mapParameterSource()
 				.addValue("purchaserNo", purchaserNo),
-			Long.class);
+			Long.class
+		);
+
+		return result == null ? 0L : result;
 	}
 
 	@Override

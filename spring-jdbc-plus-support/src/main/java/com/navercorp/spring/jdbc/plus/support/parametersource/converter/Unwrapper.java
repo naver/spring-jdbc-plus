@@ -18,7 +18,7 @@
 
 package com.navercorp.spring.jdbc.plus.support.parametersource.converter;
 
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * The interface Unwrapper.

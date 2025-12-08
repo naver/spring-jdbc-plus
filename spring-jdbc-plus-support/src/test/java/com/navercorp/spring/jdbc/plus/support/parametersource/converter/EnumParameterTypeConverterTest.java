@@ -18,8 +18,9 @@
 
 package com.navercorp.spring.jdbc.plus.support.parametersource.converter;
 
-import static com.navercorp.spring.jdbc.plus.support.parametersource.converter.EnumParameterTypeConverter.*;
-import static org.assertj.core.api.Assertions.*;
+import static com.navercorp.spring.jdbc.plus.support.parametersource.converter.EnumParameterTypeConverter.EnumToNameConverter;
+import static com.navercorp.spring.jdbc.plus.support.parametersource.converter.EnumParameterTypeConverter.EnumToOrdinalConverter;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.jupiter.api.Test;
 

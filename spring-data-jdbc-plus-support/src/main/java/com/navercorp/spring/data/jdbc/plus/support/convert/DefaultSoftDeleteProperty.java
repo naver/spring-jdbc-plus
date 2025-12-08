@@ -2,10 +2,10 @@ package com.navercorp.spring.data.jdbc.plus.support.convert;
 
 import java.util.Arrays;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.data.relational.core.mapping.RelationalPersistentEntity;
 import org.springframework.data.relational.core.mapping.RelationalPersistentProperty;
 import org.springframework.data.relational.core.sql.SqlIdentifier;
-import org.springframework.lang.Nullable;
 import org.springframework.util.StringUtils;
 
 import com.navercorp.spring.jdbc.plus.commons.annotations.SoftDeleteColumn;
@@ -21,7 +21,7 @@ class DefaultSoftDeleteProperty implements SoftDeleteProperty {
 	private final SqlIdentifier columnName;
 	private final Object updateValue;
 
-	private DefaultSoftDeleteProperty(boolean exists, SqlIdentifier columnName, @Nullable Object updateValue) {
+	private DefaultSoftDeleteProperty(boolean exists, SqlIdentifier columnName, Object updateValue) {
 		this.exists = exists;
 		this.columnName = columnName;
 		this.updateValue = updateValue;

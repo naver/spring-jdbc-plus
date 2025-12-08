@@ -21,10 +21,8 @@ package com.navercorp.spring.jdbc.plus.support.parametersource;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 
-import javax.annotation.Nullable;
-
+import org.jspecify.annotations.Nullable;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 
 /**
@@ -41,11 +39,7 @@ public class CompositeSqlParameterSource implements SqlParameterSource {
 	 * @param sqlParameterSources the sql parameter sources
 	 */
 	public CompositeSqlParameterSource(SqlParameterSource... sqlParameterSources) {
-		if (sqlParameterSources == null) {
-			this.sqlParameterSources = Collections.emptyList();
-		} else {
-			this.sqlParameterSources = Arrays.asList(sqlParameterSources);
-		}
+		this.sqlParameterSources = Arrays.asList(sqlParameterSources);
 	}
 
 	/**
@@ -68,7 +62,7 @@ public class CompositeSqlParameterSource implements SqlParameterSource {
 	}
 
 	@Override
-	public Object getValue(String paramName) throws IllegalArgumentException {
+	public @Nullable Object getValue(String paramName) throws IllegalArgumentException {
 		for (SqlParameterSource each : this.sqlParameterSources) {
 			if (each.hasValue(paramName)) {
 				return each.getValue(paramName);
@@ -103,7 +97,6 @@ public class CompositeSqlParameterSource implements SqlParameterSource {
 	public String[] getParameterNames() {
 		return this.sqlParameterSources.stream()
 			.map(SqlParameterSource::getParameterNames)
-			.filter(Objects::nonNull)
 			.flatMap(Arrays::stream)
 			.toArray(String[]::new);
 	}

@@ -19,6 +19,7 @@ package com.navercorp.spring.data.jdbc.plus.support.convert;
 import java.util.Map;
 import java.util.function.Function;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.data.jdbc.core.convert.JdbcConverter;
 import org.springframework.data.relational.core.dialect.Dialect;
 import org.springframework.data.relational.core.mapping.RelationalMappingContext;
@@ -46,7 +47,16 @@ public class SqlGeneratorSource {
 	private final Dialect dialect;
 
 	// Generator for internal extension.
-	Function<RelationalPersistentEntity<?>, SqlContexts> sqlContextsGenerator;
+	@Nullable Function<RelationalPersistentEntity<?>, SqlContexts> sqlContextsGenerator;
+
+	/**
+	 * @param converter must not be {@literal null}.
+	 * @param dialect must not be {@literal null}.
+	 * @since 4.0
+	 */
+	public SqlGeneratorSource(JdbcConverter converter, Dialect dialect) {
+		this(converter.getMappingContext(), converter, dialect);
+	}
 
 	public SqlGeneratorSource(RelationalMappingContext context, JdbcConverter converter, Dialect dialect) {
 		this.context = context;

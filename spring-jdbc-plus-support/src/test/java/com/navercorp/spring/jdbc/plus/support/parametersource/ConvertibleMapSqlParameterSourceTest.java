@@ -18,7 +18,8 @@
 
 package com.navercorp.spring.jdbc.plus.support.parametersource;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -28,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.javaunit.autoparams.AutoSource;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -46,6 +48,7 @@ class ConvertibleMapSqlParameterSourceTest {
 	@DisplayName("생성자에 Converter 로 null 을 넘기면 NullPointerException 이 발생합니다.")
 	void constructorNullConverter() {
 		Map<String, Instant> map = Collections.singletonMap("sample", Instant.now());
+		//noinspection DataFlowIssue
 		assertThatThrownBy(() -> new ConvertibleMapSqlParameterSource(map, null))
 			.isExactlyInstanceOf(NullPointerException.class)
 			.hasMessageContaining("Converter must not be null");
@@ -155,7 +158,7 @@ class ConvertibleMapSqlParameterSourceTest {
 
 	static class TestFallbackParamSource implements FallbackParameterSource {
 		@Override
-		public boolean isFallback(String paramName) {
+		public boolean isFallback(@NotNull String paramName) {
 			return paramName.equals("none");
 		}
 

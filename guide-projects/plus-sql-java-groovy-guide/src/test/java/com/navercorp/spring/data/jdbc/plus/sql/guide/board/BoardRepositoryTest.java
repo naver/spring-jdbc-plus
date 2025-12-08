@@ -18,10 +18,18 @@
 
 package com.navercorp.spring.data.jdbc.plus.sql.guide.board;
 
-import static com.navercorp.spring.data.jdbc.plus.sql.guide.board.Board.*;
-import static java.util.Comparator.*;
-import static java.util.stream.Collectors.*;
-import static org.assertj.core.api.Assertions.*;
+import static com.navercorp.spring.data.jdbc.plus.sql.guide.board.Board.Audit;
+import static com.navercorp.spring.data.jdbc.plus.sql.guide.board.Board.AuditSecret;
+import static com.navercorp.spring.data.jdbc.plus.sql.guide.board.Board.Comment;
+import static com.navercorp.spring.data.jdbc.plus.sql.guide.board.Board.Config;
+import static com.navercorp.spring.data.jdbc.plus.sql.guide.board.Board.Label;
+import static com.navercorp.spring.data.jdbc.plus.sql.guide.board.Board.Memo;
+import static com.navercorp.spring.data.jdbc.plus.sql.guide.board.Board.Post;
+import static com.navercorp.spring.data.jdbc.plus.sql.guide.board.Board.Tag;
+import static com.navercorp.spring.data.jdbc.plus.sql.guide.board.Board.builder;
+import static java.util.Comparator.comparingLong;
+import static java.util.stream.Collectors.toMap;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -41,6 +49,7 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  * @author Myeonghyeon Lee
  */
+@SuppressWarnings("ALL")
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
