@@ -30,11 +30,13 @@ dependencies {
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.projectlombok:lombok")
-    testAnnotationProcessor("org.projectlombok:lombok")
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
     // FixtureMonkey
-    testImplementation("com.navercorp.fixturemonkey:fixture-monkey-starter:1.1.6")
-    testImplementation("com.navercorp.fixturemonkey:fixture-monkey-jackson:1.1.6")
-    testImplementation("com.navercorp.fixturemonkey:fixture-monkey-jakarta-validation:1.1.6")
+    testImplementation("com.navercorp.fixturemonkey:fixture-monkey-starter:${fixtureMonkeyVersion}")
+    testImplementation("com.navercorp.fixturemonkey:fixture-monkey-jackson:${fixtureMonkeyVersion}")
+    testImplementation("com.navercorp.fixturemonkey:fixture-monkey-jakarta-validation:${fixtureMonkeyVersion}")
+
+    testAnnotationProcessor("org.projectlombok:lombok")
+
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
