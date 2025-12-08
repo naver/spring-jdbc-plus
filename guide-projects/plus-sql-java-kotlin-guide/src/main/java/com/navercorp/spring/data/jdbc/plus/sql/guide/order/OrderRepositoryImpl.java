@@ -49,8 +49,8 @@ public class OrderRepositoryImpl extends JdbcRepositorySupport<Order>
 	public List<Order> search(OrderCriteria criteria) {
 		String sql = this.sqls.search(criteria);
 		return find(sql, mapParameterSource()
-			.addValue("purchaserNo", criteria.purchaserNo)
-			.addValue("status", criteria.status.name()));
+			.addValue("purchaserNo", criteria.purchaserNo())
+			.addValue("status", criteria.status().name()));
 	}
 
 	@Override

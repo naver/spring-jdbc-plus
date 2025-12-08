@@ -18,10 +18,10 @@
 
 package com.navercorp.spring.data.jdbc.plus.sql.guide.order;
 
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.ListCrudRepository;
 
 /**
  * @author Myeonghyeon Lee
  */
-public interface OrderRepository extends CrudRepository<Order, Long>, OrderRepositoryCustom {
+public interface OrderRepository extends ListCrudRepository<Order, Long>, OrderRepositoryCustom {
 }
