@@ -24,21 +24,20 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
 
 import lombok.Builder;
-import lombok.Value;
 import lombok.With;
 
 /**
  * @author Myeonghyeon Lee
  */
 @Table("n_order_discount")
-@Value
 @Builder
-public class OrderDiscount {
+public record OrderDiscount(
 	@Id
 	@With
-	private Long id;
+	Long id,
 
-	private BigDecimal originPrice;
+	BigDecimal originPrice,
 
-	private BigDecimal discountPrice;
+	BigDecimal discountPrice
+) {
 }

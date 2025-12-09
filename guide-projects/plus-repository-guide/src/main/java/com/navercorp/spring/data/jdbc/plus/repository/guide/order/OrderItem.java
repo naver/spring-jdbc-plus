@@ -22,29 +22,26 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Embedded;
 import org.springframework.data.relational.core.mapping.Table;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Value;
 import lombok.With;
 
 /**
  * @author Myeonghyeon Lee
  */
 @Table("n_order_item")
-@Value
 @Builder
-@AllArgsConstructor
-public class OrderItem {
+public record OrderItem(
 	@Id
 	@With
-	private Long id;
+	Long id,
 
-	private String productNo;
+	String productNo,
 
-	private String name;
+	String name,
 
 	@Embedded.Nullable
-	private Pricing pricing;
+	Pricing pricing,
 
-	private final String sellerId;
+	String sellerId
+) {
 }

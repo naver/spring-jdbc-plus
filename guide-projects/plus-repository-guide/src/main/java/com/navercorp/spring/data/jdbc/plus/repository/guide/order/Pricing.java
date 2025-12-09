@@ -22,23 +22,19 @@ import java.math.BigDecimal;
 import java.util.Objects;
 
 import lombok.Builder;
-import lombok.Value;
 
 /**
  * @author Myeonghyeon Lee
  */
-@Value
 @Builder
-public final class Pricing {
-	private final long quantity;
-
-	@Builder.Default
-	private final BigDecimal price = BigDecimal.ZERO;
-
+public record Pricing(
+	long quantity,
+	BigDecimal price
+) {
 	public Pricing add(Pricing pricing) {
 		return Pricing.builder()
-			.quantity(this.quantity + pricing.getQuantity())
-			.price(this.price.add(pricing.getPrice()))
+			.quantity(this.quantity + pricing.quantity())
+			.price(this.price.add(pricing.price()))
 			.build();
 	}
 
