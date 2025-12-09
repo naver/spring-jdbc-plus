@@ -22,12 +22,12 @@ import com.navercorp.spring.data.jdbc.plus.sql.guide.order.sql.OrderSql
 import com.navercorp.spring.data.jdbc.plus.sql.provider.EntityJdbcProvider
 import com.navercorp.spring.data.jdbc.plus.sql.support.JdbcRepositorySupport
 import com.navercorp.spring.data.jdbc.plus.sql.support.trait.SingleValueSelectTrait
-import org.springframework.data.repository.CrudRepository
+import org.springframework.data.repository.ListCrudRepository
 
 /**
  * @author Myeonghyeon Lee
  */
-interface OrderRepository : CrudRepository<Order, Long>, OrderRepositoryCustom
+interface OrderRepository : ListCrudRepository<Order, Long>, OrderRepositoryCustom
 
 interface OrderRepositoryCustom {
     fun findByPurchaserNo(purchaserNo: String): List<Order>

@@ -18,7 +18,7 @@
 
 package com.navercorp.spring.data.jdbc.plus.sql.guide.order
 
-import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.BDDAssertions.then
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -63,13 +63,13 @@ class OrderRepositoryTest {
 
         // then
         val sorted = actual.sortedBy { it.price }
-        assertThat(sorted).hasSize(3)
-        assertThat(sorted[0].price).isEqualTo(1000L)
-        assertThat(sorted[0].status).isEqualTo(OrderStatus.PLACE)
-        assertThat(sorted[1].price).isEqualTo(3000L)
-        assertThat(sorted[1].status).isEqualTo(OrderStatus.COMPLETED)
-        assertThat(sorted[2].price).isEqualTo(5000L)
-        assertThat(sorted[2].status).isEqualTo(OrderStatus.PLACE)
+        then(sorted).hasSize(3)
+        then(sorted[0].price).isEqualTo(1000L)
+        then(sorted[0].status).isEqualTo(OrderStatus.PLACE)
+        then(sorted[1].price).isEqualTo(3000L)
+        then(sorted[1].status).isEqualTo(OrderStatus.COMPLETED)
+        then(sorted[2].price).isEqualTo(5000L)
+        then(sorted[2].status).isEqualTo(OrderStatus.PLACE)
     }
 
     @Test
@@ -86,9 +86,9 @@ class OrderRepositoryTest {
         val actual = sut.findByPurchaserNoAndStatusAndPrice(criteria, 5000)
 
         // then
-        assertThat(actual).hasSize(1)
-        assertThat(actual[0].price).isEqualTo(5000L)
-        assertThat(actual[0].status).isEqualTo(OrderStatus.PLACE)
+        then(actual).hasSize(1)
+        then(actual[0].price).isEqualTo(5000L)
+        then(actual[0].status).isEqualTo(OrderStatus.PLACE)
     }
 
     @Test
@@ -106,11 +106,11 @@ class OrderRepositoryTest {
 
         // then
         val sorted = actual.sortedBy { it.price }
-        assertThat(sorted).hasSize(2)
-        assertThat(sorted[0].price).isEqualTo(1000L)
-        assertThat(sorted[0].status).isEqualTo(OrderStatus.PLACE)
-        assertThat(sorted[1].price).isEqualTo(5000L)
-        assertThat(sorted[1].status).isEqualTo(OrderStatus.PLACE)
+        then(sorted).hasSize(2)
+        then(sorted[0].price).isEqualTo(1000L)
+        then(sorted[0].status).isEqualTo(OrderStatus.PLACE)
+        then(sorted[1].price).isEqualTo(5000L)
+        then(sorted[1].status).isEqualTo(OrderStatus.PLACE)
     }
 
     @Test
@@ -122,6 +122,6 @@ class OrderRepositoryTest {
         val actual: Long = sut.countByPurchaserNo("navercorp")
 
         // then
-        assertThat(actual.toInt()).isEqualTo(orders.size)
+        then(actual.toInt()).isEqualTo(orders.size)
     }
 }

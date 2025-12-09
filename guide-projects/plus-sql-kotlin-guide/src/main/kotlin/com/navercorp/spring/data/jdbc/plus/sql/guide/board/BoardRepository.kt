@@ -21,9 +21,9 @@ package com.navercorp.spring.data.jdbc.plus.sql.guide.board
 import com.navercorp.spring.data.jdbc.plus.sql.guide.board.sql.BoardSql
 import com.navercorp.spring.data.jdbc.plus.sql.provider.EntityJdbcProvider
 import com.navercorp.spring.data.jdbc.plus.sql.support.JdbcRepositorySupport
-import org.springframework.data.repository.CrudRepository
+import org.springframework.data.repository.ListCrudRepository
 
-interface BoardRepository : CrudRepository<Board, Long>, BoardRepositoryCustom
+interface BoardRepository : ListCrudRepository<Board, Long>, BoardRepositoryCustom
 
 /**
  * @author Myeonghyeon Lee

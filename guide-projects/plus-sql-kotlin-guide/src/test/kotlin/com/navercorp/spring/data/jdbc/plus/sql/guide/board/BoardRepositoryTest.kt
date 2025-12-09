@@ -18,7 +18,7 @@
 
 package com.navercorp.spring.data.jdbc.plus.sql.guide.board
 
-import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.BDDAssertions.then
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -40,7 +40,7 @@ class BoardRepositoryTest {
         Board(
             name = "repo",
             memo = Memo(memo = "board1 memo"),
-            labels = setOf(
+            labels = linkedSetOf(
                 Label(name = "label1"),
                 Label(name = "label2"),
                 Label(name = "label3")
@@ -50,7 +50,7 @@ class BoardRepositoryTest {
                     postNo = 1,
                     title = "first post",
                     content = "hello world",
-                    tags = setOf(
+                    tags = linkedSetOf(
                         Tag(content = "tag1"),
                         Tag(content = "tag2")
                     ),
@@ -76,11 +76,20 @@ class BoardRepositoryTest {
                     ),
                     configMap = mapOf(
                         "board1 post1 config-key" to
-                            Config(configKey = "board1 post1 config-key", configValue = "board1 post1 config-value"),
+                            Config(
+                                configKey = "board1 post1 config-key",
+                                configValue = "board1 post1 config-value"
+                            ),
                         "board1 post1 config-key2" to
-                            Config(configKey = "board1 post1 config-key2", configValue = "board1 post1 config-value2"),
+                            Config(
+                                configKey = "board1 post1 config-key2",
+                                configValue = "board1 post1 config-value2"
+                            ),
                         "board1 post1 config-key3" to
-                            Config(configKey = "board1 post1 config-key3", configValue = "board1 post1 config-value3")
+                            Config(
+                                configKey = "board1 post1 config-key3",
+                                configValue = "board1 post1 config-value3"
+                            )
                     ),
                     audit = Audit(
                         name = "naver1",
@@ -93,7 +102,7 @@ class BoardRepositoryTest {
                     postNo = 2,
                     title = "second post",
                     content = "hello world2",
-                    tags = setOf(
+                    tags = linkedSetOf(
                         Tag(content = "tag3"),
                         Tag(content = "tag4")
                     ),
@@ -155,7 +164,7 @@ class BoardRepositoryTest {
                     postNo = 6,
                     title = "sixth post",
                     content = "hello world6",
-                    tags = setOf(
+                    tags = linkedSetOf(
                         Tag(content = "tag7"),
                         Tag(content = "tag8")
                     ),
@@ -278,8 +287,7 @@ class BoardRepositoryTest {
     @Test
     fun findById() {
         // given
-        @Suppress("UNCHECKED_CAST")
-        boards = sut.saveAll(boards) as List<Board>
+        boards = sut.saveAll(boards)
 
         // when
         val actual1 = sut.findById(boards[0].id!!)
@@ -287,19 +295,18 @@ class BoardRepositoryTest {
         val actual3 = sut.findById(boards[2].id!!)
 
         // then
-        assertThat(actual1).isPresent
+        then(actual1).isNotNull
         assertEquals(actual1.get(), boards[0])
-        assertThat(actual2).isPresent
+        then(actual2).isNotNull
         assertEquals(actual2.get(), boards[1])
-        assertThat(actual3).isPresent
+        then(actual3).isNotNull
         assertEquals(actual3.get(), boards[2])
     }
 
     @Test
     fun findGraphById() {
         // given
-        @Suppress("UNCHECKED_CAST")
-        boards = sut.saveAll(boards) as List<Board>
+        boards = sut.saveAll(boards)
 
         // when
         val actual1: Board? = sut.findGraphById(boards[0].id!!)
@@ -307,25 +314,23 @@ class BoardRepositoryTest {
         val actual3: Board? = sut.findGraphById(boards[2].id!!)
 
         // then
-        assertThat(actual1).isNotNull
+        then(actual1).isNotNull
         assertEquals(actual1!!, boards[0])
-        assertThat(actual2).isNotNull
+        then(actual2).isNotNull
         assertEquals(actual2!!, boards[1])
-        assertThat(actual3).isNotNull
+        then(actual3).isNotNull
         assertEquals(actual3!!, boards[2])
     }
 
     @Test
     fun findAllGraph() {
         // given
-        @Suppress("UNCHECKED_CAST")
-        boards = sut.saveAll(boards) as List<Board>
+        boards = sut.saveAll(boards)
 
         // when
         val actual = sut.findAllGraph()
 
         // then
-        assertThat(actual).hasSize(3)
         assertEquals(actual[0], boards[0])
         assertEquals(actual[1], boards[1])
         assertEquals(actual[2], boards[2])
@@ -346,78 +351,90 @@ class BoardRepositoryTest {
         val actual6: PostDto? = sut.findPostDtoByPostId(boards[2].posts[1].id!!)
 
         // then
-        assertThat(actual1).isNotNull
-        assertThat(actual1!!.id).isEqualTo(boards[0].posts[0].id)
+        then(actual1).isNotNull
+        then(actual1!!.id).isEqualTo(boards[0].posts[0].id)
         assertEquals(actual1.post, boards[0].posts[0])
         assertLabelsEquals(
-            actual1.labels.stream().sorted(Comparator.comparingLong { obj: Label -> obj.id!! }).collect(Collectors.toList()),
-            boards[0].labels.stream().sorted(Comparator.comparingLong { obj: Label -> obj.id!! }).collect(Collectors.toList())
+            actual1.labels.stream().sorted(Comparator.comparingLong { obj: Label -> obj.id!! })
+                .collect(Collectors.toList()),
+            boards[0].labels.stream().sorted(Comparator.comparingLong { obj: Label -> obj.id!! })
+                .collect(Collectors.toList())
         )
-        assertThat(actual2).isNotNull
-        assertThat(actual2!!.id).isEqualTo(boards[0].posts[1].id)
+        then(actual2).isNotNull
+        then(actual2!!.id).isEqualTo(boards[0].posts[1].id)
         assertEquals(actual2.post, boards[0].posts[1])
         assertLabelsEquals(
-            actual2.labels.stream().sorted(Comparator.comparingLong { obj: Label -> obj.id!! }).collect(Collectors.toList()),
-            boards[0].labels.stream().sorted(Comparator.comparingLong { obj: Label -> obj.id!! }).collect(Collectors.toList())
+            actual2.labels.stream().sorted(Comparator.comparingLong { obj: Label -> obj.id!! })
+                .collect(Collectors.toList()),
+            boards[0].labels.stream().sorted(Comparator.comparingLong { obj: Label -> obj.id!! })
+                .collect(Collectors.toList())
         )
-        assertThat(actual3).isNotNull
-        assertThat(actual3!!.id).isEqualTo(boards[1].posts[0].id)
+        then(actual3).isNotNull
+        then(actual3!!.id).isEqualTo(boards[1].posts[0].id)
         assertEquals(actual3.post, boards[1].posts[0])
         assertLabelsEquals(
-            actual3.labels.stream().sorted(Comparator.comparingLong { obj: Label -> obj.id!! }).collect(Collectors.toList()),
-            boards[1].labels.stream().sorted(Comparator.comparingLong { obj: Label -> obj.id!! }).collect(Collectors.toList())
+            actual3.labels.stream().sorted(Comparator.comparingLong { obj: Label -> obj.id!! })
+                .collect(Collectors.toList()),
+            boards[1].labels.stream().sorted(Comparator.comparingLong { obj: Label -> obj.id!! })
+                .collect(Collectors.toList())
         )
-        assertThat(actual4).isNotNull
-        assertThat(actual4!!.id).isEqualTo(boards[1].posts[1].id)
+        then(actual4).isNotNull
+        then(actual4!!.id).isEqualTo(boards[1].posts[1].id)
         assertEquals(actual4.post, boards[1].posts[1])
         assertLabelsEquals(
-            actual4.labels.stream().sorted(Comparator.comparingLong { obj: Label -> obj.id!! }).collect(Collectors.toList()),
-            boards[1].labels.stream().sorted(Comparator.comparingLong { obj: Label -> obj.id!! }).collect(Collectors.toList())
+            actual4.labels.stream().sorted(Comparator.comparingLong { obj: Label -> obj.id!! })
+                .collect(Collectors.toList()),
+            boards[1].labels.stream().sorted(Comparator.comparingLong { obj: Label -> obj.id!! })
+                .collect(Collectors.toList())
         )
-        assertThat(actual5).isNotNull
-        assertThat(actual5!!.id).isEqualTo(boards[2].posts[0].id)
+        then(actual5).isNotNull
+        then(actual5!!.id).isEqualTo(boards[2].posts[0].id)
         assertEquals(actual5.post, boards[2].posts[0])
         assertLabelsEquals(
-            actual5.labels.stream().sorted(Comparator.comparingLong { obj: Label -> obj.id!! }).collect(Collectors.toList()),
-            boards[2].labels.stream().sorted(Comparator.comparingLong { obj: Label -> obj.id!! }).collect(Collectors.toList())
+            actual5.labels.stream().sorted(Comparator.comparingLong { obj: Label -> obj.id!! })
+                .collect(Collectors.toList()),
+            boards[2].labels.stream().sorted(Comparator.comparingLong { obj: Label -> obj.id!! })
+                .collect(Collectors.toList())
         )
-        assertThat(actual6).isNotNull
-        assertThat(actual6!!.id).isEqualTo(boards[2].posts[1].id)
+        then(actual6).isNotNull
+        then(actual6!!.id).isEqualTo(boards[2].posts[1].id)
         assertEquals(actual6.post, boards[2].posts[1])
         assertLabelsEquals(
-            actual6.labels.stream().sorted(Comparator.comparingLong { obj: Label -> obj.id!! }).collect(Collectors.toList()),
-            boards[2].labels.stream().sorted(Comparator.comparingLong { obj: Label -> obj.id!! }).collect(Collectors.toList())
+            actual6.labels.stream().sorted(Comparator.comparingLong { obj: Label -> obj.id!! })
+                .collect(Collectors.toList()),
+            boards[2].labels.stream().sorted(Comparator.comparingLong { obj: Label -> obj.id!! })
+                .collect(Collectors.toList())
         )
     }
 
     private fun assertEquals(actual: Board, target: Board) {
-        assertThat(actual.id).isEqualTo(target.id)
-        assertThat(actual.name).isEqualTo(target.name)
+        then(actual.id).isEqualTo(target.id)
+        then(actual.name).isEqualTo(target.name)
         if (actual.memo == null) {
-            assertThat(target.memo).isNull()
+            then(target.memo).isNull()
         } else {
-            assertThat(actual.memo!!.memo).isEqualTo(target.memo!!.memo)
+            then(actual.memo.memo).isEqualTo(target.memo!!.memo)
         }
         if (actual.audit == null) {
-            assertThat(target.audit).isNull()
+            then(target.audit).isNull()
         } else {
-            assertThat(actual.audit!!.id).isEqualTo(target.audit!!.id)
-            assertThat(actual.audit!!.name).isEqualTo(target.audit!!.name)
-            if (actual.audit!!.memo == null) {
-                assertThat(target.audit!!.memo).isNull()
+            then(actual.audit.id).isEqualTo(target.audit!!.id)
+            then(actual.audit.name).isEqualTo(target.audit.name)
+            if (actual.audit.memo == null) {
+                then(target.audit.memo).isNull()
             } else {
-                assertThat(actual.audit!!.memo!!.memo).isEqualTo(target.audit!!.memo!!.memo)
+                then(actual.audit.memo.memo).isEqualTo(target.audit.memo!!.memo)
             }
-            if (actual.audit!!.secret == null) {
-                assertThat(target.audit!!.secret!!).isNull()
+            if (actual.audit.secret == null) {
+                then(target.audit.secret!!).isNull()
             } else {
                 // id not set origin object
-                // assertThat(actual.audit!!.secret!!.id).isEqualTo(target.audit!!.secret!!.id)
-                assertThat(actual.audit!!.secret!!.secret).isEqualTo(target.audit!!.secret!!.secret)
+                // then(actual.audit.secret.id).isEqualTo(target.audit.secret!!.id)
+                then(actual.audit.secret.secret).isEqualTo(target.audit.secret!!.secret)
             }
         }
         if (target.configMap.isEmpty()) {
-            assertThat(actual.configMap).isEmpty()
+            then(actual.configMap).isEmpty()
         } else {
             val actualConfigs: List<Map.Entry<String, Config>> = actual.configMap.entries
                 .stream()
@@ -427,99 +444,100 @@ class BoardRepositoryTest {
                 .stream()
                 .sorted(java.util.Map.Entry.comparingByKey())
                 .collect(Collectors.toList())
-            assertThat(actualConfigs.size).isEqualTo(targetConfigs.size)
+            then(actualConfigs.size).isEqualTo(targetConfigs.size)
             for (i in actualConfigs.indices) {
-                assertThat(actualConfigs[i].key).isEqualTo(targetConfigs[i].key)
-                assertThat(actualConfigs[i].value.id).isEqualTo(targetConfigs[i].value.id)
-                assertThat(actualConfigs[i].value.configKey).isEqualTo(targetConfigs[i].value.configKey)
-                assertThat(actualConfigs[i].value.configValue).isEqualTo(targetConfigs[i].value.configValue)
+                then(actualConfigs[i].key).isEqualTo(targetConfigs[i].key)
+                then(actualConfigs[i].value.id).isEqualTo(targetConfigs[i].value.id)
+                then(actualConfigs[i].value.configKey).isEqualTo(targetConfigs[i].value.configKey)
+                then(actualConfigs[i].value.configValue).isEqualTo(targetConfigs[i].value.configValue)
             }
         }
         val actualLabels: List<Label> =
-            actual.labels.stream().sorted(Comparator.comparingLong { obj: Label -> obj.id!! }).collect(Collectors.toList())
+            actual.labels.stream().sorted(Comparator.comparingLong { obj: Label -> obj.id!! })
+                .collect(Collectors.toList())
         val boardLabels: List<Label> = actual.labels.sortedBy { it.id }
         assertLabelsEquals(actualLabels, boardLabels)
         val actualPosts: List<Post> = actual.posts
         val boardPosts: List<Post> = target.posts
-        assertThat(actualPosts.size).isEqualTo(boardPosts.size)
+        then(actualPosts.size).isEqualTo(boardPosts.size)
         for (i in actualPosts.indices) {
             assertEquals(actualPosts[i], boardPosts[i])
         }
     }
 
     private fun assertLabelsEquals(actualLabels: List<Label>, targetLabels: List<Label>) {
-        assertThat(actualLabels.size).isEqualTo(targetLabels.size)
+        then(actualLabels.size).isEqualTo(targetLabels.size)
         for (i in actualLabels.indices) {
-            assertThat(actualLabels[i].id).isEqualTo(targetLabels[i].id)
-            assertThat(actualLabels[i].name).isEqualTo(targetLabels[i].name)
+            then(actualLabels[i].id).isEqualTo(targetLabels[i].id)
+            then(actualLabels[i].name).isEqualTo(targetLabels[i].name)
         }
     }
 
     private fun assertEquals(actualPost: Post, targetPost: Post) {
-        assertThat(actualPost.id).isEqualTo(targetPost.id)
-        assertThat(actualPost.postNo).isEqualTo(targetPost.postNo)
-        assertThat(actualPost.title).isEqualTo(targetPost.title)
-        assertThat(actualPost.content).isEqualTo(targetPost.content)
+        then(actualPost.id).isEqualTo(targetPost.id)
+        then(actualPost.postNo).isEqualTo(targetPost.postNo)
+        then(actualPost.title).isEqualTo(targetPost.title)
+        then(actualPost.content).isEqualTo(targetPost.content)
         if (actualPost.memo == null) {
-            assertThat(targetPost.memo).isNull()
+            then(targetPost.memo).isNull()
         } else {
-            assertThat(actualPost.memo!!.memo).isEqualTo(targetPost.memo!!.memo)
+            then(actualPost.memo.memo).isEqualTo(targetPost.memo!!.memo)
         }
         if (actualPost.audit == null) {
-            assertThat(targetPost.audit).isNull()
+            then(targetPost.audit).isNull()
         } else {
             // id not set origin object
-            // assertThat(actualPost.audit!!.id).isEqualTo(targetPost.audit!!.id)
-            assertThat(actualPost.audit!!.name).isEqualTo(targetPost.audit!!.name)
-            if (actualPost.audit!!.memo == null) {
-                assertThat(targetPost.audit!!.memo).isNull()
+            // then(actualPost.audit.id).isEqualTo(targetPost.audit!!.id)
+            then(actualPost.audit.name).isEqualTo(targetPost.audit!!.name)
+            if (actualPost.audit.memo == null) {
+                then(targetPost.audit.memo).isNull()
             } else {
-                assertThat(actualPost.audit!!.memo!!.memo).isEqualTo(targetPost.audit!!.memo!!.memo)
+                then(actualPost.audit.memo.memo).isEqualTo(targetPost.audit.memo!!.memo)
             }
-            if (actualPost.audit!!.secret == null) {
-                assertThat(targetPost.audit!!.secret).isNull()
+            if (actualPost.audit.secret == null) {
+                then(targetPost.audit.secret).isNull()
             } else {
                 // id not set origin object
-                // assertThat(actualPost.audit!!.secret!!.id).isEqualTo(targetPost.audit!!.secret!!.id)
-                assertThat(actualPost.audit!!.secret!!.secret).isEqualTo(targetPost.audit!!.secret!!.secret)
+                // then(actualPost.audit.secret.id).isEqualTo(targetPost.audit.secret!!.id)
+                then(actualPost.audit.secret.secret).isEqualTo(targetPost.audit.secret!!.secret)
             }
         }
         val actualTags: List<Tag> = actualPost.tags.sortedBy { it.id }
         val postTags: List<Tag> = targetPost.tags.sortedBy { it.id }
-        assertThat(actualTags.size).isEqualTo(postTags.size)
+        then(actualTags.size).isEqualTo(postTags.size)
         for (i in actualTags.indices) {
-            assertThat(actualTags[i].id).isEqualTo(postTags[i].id)
-            assertThat(actualTags[i].content).isEqualTo(postTags[i].content)
+            then(actualTags[i].id).isEqualTo(postTags[i].id)
+            then(actualTags[i].content).isEqualTo(postTags[i].content)
         }
         val actualComments: List<Comment> = actualPost.comments
         val postComments: List<Comment> = targetPost.comments
-        assertThat(actualComments.size).isEqualTo(postComments.size)
+        then(actualComments.size).isEqualTo(postComments.size)
         for (i in actualTags.indices) {
             // id not set origin object
-            // assertThat(actualComments[i].id).isEqualTo(postComments[i].id)
-            assertThat(actualComments[i].content).isEqualTo(postComments[i].content)
+            // then(actualComments[i].id).isEqualTo(postComments[i].id)
+            then(actualComments[i].content).isEqualTo(postComments[i].content)
             if (actualComments[i].audit == null) {
-                assertThat(postComments[i].audit).isNull()
+                then(postComments[i].audit).isNull()
             } else {
                 // id not set origin object
-                // assertThat(actualComments[i].audit!!.id).isEqualTo(postComments[i].audit!!.id)
-                assertThat(actualComments[i].audit!!.name).isEqualTo(postComments[i].audit!!.name)
+                // then(actualComments[i].audit!!.id).isEqualTo(postComments[i].audit!!.id)
+                then(actualComments[i].audit!!.name).isEqualTo(postComments[i].audit!!.name)
                 if (actualComments[i].audit!!.memo == null) {
-                    assertThat(postComments[i].audit!!.memo).isNull()
+                    then(postComments[i].audit!!.memo).isNull()
                 } else {
-                    assertThat(actualComments[i].audit!!.memo!!.memo).isEqualTo(postComments[i].audit!!.memo!!.memo)
+                    then(actualComments[i].audit!!.memo!!.memo).isEqualTo(postComments[i].audit!!.memo!!.memo)
                 }
                 if (actualComments[i].audit!!.secret == null) {
-                    assertThat(postComments[i].audit!!.secret).isNull()
+                    then(postComments[i].audit!!.secret).isNull()
                 } else {
                     // id not set origin object
-                    // assertThat(actualComments[i].audit!!.secret!!.id).isEqualTo(postComments[i].audit!!.secret!!.id)
-                    assertThat(actualComments[i].audit!!.secret!!.secret).isEqualTo(postComments[i].audit!!.secret!!.secret)
+                    // then(actualComments[i].audit!!.secret!!.id).isEqualTo(postComments[i].audit!!.secret!!.id)
+                    then(actualComments[i].audit!!.secret!!.secret).isEqualTo(postComments[i].audit!!.secret!!.secret)
                 }
             }
         }
         if (targetPost.configMap.isEmpty()) {
-            assertThat(actualPost.configMap).isEmpty()
+            then(actualPost.configMap).isEmpty()
         } else {
             val actualConfigs: List<Map.Entry<String, Config>> = actualPost.configMap.entries
                 .stream()
@@ -529,13 +547,13 @@ class BoardRepositoryTest {
                 .stream()
                 .sorted(java.util.Map.Entry.comparingByKey())
                 .collect(Collectors.toList())
-            assertThat(actualConfigs.size).isEqualTo(targetConfigs.size)
+            then(actualConfigs.size).isEqualTo(targetConfigs.size)
             for (i in actualConfigs.indices) {
-                assertThat(actualConfigs[i].key).isEqualTo(targetConfigs[i].key)
+                then(actualConfigs[i].key).isEqualTo(targetConfigs[i].key)
                 // id not set origin object
-                // assertThat(actualConfigs[i].value.id).isEqualTo(targetConfigs[i].value.id)
-                assertThat(actualConfigs[i].value.configKey).isEqualTo(targetConfigs[i].value.configKey)
-                assertThat(actualConfigs[i].value.configValue).isEqualTo(targetConfigs[i].value.configValue)
+                // then(actualConfigs[i].value.id).isEqualTo(targetConfigs[i].value.id)
+                then(actualConfigs[i].value.configKey).isEqualTo(targetConfigs[i].value.configKey)
+                then(actualConfigs[i].value.configValue).isEqualTo(targetConfigs[i].value.configValue)
             }
         }
     }

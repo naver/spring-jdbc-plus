@@ -121,7 +121,7 @@ data class Audit(
 )
 
 data class Memo(
-    val memo: String? = null
+    val memo: String
 )
 
 @Table("n_audit_secret")
