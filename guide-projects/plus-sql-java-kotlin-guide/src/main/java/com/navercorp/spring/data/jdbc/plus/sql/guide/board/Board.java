@@ -18,9 +18,10 @@
 
 package com.navercorp.spring.data.jdbc.plus.sql.guide.board;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
+import static java.util.Comparator.comparing;
+import static java.util.stream.Collectors.toCollection;
+
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -34,53 +35,69 @@ import org.springframework.data.relational.core.mapping.MappedCollection;
 import org.springframework.data.relational.core.mapping.Table;
 
 import lombok.Builder;
-import lombok.Getter;
-import lombok.Value;
-import lombok.With;
 
 import com.navercorp.spring.jdbc.plus.commons.annotations.SqlTableAlias;
 
 /**
  * @author Myeonghyeon Lee
  */
+@Builder(toBuilder = true)
 @Table("n_board")
-@Getter
-@Builder
-public class Board {
+public record Board(
 	@Id
-	private Long id;
+	Long id,
 
-	private String name;
+	String name,
 
 	@MappedCollection(idColumn = "board_id")
-	@Builder.Default
-	private Set<Label> labels = new HashSet<>();
+	@Nullable Set<Label> labels,
 
 	@MappedCollection(idColumn = "board_id", keyColumn = "board_index")
-	@Builder.Default
-	private List<Post> posts = new ArrayList<>();
+	@Nullable List<Post> posts,
 
 	@SqlTableAlias("b_audit")
 	@Column("board_id")
-	private @Nullable Audit audit;
+	@Nullable Audit audit,
 
 	@Embedded.Nullable(prefix = "board_")
-	private @Nullable Memo memo;
+	@Nullable Memo memo,
 
 	@MappedCollection(idColumn = "board_id", keyColumn = "config_key")
-	@Builder.Default
-	private @Nullable Map<String, Config> configMap = new HashMap<>();
+	@Nullable Map<String, Config> configMap
+) {
+	public Board {
+		labels = labels == null ? Set.of() : labels;
+		posts = posts == null ? List.of() : posts;
+		configMap = configMap == null ? Map.of() : configMap;
+	}
 
+	public Board sort() {
+		return toBuilder()
+			.labels(labels.stream()
+				.sorted(comparing(label -> label.id().title()))
+				.collect(toCollection(LinkedHashSet::new)))
+			.posts(posts.stream()
+				.map(Post::sort)
+				.sorted(comparing(Post::id))
+				.toList())
+			.audit(audit != null ? audit.sort() : null)
+			.build();
+	}
+
+	@Builder(toBuilder = true)
 	@Table("n_label")
-	@Getter
-	@Builder
-	public static class Label implements Persistable<LabelId> {
+	public record Label(
 		@Id
 		@Nullable
 		@Embedded.Empty
-		private LabelId id;
+		LabelId id,
 
-		private String name;
+		String name
+	) implements Persistable<LabelId> {
+		@Override
+		public @Nullable LabelId getId() {
+			return id;
+		}
 
 		@Override
 		public boolean isNew() {
@@ -88,115 +105,135 @@ public class Board {
 		}
 	}
 
-	@Value
-	@Builder
-	public static class LabelId {
+	@Builder(toBuilder = true)
+	public record LabelId(
 		@Column("title")
-		String title;
+		String title,
 
 		@Column("project_name")
-		String projectName;
+		String projectName
+	) {
 	}
 
+	@Builder(toBuilder = true)
 	@Table("n_post")
-	@Getter
-	@Builder
-	public static class Post {
+	public record Post(
 		@Id
-		private Long id;
+		Long id,
 
-		private Long postNo;
+		Long postNo,
 
-		private String title;
+		String title,
 
-		private String content;
+		String content,
 
 		@MappedCollection(idColumn = "post_id")
-		@Builder.Default
-		private Set<Tag> tags = new HashSet<>();
+		@Nullable Set<Tag> tags,
 
 		@MappedCollection(idColumn = "post_id", keyColumn = "post_index")
-		@Builder.Default
-		private List<Comment> comments = new ArrayList<>();
+		@Nullable List<Comment> comments,
 
 		@Column("post_id")
-		private @Nullable Audit audit;
+		@Nullable Audit audit,
 
 		@Embedded.Nullable
-		private @Nullable Memo memo;
+		@Nullable Memo memo,
 
 		@MappedCollection(idColumn = "post_id", keyColumn = "config_key")
-		@Builder.Default
-		private @Nullable Map<String, Config> configMap = new HashMap<>();
+		@Nullable Map<String, Config> configMap
+	) {
+		public Post {
+			tags = tags == null ? Set.of() : tags;
+			comments = comments == null ? List.of() : comments;
+			configMap = configMap == null ? Map.of() : configMap;
+		}
+
+		public Post sort() {
+			return toBuilder()
+				.tags(tags.stream()
+					.sorted(comparing(Tag::id))
+					.collect(toCollection(LinkedHashSet::new)))
+				.comments(comments.stream()
+					.map(Comment::sort)
+					.sorted(comparing(Comment::id))
+					.toList())
+				.audit(audit != null ? audit.sort() : null)
+				.build();
+		}
 	}
 
+	@Builder(toBuilder = true)
 	@Table("n_tag")
-	@Value
-	@Builder
-	public static class Tag {
+	public record Tag(
 		@Id
-		@With
-		Long id;
+		Long id,
 
-		String content;
+		String content
+	) {
 	}
 
+	@Builder(toBuilder = true)
 	@Table("n_comment")
-	@Getter
-	@Builder
-	public static class Comment {
+	public record Comment(
 		@Id
-		private Long id;
+		Long id,
 
-		private String content;
+		String content,
 
 		@Column("comment_id")
-		private @Nullable Audit audit;
+		@Nullable Audit audit
+	) {
+		public Comment sort() {
+			return toBuilder()
+				.audit(audit != null ? audit.sort() : null)
+				.build();
+		}
 	}
 
+	@Builder(toBuilder = true)
 	@Table("n_audit")
-	@Getter
-	@Builder
-	public static class Audit {
+	public record Audit(
 		@Id
-		private Long id;
+		Long id,
 
-		private String name;
+		String name,
 
 		@Embedded.Nullable
-		private @Nullable Memo memo;
+		@Nullable Memo memo,
 
 		@Column("audit_id")
-		private @Nullable AuditSecret secret;
+		@Nullable AuditSecret secret
+	) {
+		public Audit sort() {
+			return this;
+		}
 	}
 
-	@Value
-	@Builder
-	public static class Memo {
-		String memo;
+	@Builder(toBuilder = true)
+	public record Memo(
+		String memo
+	) {
 	}
 
+	@Builder(toBuilder = true)
 	@Table("n_audit_secret")
-	@Value
-	@Builder
-	public static class AuditSecret {
+	public record AuditSecret(
 		@Id
-		@With
-		Long id;
+		Long id,
 
-		String secret;
+		String secret
+	) {
 	}
 
+	@Builder(toBuilder = true)
 	@Table("n_config")
-	@Value
-	@Builder
-	public static class Config {
+	public record Config(
 		@Id
-		@With
-		Long id;
+		Long id,
 
-		String configKey;
+		String configKey,
 
-		String configValue;
+		String configValue
+	) {
 	}
 }

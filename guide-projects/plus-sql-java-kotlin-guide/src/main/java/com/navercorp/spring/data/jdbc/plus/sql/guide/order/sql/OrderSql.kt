@@ -25,6 +25,7 @@ import com.navercorp.spring.data.jdbc.plus.sql.support.SqlGeneratorSupport
 
 /**
  * @author Myeonghyeon Lee
+ * @author IAM20
  */
 class OrderSql : SqlGeneratorSupport() {
 
@@ -43,7 +44,6 @@ class OrderSql : SqlGeneratorSupport() {
         ${when (criteria.sortBy) {
             OrderSort.ID -> "ORDER BY id"
             OrderSort.PRICE -> "ORDER BY price"
-            else -> ""
         }}
         """
 

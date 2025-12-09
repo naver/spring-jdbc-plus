@@ -26,24 +26,23 @@ import org.springframework.data.relational.core.mapping.MappedCollection;
 import org.springframework.data.relational.core.mapping.Table;
 
 import lombok.Builder;
-import lombok.Value;
 
 import com.navercorp.spring.jdbc.plus.commons.annotations.SqlTableAlias;
 
 /**
  * @author Myeonghyeon Lee
  */
-@Value
 @Builder
 @Table("post")
-public class PostDto {
+public record PostDto(
 	@Id
-	Long id;
+	Long id,
 
 	@Column
-	Board.Post post;
+	Board.Post post,
 
 	@SqlTableAlias("p_labels")
 	@MappedCollection(idColumn = "board_id")
-	Set<Board.Label> labels;
+	Set<Board.Label> labels
+) {
 }

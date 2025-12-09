@@ -22,28 +22,24 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
 
 import lombok.Builder;
-import lombok.Getter;
 
 import com.navercorp.spring.jdbc.plus.commons.annotations.SqlFunction;
 
 /**
  * @author Myeonghyeon Lee
+ * @author IAM20
  */
 @Table("n_order")
-@Getter
 @Builder
-public class Order {
+public record Order(
 	@Id
-	private Long id;
+	Long id,
 
 	@SqlFunction(expressions = {SqlFunction.COLUMN_NAME, "0"})
-	private Long price;
+	Long price,
 
-	private OrderStatus status;
+	OrderStatus status,
 
-	private String purchaserNo;
-
-	public void complete() {
-		this.status = OrderStatus.COMPLETED;
-	}
+	String purchaserNo
+) {
 }

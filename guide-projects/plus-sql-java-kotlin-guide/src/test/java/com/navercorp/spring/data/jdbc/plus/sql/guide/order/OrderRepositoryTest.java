@@ -18,14 +18,13 @@
 
 package com.navercorp.spring.data.jdbc.plus.sql.guide.order;
 
-import static java.util.Comparator.comparing;
-import static org.assertj.core.api.Assertions.assertThat;
+import static com.navercorp.fixturemonkey.api.expression.JavaGetterMethodPropertySelector.javaGetter;
+import static com.navercorp.spring.data.jdbc.plus.sql.guide.test.ArbitrarySpec.fixtureMonkey;
+import static org.assertj.core.api.BDDAssertions.then;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -42,59 +41,41 @@ class OrderRepositoryTest {
 	@Autowired
 	private OrderRepository sut;
 
-	private List<Order> orders = Arrays.asList(
-		Order.builder()
-			.price(1000L)
-			.status(OrderStatus.PLACE)
-			.purchaserNo("navercorp")
-			.build(),
-		Order.builder()
-			.price(5000L)
-			.status(OrderStatus.PLACE)
-			.purchaserNo("navercorp")
-			.build(),
-		Order.builder()
-			.price(3000L)
-			.status(OrderStatus.COMPLETED)
-			.purchaserNo("navercorp")
-			.build());
+	List<Order> samples = fixtureMonkey.giveMeBuilder(Order.class)
+		.set(javaGetter(Order::purchaserNo), "navercorp")
+		.sampleList(3);
 
 	@Test
 	void findById() {
 		// given
-		sut.saveAll(orders);
+		List<Order> orders = sut.saveAll(samples);
 
 		// when
-		Optional<Order> actual = sut.findById(orders.get(0).getId());
+		Optional<Order> actual = sut.findById(orders.get(0).id());
 
 		// then
-		Assertions.assertThat(actual).isPresent();
-		assertThat(actual.get().getId()).isEqualTo(orders.get(0).getId());
+		then(actual).isPresent();
+		then(actual.get().id()).isEqualTo(orders.get(0).id());
 	}
 
 	@Test
 	void findByPurchaserNo() {
 		// given
-		sut.saveAll(orders);
+		sut.saveAll(samples);
 
 		// when
 		List<Order> actual = sut.findByPurchaserNo("navercorp");
 
 		// then
-		actual.sort(comparing(Order::getPrice));
-		Assertions.assertThat(actual).hasSize(3);
-		assertThat(actual.get(0).getPrice()).isEqualTo(1000L);
-		assertThat(actual.get(0).getStatus()).isEqualTo(OrderStatus.PLACE);
-		assertThat(actual.get(1).getPrice()).isEqualTo(3000L);
-		assertThat(actual.get(1).getStatus()).isEqualTo(OrderStatus.COMPLETED);
-		assertThat(actual.get(2).getPrice()).isEqualTo(5000L);
-		assertThat(actual.get(2).getStatus()).isEqualTo(OrderStatus.PLACE);
+		then(actual).hasSize(3);
+		then(actual).allMatch(o -> o.purchaserNo().equals("navercorp"));
 	}
 
 	@Test
 	void search() {
 		// given
-		sut.saveAll(orders);
+		sut.saveAll(samples);
+
 		OrderCriteria criteria = OrderCriteria.builder()
 			.purchaserNo("navercorp")
 			.status(OrderStatus.PLACE)
@@ -105,23 +86,24 @@ class OrderRepositoryTest {
 		List<Order> actual = sut.search(criteria);
 
 		// then
-		actual.sort(comparing(Order::getPrice));
-		Assertions.assertThat(actual).hasSize(2);
-		assertThat(actual.get(0).getPrice()).isEqualTo(1000L);
-		assertThat(actual.get(0).getStatus()).isEqualTo(OrderStatus.PLACE);
-		assertThat(actual.get(1).getPrice()).isEqualTo(5000L);
-		assertThat(actual.get(1).getStatus()).isEqualTo(OrderStatus.PLACE);
+		then(actual).hasSize(
+			(int)samples.stream()
+				.filter(it -> it.status() == OrderStatus.PLACE)
+				.count()
+		);
+		then(actual).allMatch(o -> o.purchaserNo().equals("navercorp"));
+		then(actual).allMatch(o -> o.status().equals(OrderStatus.PLACE));
 	}
 
 	@Test
 	void countByPurchaserNo() {
 		// given
-		sut.saveAll(orders);
+		sut.saveAll(samples);
 
 		// when
 		long actual = sut.countByPurchaserNo("navercorp");
 
 		// then
-		assertThat(actual).isEqualTo(orders.size());
+		then(actual).isEqualTo(3);
 	}
 }

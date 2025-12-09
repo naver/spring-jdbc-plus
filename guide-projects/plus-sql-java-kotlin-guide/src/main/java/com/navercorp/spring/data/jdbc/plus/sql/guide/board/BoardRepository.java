@@ -19,11 +19,11 @@
 package com.navercorp.spring.data.jdbc.plus.sql.guide.board;
 
 import org.jspecify.annotations.NullMarked;
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.ListCrudRepository;
 
 /**
  * @author Myeonghyeon Lee
  */
 @NullMarked
-public interface BoardRepository extends CrudRepository<Board, Long>, BoardRepositoryCustom {
+public interface BoardRepository extends ListCrudRepository<Board, Long>, BoardRepositoryCustom {
 }
