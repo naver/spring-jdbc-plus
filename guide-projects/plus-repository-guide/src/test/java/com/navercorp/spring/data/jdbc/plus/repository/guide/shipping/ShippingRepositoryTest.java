@@ -18,7 +18,7 @@
 
 package com.navercorp.spring.data.jdbc.plus.repository.guide.shipping;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.BDDAssertions.*;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -50,7 +50,7 @@ public class ShippingRepositoryTest {
 	@Test
 	void insert() {
 		Shipping actual = this.sut.insert(shipping);
-		assertThat(actual.getId()).isEqualTo(shipping.getId());
+		then(actual.getId()).isEqualTo(shipping.getId());
 	}
 
 	@Test
@@ -63,8 +63,8 @@ public class ShippingRepositoryTest {
 		Shipping actual = this.sut.update(shipping);
 
 		// then
-		assertThat(actual.getId()).isEqualTo(shipping.getId());
-		assertThat(actual.getMemo()).isEqualTo("non-fragile");
+		then(actual.getId()).isEqualTo(shipping.getId());
+		then(actual.getMemo()).isEqualTo("non-fragile");
 	}
 
 	@Test
@@ -76,8 +76,8 @@ public class ShippingRepositoryTest {
 		Optional<Shipping> actual = this.sut.findByOrderId(shipping.getOrderId());
 
 		// then
-		assertThat(actual).isNotEmpty();
-		assertThat(actual.get().getId()).isEqualTo(shipping.getId());
+		then(actual).isNotEmpty();
+		then(actual.get().getId()).isEqualTo(shipping.getId());
 	}
 
 	@Test
@@ -89,7 +89,7 @@ public class ShippingRepositoryTest {
 		Optional<Shipping> actual = this.sut.findById(shipping.getId());
 
 		// then
-		assertThat(actual).isNotEmpty();
-		assertThat(actual.get().getId()).isEqualTo(shipping.getId());
+		then(actual).isNotEmpty();
+		then(actual.get().getId()).isEqualTo(shipping.getId());
 	}
 }

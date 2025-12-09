@@ -1,6 +1,6 @@
 package com.navercorp.spring.data.jdbc.plus.repository.guide.coupon;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.BDDAssertions.*;
 
 import java.util.List;
 
@@ -29,7 +29,7 @@ class CouponRepositoryTest {
 		sut.insert(coupon);
 
 		// then
-		assertThat(sut.findById(coupon.id())).hasValue(coupon);
+		then(sut.findById(coupon.id())).hasValue(coupon);
 	}
 
 	@Test
@@ -44,9 +44,9 @@ class CouponRepositoryTest {
 			.build());
 
 		// then
-		assertThat(sut.findById(coupon.id())).hasValueSatisfying(actual -> {
-			assertThat(actual.id()).isEqualTo(coupon.id());
-			assertThat(actual.discountAmount()).isEqualTo(40302L);
+		then(sut.findById(coupon.id())).hasValueSatisfying(actual -> {
+			then(actual.id()).isEqualTo(coupon.id());
+			then(actual.discountAmount()).isEqualTo(40302L);
 		});
 	}
 
@@ -67,8 +67,8 @@ class CouponRepositoryTest {
 		List<Coupon> actual = sut.findByPurchaserNo("940329");
 
 		// then
-		assertThat(actual).hasSize(5).allSatisfy(it -> {
-			assertThat(it).isIn(coupons);
+		then(actual).hasSize(5).allSatisfy(it -> {
+			then(it).isIn(coupons);
 		});
 	}
 
@@ -76,4 +76,3 @@ class CouponRepositoryTest {
 		return new Coupon(CouponId.generate(), 1000L, "940329");
 	}
 }
-

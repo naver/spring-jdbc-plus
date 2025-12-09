@@ -18,7 +18,7 @@
 
 package com.navercorp.spring.data.jdbc.plus.repository.guide.order;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.BDDAssertions.*;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
@@ -131,9 +131,9 @@ public class OrderRepositoryTest {
 
 		// then
 		actual.forEach(order -> {
-			assertThat(order.getId()).isNotNull();
-			assertThat(order.getDiscount().id()).isNotNull();
-			order.getItems().forEach(item -> assertThat(item.id()).isNotNull());
+			then(order.getId()).isNotNull();
+			then(order.getDiscount().id()).isNotNull();
+			order.getItems().forEach(item -> then(item.id()).isNotNull());
 		});
 	}
 
@@ -147,7 +147,7 @@ public class OrderRepositoryTest {
 		Order actual = this.sut.update(order);
 
 		// then
-		assertThat(actual.getStatus()).isEqualTo(OrderStatus.COMPLETED);
+		then(actual.getStatus()).isEqualTo(OrderStatus.COMPLETED);
 	}
 
 	@Test
@@ -159,7 +159,7 @@ public class OrderRepositoryTest {
 		Optional<Order> actual = this.sut.findById(order.getId());
 
 		// then
-		assertThat(actual).isNotEmpty();
-		assertThat(actual.get().getId()).isEqualTo(order.getId());
+		then(actual).isNotEmpty();
+		then(actual.get().getId()).isEqualTo(order.getId());
 	}
 }
