@@ -221,7 +221,6 @@ You can use value types `Boolean` or `String` by Declaring `@SoftDeleteColumn.Bo
 
 ## Examples
 
-* [Java + Groovy SQL Example](./guide-projects/plus-sql-java-groovy-guide)
 * [Java + Kotlin SQL Example](./guide-projects/plus-sql-java-kotlin-guide)
 * [Kotlin Example](./guide-projects/plus-sql-kotlin-guide)
 
