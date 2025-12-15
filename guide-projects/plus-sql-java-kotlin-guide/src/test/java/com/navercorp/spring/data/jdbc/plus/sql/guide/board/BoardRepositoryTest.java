@@ -18,9 +18,9 @@
 
 package com.navercorp.spring.data.jdbc.plus.sql.guide.board;
 
-import static com.navercorp.spring.data.jdbc.plus.sql.guide.test.ArbitrarySpec.fixtureMonkey;
-import static java.util.stream.Collectors.toSet;
-import static org.assertj.core.api.BDDAssertions.then;
+import static com.navercorp.spring.data.jdbc.plus.sql.guide.test.ArbitrarySpec.*;
+import static java.util.stream.Collectors.*;
+import static org.assertj.core.api.BDDAssertions.*;
 
 import java.util.List;
 import java.util.Optional;
@@ -87,6 +87,18 @@ public class BoardRepositoryTest {
 		then(actual1).isPresent().hasValue(savedBoards.get(0));
 		then(actual2).isPresent().hasValue(savedBoards.get(1));
 		then(actual3).isPresent().hasValue(savedBoards.get(2));
+	}
+
+	@Test
+	void deleteByName() {
+		// given
+		Board sample = sut.save(boards.get(0));
+
+		// when
+		this.sut.deleteByName(sample.name());
+
+		// then
+		then(this.sut.findById(sample.id())).isEmpty();
 	}
 
 	@Test

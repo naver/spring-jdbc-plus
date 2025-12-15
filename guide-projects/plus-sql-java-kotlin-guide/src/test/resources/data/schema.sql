@@ -94,3 +94,12 @@ CREATE TABLE IF NOT EXISTS cupn_pubt_hist (
   hist_no BIGINT,
   discount_amt DECIMAL(20, 2),
   PRIMARY KEY(pubt_no, hist_no));
+
+CREATE TABLE n_shipping (
+  shipping_no VARCHAR(45),
+  order_no VARCHAR(45),
+  sender_address VARCHAR(255),
+  receiver_address VARCHAR(255),
+  memo VARCHAR(255),
+  delivered_at DATETIME,
+  PRIMARY KEY(shipping_no));

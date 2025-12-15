@@ -26,4 +26,5 @@ import org.springframework.data.repository.ListCrudRepository;
  */
 @NullMarked
 public interface BoardRepository extends ListCrudRepository<Board, Long>, BoardRepositoryCustom {
+	void deleteByName(String name);
 }
