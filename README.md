@@ -28,7 +28,7 @@
 
     dependencies {
         implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
-        implementation("com.navercorp.spring:spring-boot-starter-data-jdbc-plus-sql:4.0.0")
+        implementation("com.navercorp.spring:spring-boot-starter-data-jdbc-plus-sql:4.0.1")
     }
     ```
 
@@ -50,7 +50,7 @@
     <dependency>
         <groupId>com.navercorp.spring</groupId>
         <artifactId>spring-boot-starter-data-jdbc-plus-sql</artifactId>
-        <version>4.0.0</version>
+        <version>4.0.1</version>
     </dependency>
     ```
 
